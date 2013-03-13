@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Edit layer"
+			   minWidth="280"
+			   minHeight="160"
+			   >
+	
+	<s:Label text="Name:" x="10" y="16" />
+	<s:TextInput id="_name" x="60" y="10" width="180" />
+	
+	<s:Label text="Units:" x="10" y="45" />
+	<s:CheckBox id="_units" x="50" y="40" />
+	
+	<s:Button label="Ok" x="100" y="100" click="onOk(event)" />
+	<s:Button label="Cancel" x="200" y="100" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import list_items.LayerListItem;
+import mx.managers.PopUpManager;
+import project_data.Layer;
+		
+		private var _project:Project;
+		private var _layer:Layer;
+		private var _main:Main;
+		
+		
+		public function Init( project:Project, layer:Layer, main:Main ): void
+		{
+			closeButton.visible = false;
+			
+			_project = project;
+			_layer = layer;
+			_main = main;
+			
+			_name.text = layer._name;
+			_units.selected = layer._units;
+		}
+		
+		private function onOk( ... args ): void
+		{
+			_layer._name = _name.text;
+			_layer._units = _units.selected;
+			
+			if ( _main != null )
+			{
+				//inform list about item change:
+				var associatedItem:LayerListItem = null;
+				for each ( var item:LayerListItem in _main._layers_list_data_provider.source )
+				{
+					if ( item.layer == _layer )
+					{
+						associatedItem = item;
+						break;
+					}
+				}
+				if ( associatedItem == null )
+				{
+					Cc.error( "E: EditingLayerWindow.onOk(): item was NOT found." );
+				}
+				else
+				{
+					associatedItem.label = _layer._name;
+					_main._layers_list_data_provider.itemUpdated( associatedItem );
+				}
+			}
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			_layer = null;
+			_main = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>

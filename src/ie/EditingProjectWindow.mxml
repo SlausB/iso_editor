@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Edit project"
+			   initialize="onInit(event)"
+			   minWidth="400"
+			   minHeight="400"
+			   >
+	
+	
+	<s:Label text="Tile size" scaleX="2" scaleY="2" x="152" y="12" />
+	<s:Label text="(green line represents modifying measure)" x="82" y="33" />
+	
+	<s:Label text="Side (north to east):" x="10" y="64" />
+	<s:NumericStepper id="_sideStepper" x="140" y="58" change="onSideChange(event)" minimum="-2147483648" maximum="2147483647" width="80" snapInterval="0.0001" stepSize="1" />
+	
+	<s:Label text="Width (west to east):" x="10" y="94" />
+	<s:NumericStepper id="_widthStepper" x="140" y="88" change="onWidthChange(event)" minimum="-2147483648" maximum="2147483647" width="80" snapInterval="0.0001" stepSize="1" />
+	
+	<s:Label text="Height (north to south):" x="10" y="124" />
+	<s:NumericStepper id="_heightStepper" x="140" y="118" change="onHeightChange(event)" minimum="-2147483648" maximum="2147483647" width="80" snapInterval="0.0001" stepSize="1" />
+	
+	<s:Label text="Sample:" x="280" y="66" />
+	<s:SpriteVisualElement id="_sampleHolder" x="304" y="90" percentWidth="100" percentHeight="100" />
+	
+	
+	<s:Button x="220" y="330" label="Ok" click="onOk(event)" />
+	<s:Button x="310" y="330" label="Cancel" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import flash.display.CapsStyle;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import mx.managers.PopUpManager;
+import utils.Utils;
+		
+		private var _project:Project;
+		
+		private var _sample:Sprite = new Sprite;
+		
+		private var _tileSize:Number;
+		
+		private var _sideValue:Number;
+		private var _widthValue:Number;
+		private var _heightValue:Number;
+		
+		private static const MEASURE_SIDE:int = 1;
+		private static const MEASURE_WIDTH:int = 2;
+		private static const MEASURE_HEIGHT:int = 3;
+		private var _measure:int = MEASURE_SIDE;
+		
+		
+		private function onInit( ... args ): void
+		{
+			closeButton.visible = false;
+			
+			_sampleHolder.addChild( _sample );
+		}
+		
+		public function Init( project:Project ): void
+		{
+			_project = project;
+			
+			_tileSize = _project._data._tileSize;
+			
+			Update();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		private function Update(): void
+		{
+			_sideStepper.value = _sideValue = _tileSize / Utils.TILE_SIDE;
+			_widthStepper.value = _widthValue = _tileSize * 2.0;
+			_heightStepper.value = _heightValue = _tileSize;
+			
+			var pos:Point;
+			
+			_sample.graphics.clear();
+			
+			_sample.graphics.beginFill( 0x0000FF );
+			_sample.graphics.moveTo( 0, 0 );
+			pos = Utils.FromIso( _sideValue, 0 );
+			_sample.graphics.lineTo( pos.x, pos.y );
+			pos = Utils.FromIso( _sideValue, _sideValue );
+			_sample.graphics.lineTo( pos.x, pos.y );
+			pos = Utils.FromIso( 0, _sideValue );
+			_sample.graphics.lineTo( pos.x, pos.y );
+			_sample.graphics.lineTo( 0, 0 );
+			_sample.graphics.endFill();
+			
+			_sample.graphics.lineStyle( 4, 0x15BA00, 1, true, "normal", CapsStyle.ROUND );
+			switch ( _measure )
+			{
+				case MEASURE_SIDE:
+					_sample.graphics.moveTo( 0, 0 );
+					pos = Utils.FromIso( _sideValue, 0 );
+					_sample.graphics.lineTo( pos.x, pos.y );
+					break;
+				
+				case MEASURE_WIDTH:
+					pos = Utils.FromIso( 0, _sideValue );
+					_sample.graphics.moveTo( pos.x, pos.y );
+					pos = Utils.FromIso( _sideValue, 0 );
+					_sample.graphics.lineTo( pos.x, pos.y );
+					break;
+				
+				case MEASURE_HEIGHT:
+					_sample.graphics.moveTo( 0, 0 );
+					pos = Utils.FromIso( _sideValue, _sideValue );
+					_sample.graphics.lineTo( pos.x, pos.y );
+					break;
+			}
+		}
+		
+		private function onSideChange( event:Event ): void
+		{
+			_measure = MEASURE_SIDE;
+			
+			var value:Number = ( event.target as spark.components.NumericStepper ).value;
+			if ( isNaN( value ) )
+			{
+				value = Math.round( _sideValue ) + 1.0;
+			}
+			
+			_tileSize = value / Utils.TILE_SIDE;
+			Update();
+		}
+		
+		private function onWidthChange( event:flash.events.Event ): void
+		{
+			_measure = MEASURE_WIDTH;
+			
+			var value:Number = ( event.target as spark.components.NumericStepper ).value;
+			if ( isNaN( value ) )
+			{
+				value = Math.round( _widthValue ) + 1.0;
+			}
+			
+			_tileSize = value / 2.0;
+			Update();
+		}
+		
+		private function onHeightChange( event:flash.events.Event ): void
+		{
+			_measure = MEASURE_HEIGHT;
+			
+			var value:Number = ( event.target as spark.components.NumericStepper ).value;
+			if ( isNaN( value ) )
+			{
+				value = Math.round( _heightValue ) + 1.0;
+			}
+			
+			_tileSize = value;
+			Update();
+		}
+		
+		private function onOk( ... args ): void
+		{
+			_project._data._tileSize = _tileSize;
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>

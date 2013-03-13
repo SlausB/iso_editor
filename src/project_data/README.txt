@@ -1,0 +1,1 @@
+	Files of this derictory are registered using flash.net.registerClassAlias() for AMF usage, so don't move them into some other folder.

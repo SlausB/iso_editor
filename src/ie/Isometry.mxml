@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SpriteVisualElement xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   percentWidth="100"
+			   percentHeight="100"
+			   addedToStage="onInit()"
+			   mouseDown="onMouseDown(event)"
+			   mouseUp="onMouseUp(event)"
+			   mouseMove="onMouseMove(event)"
+			   >
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+import blisc.Blisc;
+import blisc.BliscAnimation;
+import blisc.BliscComplex;
+import blisc.BliscComplexTemplate;
+import blisc.BliscComplexWithinCompound;
+import blisc.BliscComplexWithinCompoundTemplate;
+import blisc.BliscCompound;
+import blisc.BliscCompoundTemplate;
+import blisc.BliscObjectTemplate;
+import blisc.BliscSprite;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.DisplayObject;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.geom.Point;
+import flash.text.TextField;
+import mx.core.UIComponent;
+import mx.events.DragEvent;
+import mx.managers.DragManager;
+import project_data.ComplexTemplate;
+import project_data.ComplexWithinCompound;
+import project_data.CompoundTemplate;
+import project_data.Layer;
+import project_data.Map;
+import project_data.ObjectInstance;
+import project_data.ObjectTemplate;
+import project_data.SingleResource;
+import utils.Utils;
+import view.Projection;
+		
+		/** We can draw only on child objects - not upon SpriteVisualElement itself :( .*/
+		private var _bliscViewport:Sprite = new Sprite;
+		
+		public var _blisc:Blisc;
+		
+		/** Dirty (but only one known) way to handle viewport size changes.*/
+		private var _previousWidth:Number;
+		private var _previousHeight:Number;
+		
+		/** What is currently displayed.*/
+		private var _displaying:Map = null;
+		
+		private var _project:Project;
+		private var _main:Main;
+		
+		private var _gridDrawer:GridDrawer = null;
+		
+		
+		private function onInit( ... args ): void
+		{
+			addChild( _bliscViewport );
+			
+			_previousWidth = width;
+			_previousHeight = height;
+			
+			stage.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+		}
+		
+		public function Init( project:Project, main:Main ): void
+		{
+			_project = project;
+			_main = main;
+		}
+		
+		private function onEnterFrame( ... args ): void
+		{
+			if ( width != _previousWidth || height != _previousHeight )
+			{
+				_previousWidth = width;
+				_previousHeight = height;
+				
+				if ( _blisc != null )
+				{
+					_blisc.SetCameraSize( width, height );
+				}
+				
+				if ( _gridDrawer != null )
+				{
+					_gridDrawer.SetViewport( width, height );
+				}
+			}
+			
+			if ( _blisc != null )
+			{
+				_blisc.draw();
+			}
+		}
+		
+		public function onIsometryMouseEvent( type:int, opaqueData:* ): void
+		{
+			
+		}
+		
+		/** TODO:
+			1: need to use it with some cashing - avoid creating animations for each similar object.
+			2: create prope animations from MovieClip's
+		*/
+		private function CreateAnimation( singleResource:SingleResource ): BliscAnimation
+		{
+			var resourceView:DisplayObject = singleResource.Display( _project );
+			
+			var bitmapData:BitmapData = new BitmapData( resourceView.width, resourceView.height );
+			bitmapData.draw( resourceView );
+			
+			var bliscAnimation:BliscAnimation = new BliscAnimation( 0, new < BliscSprite >[ new BliscSprite( bitmapData ) ], null, singleResource._name );
+			return bliscAnimation;
+		}
+		
+		private function ComplexTemplateToBlisc( complex:ComplexTemplate ): BliscComplexTemplate
+		{
+			return new BliscComplexTemplate( complex._name, CreateAnimation( complex._singleResource ), complex._centerX, complex._centerY, complex._layer._name, complex._tiles.concat() );
+		}
+		
+		private function AddObject( objectInstance:ObjectInstance ): void
+		{
+			var bliscObjectTemplate:BliscObjectTemplate;
+			
+			if ( objectInstance._template is ComplexTemplate )
+			{
+				bliscObjectTemplate = ComplexTemplateToBlisc( objectInstance._template as ComplexTemplate );
+			}
+			else
+			{
+				var compound:CompoundTemplate = objectInstance._template as CompoundTemplate;
+				var complexes:Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >;
+				for each ( var complexWithinCompound:ComplexWithinCompound in compound._consisting )
+				{
+					complexes.push( new BliscComplexWithinCompoundTemplate( ComplexTemplateToBlisc( complexWithinCompound._complex ), new Point( complexWithinCompound._isoDispX, complexWithinCompound._isoDispY ) ) );
+				}
+				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
+			}
+			
+			var bliscCompound:BliscCompound = new BliscCompound( bliscObjectTemplate, null, _blisc );
+			bliscCompound.SetIsoX( objectInstance._isoCoords.x );
+			bliscCompound.SetIsoY( objectInstance._isoCoords.y );
+			_blisc.AddObject( bliscCompound );
+		}
+		
+		private static const GRID_DRAWER_LAYER_NAME:String = "grid_drawer_holder";
+		
+		/** Display specified map if it is not currently displayed yet. Abandon any other maps if there are.*/
+		public function Display( map:Map ): void
+		{
+			if ( map == _displaying )
+			{
+				return;
+			}
+			
+			Unload();
+			
+			_displaying = map;
+			
+			if ( _blisc != null )
+			{
+				_blisc.Destroy();
+				_blisc = null;
+			}
+			
+			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project._data._tileSize * Utils.TILE_SIDE );
+			
+			//adding an ability to draw map's grid:
+			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
+			var drawerComplexTemplate:BliscComplexTemplate = new BliscComplexTemplate( "grid_drawer", null, 0, 0, GRID_DRAWER_LAYER_NAME, new Vector.< Point > );
+			var drawerCompound:BliscCompound = new BliscCompound( drawerComplexTemplate, null, _blisc );
+			_gridDrawer = new GridDrawer( map._right, map._right, width, height, _project );
+			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
+			drawerCompound._complexes[ 0 ]._complex = new BliscComplex( drawerComplexTemplate, _gridDrawer );
+			_blisc.AddObject( drawerCompound );
+			
+			for each ( var layer:Layer in _project._data._layers )
+			{
+				_blisc.AddLayer( layer._name );
+			}
+			
+			for each ( var objectInstance:ObjectInstance in map._instances )
+			{
+				AddObject( objectInstance );
+			}
+		}
+		
+		/** Remove currently displaying map (if there is such) and abandon it.*/
+		public function Unload(): void
+		{
+			if ( _displaying == null )
+			{
+				return;
+			}
+		}
+		
+		public function onDragEnter( event:DragEvent ): void
+		{
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) ||
+				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) )
+			{
+				DragManager.acceptDragDrop( event.currentTarget as UIComponent );
+			}
+		}
+		
+		public function onDragOver( event:DragEvent ): void
+		{
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) || 
+				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) )
+			{
+				DragManager.showFeedback( DragManager.COPY );
+				return;
+			}
+			
+			DragManager.showFeedback( DragManager.NONE );
+		}
+		
+		public function onDragDrop( event:DragEvent ): void
+		{
+			if ( _displaying == null )
+			{
+				_main.PopUp( "Select some map first.", Main.POP_UP_ERROR );
+				return;
+			}
+			
+			var addingTemplate:ObjectTemplate = null;
+			
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
+			{
+				addingTemplate = event.dragSource.dataForFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) as ObjectTemplate;
+			}
+			else if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) )
+			{
+				addingTemplate = event.dragSource.dataForFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) as ObjectTemplate;
+			}
+			
+			if ( addingTemplate != null )
+			{
+				var addingInstance:ObjectInstance = new ObjectInstance;
+				addingInstance.Init( addingTemplate );
+				
+				AddObject( addingInstance );
+			}
+		}
+		
+		public function get displaying(): project_data.Map
+		{
+			return _displaying;
+		}
+		
+		private function onMouseDown( e:MouseEvent ): void
+		{
+			if ( _blisc != null )
+			{
+				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				_blisc.OnMouseDown( local.x, local.y );
+			}
+		}
+		
+		private function onMouseUp( e:MouseEvent ): void
+		{
+			if ( _blisc != null )
+			{
+				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				_blisc.OnMouseUp( local.x, local.y );
+			}
+		}
+		
+		private function onMouseMove( e:MouseEvent ): void
+		{
+			if ( _blisc != null )
+			{
+				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				_blisc.OnMouseMove( local.x, local.y );
+			}
+		}
+		
+		]]>
+	</fx:Script>
+	
+	
+</s:SpriteVisualElement>

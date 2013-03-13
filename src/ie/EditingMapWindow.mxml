@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   minWidth="280"
+			   minHeight="200"
+			   title="Edit map"
+			   >
+	
+	
+	<s:Label text="Name:" x="10" y="16" />
+	<s:TextInput id="_name" x="56" y="10" width="190" />
+	
+	<s:Label text="Right:" x="10" y="53" />
+	<s:NumericStepper id="_right" x="50" y="45" width="90" minimum="-2147483648" maximum="2147483647" />
+	
+	<s:Label text="Down:" x="10" y="79" />
+	<s:NumericStepper id="_down" x="50" y="72" width="90" minimum="-2147483648" maximum="2147483647" />
+	
+	<s:Button label="Ok" x="118" y="134" click="onOk(event)" />
+	<s:Button label="Cancel" x="200" y="134" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import list_items.MapListItem;
+import mx.managers.PopUpManager;
+import project_data.Map;
+		
+		private var _project:Project;
+		private var _main:Main;
+		private var _map:Map;
+		
+		
+		public function Init( project:Project, main:Main, map:Map ): void
+		{
+			closeButton.visible = false;
+			
+			_project = project;
+			_main = main;
+			_map = map;
+			
+			_name.text = map._name;
+			_right.value = map._right;
+			_down.value = map._down;
+		}
+		
+		private function onOk( ... args ): void
+		{
+			if ( _map == null )
+			{
+				return;
+			}
+			
+			_map._name = _name.text;
+			_map._right = _right.value;
+			_map._down = _down.value;
+			
+			if ( _map == _main._isometry.displaying )
+			{
+				_main._isometry.Unload();
+				_main._isometry.Display( _map );
+			}
+			
+			//inform list about item change:
+			var associatedItem:MapListItem = null;
+			for each ( var item:MapListItem in _main._maps_list_data_provider.source )
+			{
+				if ( item.map == _map )
+				{
+					associatedItem = item;
+					break;
+				}
+			}
+			if ( associatedItem == null )
+			{
+				Cc.error( "E: EditingMapWindow.onOk(): item was NOT found." );
+			}
+			else
+			{
+				associatedItem.label = _map._name;
+				_main._maps_list_data_provider.itemUpdated( associatedItem );
+			}
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			_main = null;
+			_map = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>

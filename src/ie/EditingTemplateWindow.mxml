@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   minWidth="624"
+			   minHeight="690"
+			   initialize="onInit()"
+			   dragEnter="onDragEnter(event)"
+			   dragOver="onDragOver(event)"
+			   dragDrop="onDragDrop(event)"
+			   >
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Label x="10" y="14" text="Name: " />
+	<s:TextInput id="_name" x="60" y="7" width="160" />
+	
+	<s:DropDownList x="10" y="34" id="_layerDropDownList" width="140" prompt="Select a layer" >
+		<mx:ArrayList id="_layerList" />
+	</s:DropDownList>
+	
+	<s:Label id="_dispXName" x="250" y="14" text="Disp X:" />
+	<s:NumericStepper x="298" y="6" id="_dispXStepper" change="onDispXChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
+	<s:Label id="_dispYName" x="250" y="40" text="Disp Y:" />
+	<s:NumericStepper x="298" y="34" id="_dispYStepper" change="onDispYChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
+	
+	<s:Label id="_tileDispXName" x="400" y="14" text="Tile X:" />
+	<s:TextInput x="450" y="6" id="_tileDispXInput" change="onTileDispXChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_tileDispYName" x="400" y="40" text="Tile Y:" />
+	<s:TextInput x="450" y="34" id="_tileDispYInput" change="onTileDispYChange(event)" width="60" restrict="-1234567890." />
+	
+	<s:SpriteVisualElement x="10" y="70" id="_space" />
+	
+	<s:Label x="20" y="620" text="N/A" id="_pos" />
+	
+	<s:Button x="420" y="620" label="Ok" click="onOk()" />
+	<s:Button x="500" y="620" label="Cancel" click="onCancel()" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import edit_space.ColorCollection;
+import flash.display.BitmapData;
+import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.filters.GlowFilter;
+import flash.geom.Point;
+import flash.text.TextField;
+import flash.utils.getQualifiedClassName;
+import list_items.CompoundListItem;
+import list_items.TemplateListItem;
+import mx.controls.NumericStepper;
+import mx.core.IUIComponent;
+import mx.core.UIComponent;
+import mx.events.DragEvent;
+import mx.managers.DragManager;
+import mx.managers.PopUpManager;
+import project_data.ComplexTemplate;
+import project_data.ComplexWithinCompound;
+import project_data.CompoundTemplate;
+import project_data.Layer;
+import project_data.ObjectTemplate;
+import project_data.Resource;
+import project_data.SingleResource;
+import utils.Utils;
+		
+		public var _tiles:Vector.< Point > = new Vector.< Point >;
+		
+		/** Where tiles, coordinate scale and object itself are drawn.*/
+		private var _content:Sprite = new Sprite;
+		/** Colored tiles.*/
+		private var _grid:Sprite = new Sprite;
+		private var _axis:Sprite = new Sprite;
+		/** Object's graphics.*/
+		private var _graphics:Sprite = new Sprite;
+		/** Set of tiles marked as occupied by editing object.*/
+		private var _occupiying:Sprite = new Sprite;
+		/** Selecting tile highlight.*/
+		private var _cursor:Sprite = new Sprite;
+		/** Geometrical object's center holder if it is Complex.*/
+		private var _centerHolder:Sprite = new Sprite;
+		
+		/** 0;0 coordinates of the editing space.*/
+		private const WIDTH:Number = 600;
+		private const HEIGHT:Number = 540;
+		
+		private var _mousePos:Point = null;
+		private var _wasMoving:Boolean = false;
+		/** Dunno why but MOUSE_UP event is issued right after window is created.*/
+		private var _wasDown:Boolean = false;
+		
+		
+		private var _project:Project = null;
+		
+		/** Which object disighner currently edit.*/
+		private var _editing:ObjectTemplate = null;
+		/** Already cast _editing to use it. Some of it is null.*/
+		private var _complex:ComplexTemplate = null;
+		private var _compound:CompoundTemplate = null;
+		
+		private var _main:Main = null;
+		
+		
+		/** What is currently selected or being dragged.*/
+		public var _dragging:DisplayObject = null;
+		private var _lastDragged:DraggingComplex = null;
+		
+		public var _templates:Vector.< DraggingComplex > = new Vector.< DraggingComplex >;
+		
+		[ Embed( source = "../center.png" ) ]
+		private var _centerImageClass:Class;
+		private var _centerImage:DisplayObject = ( new _centerImageClass ) as DisplayObject;
+		private static const CENTER_DISP_X:Number = 10;
+		private static const CENTER_DISP_Y:Number = 31;
+		
+		private var _chosenLayer:Layer = null;
+		
+		
+		private function Destroy(): void
+		{
+			_space.stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
+			_space.stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+			_space.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+			
+			_project = null;
+			_editing = null;
+			_complex = null;
+			_compound = null;
+			_main = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		private function onDragEnter( event:DragEvent ): void
+		{
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) )
+			{
+				if ( _complex != null )
+				{
+					DragManager.acceptDragDrop( event.currentTarget as UIComponent );
+				}
+				
+				return;
+			}
+			
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
+			{
+				if ( _compound != null )
+				{
+					DragManager.acceptDragDrop( event.currentTarget as UIComponent ); 
+				}
+			}
+		}
+		
+		private function onDragOver( event:DragEvent ): void
+		{
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) )
+			{
+				if ( _complex != null )
+				{
+					DragManager.showFeedback( DragManager.COPY );
+					return;
+				}
+			}
+			else if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
+			{
+				if ( _compound != null )
+				{
+					DragManager.showFeedback( DragManager.COPY );
+					return;
+				}
+			}
+			
+			DragManager.showFeedback( DragManager.NONE );
+		}
+		
+		private function onDragDrop( event:DragEvent ): void
+		{
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) )
+			{
+				if ( _complex != null && _templates.length > 0 )
+				{
+					_templates[ 0 ].Aim( event.dragSource.dataForFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) as SingleResource, _project );
+				}
+			}
+			else if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
+			{
+				if ( _compound != null )
+				{
+					var broughtComplex:ComplexTemplate = event.dragSource.dataForFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) as ComplexTemplate;
+					
+					var withinCompound:ComplexWithinCompound = new ComplexWithinCompound;
+					withinCompound._complex = broughtComplex;
+					
+					var adding:DraggingComplex = new DraggingComplex( broughtComplex, _project, withinCompound );
+					AddDragging( adding );
+					
+					//to allow modificate it's positions using TextInputs without touching object itself:
+					_lastDragged = adding;
+				}
+			}
+		}
+		
+		public function onOk( ... args ): void
+		{
+			if ( _main == null || _project == null )
+			{
+				return;
+			}
+			
+			if ( _complex != null )
+			{
+				_complex._centerX = _centerImage.x + CENTER_DISP_X;
+				_complex._centerY = _centerImage.y + CENTER_DISP_Y;
+				
+				if ( _layerDropDownList.selectedItem != null )
+				{
+					_complex._layer = _layerDropDownList.selectedItem.layer;
+				}
+				
+				_complex._name = _name.text;
+				
+				_complex._tiles = _tiles;
+				
+				if ( _templates.length > 0 )
+				{
+					var draggingComplex:DraggingComplex = _templates[ 0 ];
+					
+					_complex._dispX = draggingComplex.x;
+					_complex._dispY = draggingComplex.y;
+					
+					_complex._singleResource = draggingComplex._aimingResource;
+				}
+				
+				
+				//inform list view about item change:
+				var associatedTemplateListItem:TemplateListItem = null;
+				for each ( var templateListItem:TemplateListItem in _main._templates_list_data_provider.source )
+				{
+					if ( templateListItem.template == _editing )
+					{
+						associatedTemplateListItem = templateListItem;
+						break;
+					}
+				}
+				if ( associatedTemplateListItem == null )
+				{
+					Cc.error( "E: EditingTemplateWindow.onOk(): TemplateListItem wasn't found." );
+				}
+				else
+				{
+					associatedTemplateListItem.label = _editing._name;
+					_main._templates_list_data_provider.itemUpdated( associatedTemplateListItem );
+				}
+			}
+			else
+			{
+				_compound._name = _name.text;
+				
+				for each ( var consisting:ComplexWithinCompound in _compound._consisting )
+				{
+					consisting.Destroy();
+				}
+				_compound._consisting.length = 0;
+				
+				for each ( var template:DraggingComplex in _templates )
+				{
+					var adding:ComplexWithinCompound = new ComplexWithinCompound;
+					var iso:Point = Utils.ToIso( template.x, template.y );
+					adding.Init( template._complex, iso.x, iso.y );
+					_compound._consisting.push( adding );
+				}
+				
+				//inform list view about item change:
+				var associatedCompoundListItem:CompoundListItem = null;
+				for each ( var compoundListItem:CompoundListItem in _main._compounds_list_data_provider.source )
+				{
+					if ( compoundListItem.compound == _editing )
+					{
+						associatedCompoundListItem = compoundListItem;
+						break;
+					}
+				}
+				if ( associatedCompoundListItem == null )
+				{
+					Cc.error( "E: EditingTemplateWindow.onOk(): CompoundListItem wasn't found." );
+				}
+				else
+				{
+					associatedCompoundListItem.label = _editing._name;
+					_main._compounds_list_data_provider.itemUpdated( associatedCompoundListItem );
+				}
+			}
+			
+			Destroy();
+		}
+		
+		public function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function onDispXChange( event:Event ): void
+		{
+			ApplyDisplacement();
+		}
+		
+		private function onDispYChange( event:Event ): void
+		{
+			ApplyDisplacement();
+		}
+		
+		private function ShowIsoDisplacements(): void
+		{
+			var iso:Point = Utils.ToIso( _dispXStepper.value, _dispYStepper.value );
+			_tileDispXInput.text = ( iso.x / _project._data._tileSize ).toString();
+			_tileDispYInput.text = ( iso.y / _project._data._tileSize ).toString();
+		}
+		
+		private function ApplyDisplacement( andIso:Boolean = true ): void
+		{
+			if ( _complex == null )
+			{
+				if ( andIso )
+				{
+					ShowIsoDisplacements();
+				}
+				
+				var obj:DisplayObject = _lastDragged == null ? _dragging : _lastDragged;
+				
+				if ( obj != null )
+				{
+					obj.x = _dispXStepper.value;
+					obj.y = _dispYStepper.value;
+				}
+			}
+			else
+			{
+				if ( _templates.length > 0 )
+				{
+					var draggingComplex:DraggingComplex = _templates[ 0 ];
+					draggingComplex.x = _dispXStepper.value;
+					draggingComplex.y = _dispYStepper.value;
+				}
+			}
+		}
+		
+		private function ApplyTileDisplacement(): void
+		{
+			var planar:Point = Utils.FromIso(
+				parseFloat( _tileDispXInput.text ) * _project._data._tileSize,
+				parseFloat( _tileDispYInput.text ) * _project._data._tileSize );
+			
+			_dispXStepper.value = planar.x;
+			_dispYStepper.value = planar.y;
+			
+			ApplyDisplacement( false );
+		}
+		
+		private function onTileDispXChange( event:Event ): void
+		{
+			ApplyTileDisplacement();
+		}
+		
+		private function onTileDispYChange( event:Event ): void
+		{
+			ApplyTileDisplacement();
+		}
+		
+		private function HitTest( e:MouseEvent, object:DisplayObject ): Boolean
+		{
+			if ( object.width <= 0 || object.height <= 0 )
+			{
+				return false;
+			}
+			
+			if ( object.hitTestPoint( e.stageX, e.stageY ) == false )
+			{
+				return false;
+			}
+			
+			var local:Point = object.globalToLocal( new Point( e.stageX, e.stageY ) );
+			var bitmapData:BitmapData = new BitmapData( object.width, object.height, true, 0 );
+			bitmapData.draw( object );
+			
+			return ( bitmapData.getPixel( local.x, local.y ) & 0x00FFFFFF ) > 0;
+		}
+		
+		private function FindInteractive( e:MouseEvent ): DisplayObject
+		{
+			if ( HitTest( e, _centerImage ) )
+			{
+				return _centerImage;
+			}
+			
+			for each ( var template:DraggingComplex in _templates )
+			{
+				if ( template._view == null )
+				{
+					continue;
+				}
+				
+				if ( HitTest( e, template._view ) )
+				{
+					return template;
+				}
+			}
+			
+			return null;
+		}
+		
+		private function onMouseDown( e:MouseEvent ): void
+		{
+			//leave this window alone when you interact with some other windows:
+			var local:Point = _space.globalToLocal( new Point( e.stageX, e.stageY ) );
+			if ( local.x < 0 || local.y < 0 || local.x > WIDTH || local.y > HEIGHT )
+			{
+				return;
+			}
+			
+			_dragging = FindInteractive( e );
+			if ( _dragging is DraggingComplex )
+			{
+				_lastDragged = _dragging as DraggingComplex;
+				_dispXStepper.value = _lastDragged._complex._dispX;
+				_dispYStepper.value = _lastDragged._complex._dispY;
+				ShowIsoDisplacements();
+			}
+			
+			var obj:DisplayObject = _dragging == null ? _content : _dragging;
+			_mousePos = new Point( e.stageX - obj.x, e.stageY - obj.y );
+			_wasMoving = false;
+			_wasDown = true;
+		}
+		
+		private function onMouseUp( e:MouseEvent ): void
+		{
+			_mousePos = null;
+			
+			if ( _wasDown == false )
+			{
+				return;
+			}
+			_wasDown = false;
+			
+			//add another occupying tile:
+			if ( _wasMoving == false && _complex != null )
+			{
+				var tile:Point = ResolveTile( e.stageX, e.stageY );
+				var duplicate:Boolean = false;
+				for ( var i:int = 0; i < _tiles.length; ++i )
+				{
+					var occupied:Point = _tiles[ i ];
+					if ( tile.x == occupied.x && tile.y == occupied.y )
+					{
+						duplicate = true;
+						_tiles.splice( i, 1 );
+						break;
+					}
+				}
+				if ( duplicate == false )
+				{
+					_tiles.push( tile );
+				}
+				DrawOccupiedTiles();
+			}
+		}
+		
+		/** Previous object isn't under mouse anymore.*/
+		private function LeaveOver(): void
+		{
+			if ( _dragging != null )
+			{
+				_dragging.filters = [ ];
+				_dragging = null;
+			}
+		}
+		
+		private function onMouseMove( e:MouseEvent ): void
+		{
+			_wasMoving = true;
+			
+			if ( _project == null )
+			{
+				return;
+			}
+			
+			//mouse button is NOT down right now:
+			if ( _mousePos == null )
+			{
+				var newDragging:DisplayObject = FindInteractive( e );
+				//moving mouse over editing space - just highlight selecting tile:
+				if ( newDragging == null )
+				{
+					LeaveOver();
+					
+					var tile:Point = ResolveTile( e.stageX, e.stageY );
+					
+					_pos.text = "x = " + tile.x.toString() + ", y = " + tile.y.toString();
+					
+					var planarPos:Point = Utils.FromIso( tile.x, tile.y );
+					
+					_cursor.x = planarPos.x * _project._data._tileSize;
+					_cursor.y = planarPos.y * _project._data._tileSize;
+					_cursor.visible = true;
+				}
+				else if ( newDragging != _dragging )
+				{
+					_cursor.visible = false;
+					
+					LeaveOver();
+					
+					newDragging.filters = [ new GlowFilter( 0x00FF00, 1, 3, 4, 3 ) ];
+					
+					_dragging = newDragging;
+				}
+			}
+			//dragging something:
+			else
+			{
+				//whatever it is - just change it's coordinates:
+				var obj:DisplayObject = _dragging == null ? _content : _dragging;
+				
+				obj.x = e.stageX - _mousePos.x;
+				obj.y = e.stageY - _mousePos.y;
+				
+				if ( obj is DraggingComplex )
+				{
+					_dispXStepper.value = obj.x;
+					_dispYStepper.value = obj.y;
+					
+					if ( _compound != null )
+					{
+						ShowIsoDisplacements();
+					}
+				}
+			}
+		}
+		
+		public function onInit( ... args ): void
+		{
+			closeButton.visible = false;
+			
+			_space.addChild( _content );
+			_content.addChild( _grid );
+			_grid.cacheAsBitmap = true;
+			_content.addChild( _axis );
+			_axis.cacheAsBitmap = true;
+			_content.addChild( _graphics );
+			_content.addChild( _occupiying );
+			_content.addChild( _cursor );
+			_content.addChild( _centerHolder );
+			
+			var mask:Sprite = new Sprite;
+			mask.graphics.beginFill( 0x000000 );
+			mask.graphics.drawRect( 0, 0, WIDTH, HEIGHT );
+			mask.graphics.endFill();
+			_space.addChild( mask );
+			_space.mask = mask;
+			
+			_space.stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
+			_space.stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
+			_space.stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+		}
+		
+		private function ResolveTile( stageX:Number, stageY:Number ): Point
+		{
+			var coords:Point = _content.globalToLocal( new Point( stageX, stageY ) );
+			var isoPos:Point = Utils.ToIso( coords.x, coords.y );
+			return new Point( Math.floor( isoPos.x / ( _project._data._tileSize/* * Utils.ISO_SLOPE_COS*/ ) ), Math.floor( isoPos.y / ( _project._data._tileSize/* * Utils.ISO_SLOPE_COS*/ ) ) );
+		}
+		
+		private function AddDragging( dragging:DraggingComplex ): void
+		{
+			_templates.push( dragging );
+			_graphics.addChild( dragging );
+		}
+		
+		public function Init( project:Project, template:ObjectTemplate, main:Main ): void
+		{
+			_project = project;
+			_editing = template;
+			_complex = template as ComplexTemplate;
+			_compound = template as CompoundTemplate;
+			_main = main;
+			
+			_name.text = template._name;
+			
+			
+			//positions steppers:
+			if ( _compound == null )
+			{
+				_tileDispXName.visible = false;
+				_tileDispXInput.visible = false;
+				
+				_tileDispYName.visible = false;
+				_tileDispYInput.visible = false;
+			}
+			
+			//layers:
+			if ( _complex == null )
+			{
+				_layerDropDownList.visible = false;
+			}
+			else
+			{
+				for each ( var layer:Layer in _project._data._layers )
+				{
+					var layerItem:* = { label: layer._name, layer: layer };
+					
+					_layerList.addItem( layerItem );
+					
+					if ( _complex._layer != null && layer == _complex._layer )
+					{
+						_layerDropDownList.selectedItem = layerItem;
+					}
+				}
+				if ( _complex._layer != null && _layerDropDownList.selectedItem == null )
+				{
+					Cc.error( "E: EditingTemplateWindow.Init(): layer wasn't found within presented." );
+				}
+			}
+			
+			//center image:
+			if ( _complex != null )
+			{
+				_centerImage.x = _complex._centerX - CENTER_DISP_X;
+				_centerImage.y = _complex._centerY - CENTER_DISP_Y;
+				_centerHolder.addChild( _centerImage );
+			}
+			
+			//elements views:
+			if ( _complex != null )
+			{
+				AddDragging( new DraggingComplex( _complex, _project ) );
+			}
+			else
+			{
+				for each ( var consisting:ComplexWithinCompound in _compound._consisting )
+				{
+					AddDragging( new DraggingComplex( consisting._complex, _project, consisting ) );
+				}
+				
+				//again - to allow change object's coordinates using TextInputss without touching him:
+				if ( _templates.length > 0 )
+				{
+					_lastDragged = _templates[ _templates.length - 1 ];
+					_dispXStepper.value = _lastDragged.x;
+					_dispYStepper.value = _lastDragged.y;
+					ShowIsoDisplacements();
+				}
+			}
+			
+			if ( _complex != null )
+			{
+				title = "Complex";
+				
+				_dispXStepper.value = _complex._dispX;
+				_dispYStepper.value = _complex._dispY;
+			}
+			else
+			{
+				title = "Compound";
+			}
+			ApplyDisplacement();
+			
+			
+			//draw cursor frame:
+			_cursor.graphics.clear();
+			_cursor.graphics.lineStyle( 3, 0x1EE843 );
+			_cursor.graphics.lineTo( 0, 0 );
+			var cursorCoord:Point;
+			cursorCoord = Utils.FromIso( project._data._tileSize, 0 );
+			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
+			cursorCoord = Utils.FromIso( project._data._tileSize, project._data._tileSize );
+			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
+			cursorCoord = Utils.FromIso( 0, project._data._tileSize );
+			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
+			_cursor.graphics.lineTo( 0, 0 );
+			_cursor.graphics.endFill();
+			_cursor.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
+			
+			_content.x = WIDTH / 2.0;
+			_content.y = HEIGHT / 2.0;
+			
+			
+			if ( _complex != null )
+			{
+				for each ( var tile:Point in _complex._tiles )
+				{
+					_tiles.push( new Point( tile.x, tile.y ) );
+				}
+				DrawOccupiedTiles();
+			}
+			
+			
+			
+			///DRAW BACKGROUND CONSISTING FROM TILES:
+			
+			function DrawTile( x:Number, y:Number, color:uint ): void
+			{
+				_grid.graphics.moveTo( x, y );
+				_grid.graphics.beginFill( color );
+				
+				var pos:Point;
+				
+				pos = Utils.FromIso( _project._data._tileSize, 0 );
+				_grid.graphics.lineTo( x + pos.x, y + pos.y );
+				
+				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				_grid.graphics.lineTo( x + pos.x, y + pos.y );
+				
+				pos = Utils.FromIso( 0, _project._data._tileSize );
+				_grid.graphics.lineTo( x + pos.x, y + pos.y );
+				
+				_grid.graphics.lineTo( x, y );
+				_grid.graphics.endFill();
+			}
+			
+			var colorProvider:Function = /*GoldenRatioHSVColorProvider*/ColorsCollectionColorProvider;
+			var colorProviderData:Object = { };
+			
+			for ( var i:int = 0; i < 289; ++i )
+			{
+				var pos:Point = new Point;
+				Utils.IsoSpriralFromTile( i, pos );
+				
+				const color:uint = colorProvider( colorProviderData, i, pos.x, pos.y );
+				
+				const x:Number = pos.x * _project._data._tileSize;
+				const y:Number = pos.y * _project._data._tileSize;
+				DrawTile( x, y, color );
+			}
+			
+			
+			///DRAW COORDINATE AXIS:
+			const AXIS_LENGTH:Number = _project._data._tileSize * 4.5;
+			const ARROW_LENGTH:Number = AXIS_LENGTH * 0.1;
+			const ARROW_SIDE:Number = ARROW_LENGTH * 0.4;
+			_axis.graphics.clear();
+			//X:
+			_axis.graphics.lineStyle( 3, 0xFF0000 );
+			_axis.graphics.moveTo( 0, 0 );
+			var xAxis:Point = Utils.FromIso( AXIS_LENGTH, 0 );
+			_axis.graphics.lineTo( xAxis.x, xAxis.y );
+			pos = Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, ARROW_SIDE );
+			_axis.graphics.lineTo( pos.x, pos.y );
+			_axis.graphics.moveTo( xAxis.x, xAxis.y );
+			pos = Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, -ARROW_SIDE );
+			_axis.graphics.lineTo( pos.x, pos.y );
+			//Y:
+			_axis.graphics.lineStyle( 3, 0x00FF00 );
+			_axis.graphics.moveTo( 0, 0 );
+			var yAxis:Point = Utils.FromIso( 0, AXIS_LENGTH );
+			_axis.graphics.lineTo( yAxis.x, yAxis.y );
+			pos = Utils.FromIso( ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH );
+			_axis.graphics.lineTo( pos.x, pos.y );
+			_axis.graphics.moveTo( yAxis.x, yAxis.y );
+			pos = Utils.FromIso( -ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH );
+			_axis.graphics.lineTo( pos.x, pos.y );
+			//Z:
+			_axis.graphics.lineStyle( 3, 0x0000FF );
+			_axis.graphics.moveTo( 0, 0 );
+			_axis.graphics.lineTo( 0, -AXIS_LENGTH );
+			_axis.graphics.lineTo( ARROW_SIDE, - ( AXIS_LENGTH - ARROW_LENGTH ) );
+			_axis.graphics.moveTo( 0, -AXIS_LENGTH );
+			_axis.graphics.lineTo( -ARROW_SIDE, - ( AXIS_LENGTH - ARROW_LENGTH ) );
+			//glow:
+			_axis.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
+		}
+		
+		private function DrawOccupiedTiles(): void
+		{
+			_occupiying.graphics.clear();
+			_occupiying.graphics.lineStyle( 4, 0xBC6609 );
+			
+			for each ( var tile:Point in _tiles )
+			{
+				//north:
+				var origin:Point = Utils.FromIso( tile.x, tile.y );
+				origin.x *= _project._data._tileSize;
+				origin.y *= _project._data._tileSize;
+				_occupiying.graphics.moveTo( origin.x, origin.y );
+				//east:
+				var pos:Point = Utils.FromIso( _project._data._tileSize, 0 );
+				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				//south:
+				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				//west:
+				pos = Utils.FromIso( 0, _project._data._tileSize );
+				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				//back to north:
+				_occupiying.graphics.lineTo( origin.x, origin.y );
+				//inner crossing:
+				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				pos = Utils.FromIso( _project._data._tileSize, 0 );
+				_occupiying.graphics.moveTo( origin.x + pos.x, origin.y + pos.y );
+				pos = Utils.FromIso( 0, _project._data._tileSize );
+				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+			}
+			
+			_occupiying.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
+		}
+		
+		private function GoldenRatioHSVColorProvider( data:Object, index:int, x:int, y:int, recursive:int = 0 ): uint
+		{
+			if ( ( data.generated is Array ) == false )
+			{
+				data.generated = [];
+			}
+			
+			const h:Number = ( Math.random() + index * 0.618033988749895 ) % 1.0;
+			const s:Number = /*0.5*/0.99;
+			const v:Number = /*0.95*/0.99;
+			
+			const h_i:int = h * 6;
+			const f:Number = h * 6 - h_i;
+			const p:Number = v * ( 1 - s );
+			const q:Number = v * ( 1 - f * s );
+			const t:Number = v * ( 1 - ( 1 - f ) * s );
+			
+			var r:Number;
+			var g:Number;
+			var b:Number;
+			
+			switch ( h_i )
+			{
+				case 0:
+					r = v;
+					g = t;
+					b = p;
+					break;
+				
+				case 1:
+					r = q;
+					g = v;
+					b = p;
+					break;
+				
+				case 2:
+					r = p;
+					g = v;
+					b = t;
+					break;
+				
+				case 3:
+					r = p;
+					g = q;
+					b = v;
+					break;
+				
+				case 4:
+					r = t;
+					g = p;
+					b = v;
+					break;
+				
+				case 5:
+					r = v;
+					g = p;
+					b = q;
+					break;
+			}
+			
+			r *= 256;
+			g *= 256;
+			b *= 256;
+			
+			const UNIQUENESS:int = 70;
+			
+			//check color uniqueness if we have time for it:
+			if ( recursive < 30 )
+			{
+				for each ( var neighbour:Object in data.generated )
+				{
+					//if neighbour tile:
+					if ( Math.abs( neighbour.x - x ) <= 1 && Math.abs( neighbour.y - y ) <= 1 )
+					{
+						//if have unsatisfied color uniqueness:
+						if ( ( Math.abs( neighbour.r - r ) + Math.abs( neighbour.g - g ) + Math.abs( neighbour.b - b ) ) < UNIQUENESS )
+						{
+							return GoldenRatioHSVColorProvider( data, index, x, y, recursive + 1 );
+						}
+					}
+				}
+			}
+			
+			data.generated.push( { x: x, y: y, r: r, g: g, b: b } );
+			return ( r << 16 | g << 8 | b << 0 );
+		}
+		
+		private function ColorsCollectionColorProvider( data:Object, index:int, x:int, y:int ): uint
+		{
+			if ( ( data.generated is Array ) == false )
+			{
+				data.generated = [];
+			}
+			
+			var permittedColors:Vector.< ColorCollection > = colorsCollections.concat();
+			var forbiddenColors:Vector.< uint > = new Vector.< uint >;
+			
+			for each ( var neighbour:Object in data.generated )
+			{
+				//if neighbour tile:
+				if ( Math.abs( neighbour.x - x ) <= 1 && Math.abs( neighbour.y - y ) <= 1 )
+				{
+					var neighbourColor:ColorCollection = neighbour.color;
+					//remove all colors which consist within groups mentions within neighbour tiles:
+					for ( var i:int = 0; i < permittedColors.length; ++i )
+					{
+						var permittedColor:ColorCollection = permittedColors[ i ];
+						var duplicated:Boolean = false;
+						for each ( var neighbourGroup:int in neighbourColor._groups )
+						{
+							for each ( var permittedGroup:int in permittedColor._groups )
+							{
+								if ( permittedGroup == neighbourGroup )
+								{
+									duplicated = true;
+									break;
+								}
+							}
+							if ( duplicated )
+							{
+								break;
+							}
+						}
+						if ( duplicated )
+						{
+							permittedColors.splice( i, 1 );
+							--i;
+						}
+					}
+				}
+			}
+			
+			var chosenColor:ColorCollection;
+			if ( permittedColors.length > 0 )
+			{
+				chosenColor = permittedColors[ Utils.RandomInt( 0, permittedColors.length - 1 ) ];
+			}
+			else
+			{
+				//Cc.error( "E: EditingTemplateWindow.ColorsCollectionColorProvider(): not enaugh colors." );
+				chosenColor = colorsCollections[ Utils.RandomInt( 0, colorsCollections.length - 1 ) ];
+			}
+			data.generated.push( { x: x, y: y, color: chosenColor } );
+			return chosenColor._color;
+		}
+		private static const GROUP_DARK:int = 1;
+		private static const GROUP_BLUE:int = 2;
+		private static const GROUP_GREEN:int = 3;
+		private static const GROUP_YELLOW:int = 4;
+		private static const GROUP_PINK:int = 5;
+		private static const GROUP_RED:int = 6;
+		private static const GROUP_OLIVE:int = 7;
+		private static const GROUP_GREY:int = 8;
+		private static const GROUP_WHITE:int = 9;
+		private static const GROUP_DARK_BLUE:int = 10;
+		private static const GROUP_ORANGE:int = 11;
+		private static const GROUP_BROWN:int = 12;
+		private static const GROUP_PURPLE:int = 13;
+		private static var colorsCollections:Vector.< ColorCollection > = new < ColorCollection >[
+			//new edit_space.ColorCollection( 0x010101, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x383838, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x58585A, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x6F6F71, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x828385, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x8DD8F8, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0xA6C3D1, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x859CAA, new < int >[ GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x667A83, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x43515A, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			
+			new edit_space.ColorCollection( 0x949597, new < int >[ GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0xA8A9AB, new < int >[ GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0xBCBDBF, new < int >[ GROUP_GREY ] ),
+			//new edit_space.ColorCollection( 0xD3D3D5, new < int >[ GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0xE5E5E5, new < int >[ GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x486F6E, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0x3A8477, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0x64908F, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0x50A393, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0x54A278, new < int >[ GROUP_GREEN ] ),
+			
+			//new edit_space.ColorCollection( 0xFFFFFF, new < int >[ GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x2D3194, new < int >[ GROUP_DARK_BLUE ] ),
+			new edit_space.ColorCollection( 0x03ABF6, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x00A448, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0xFEF200, new < int >[ GROUP_YELLOW ] ),
+			new edit_space.ColorCollection( 0x53C5D0, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x47A6AC, new < int >[ GROUP_BLUE ] ),
+			//new edit_space.ColorCollection( 0xA9C1B1, new < int >[ GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0xD0E6DA, new < int >[ GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x9CD4AD, new < int >[ GROUP_GREEN ] ),
+			
+			new edit_space.ColorCollection( 0xEF1C25, new < int >[ GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xED008C, new < int >[ GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xA64685, new < int >[ GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xF6821F, new < int >[ GROUP_ORANGE ] ),
+			new edit_space.ColorCollection( 0xF6ACAD, new < int >[ GROUP_RED, GROUP_PINK ] ),
+			//new edit_space.ColorCollection( 0x859D8F, new < int >[ GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x8A9875, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0xAFBC74, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0xADBC91, new < int >[ GROUP_GREEN ] ),
+			new edit_space.ColorCollection( 0xA6CE3A, new < int >[ GROUP_GREEN ] ),
+			
+			new edit_space.ColorCollection( 0x806C65, new < int >[ GROUP_BROWN, GROUP_DARK ] ),
+			//new edit_space.ColorCollection( 0xC8C5E2, new < int >[ GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0x9C95C9, new < int >[ GROUP_WHITE, GROUP_BLUE ] ),
+			//new edit_space.ColorCollection( 0x6C8CC9, new < int >[ GROUP_WHITE, GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x7671B4, new < int >[ GROUP_BLUE, GROUP_DARK_BLUE ] ),
+			//new edit_space.ColorCollection( 0xD3E488, new < int >[ GROUP_GREEN, GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x57584A, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x808171, new < int >[ GROUP_DARK, GROUP_GREY ] ),
+			//new edit_space.ColorCollection( 0xAAA893, new < int >[ GROUP_DARK, GROUP_GREY, GROUP_WHITE, GROUP_GREEN ] ),
+			//new edit_space.ColorCollection( 0xAAA676, new < int >[ GROUP_GREEN, GROUP_WHITE ] ),
+			
+			new edit_space.ColorCollection( 0x7D78A1, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x4A5D88, new < int >[ GROUP_DARK_BLUE ] ),
+			new edit_space.ColorCollection( 0x514C6A, new < int >[ GROUP_DARK_BLUE ] ),
+			new edit_space.ColorCollection( 0x657A99, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0x0097D7, new < int >[ GROUP_BLUE ] ),
+			new edit_space.ColorCollection( 0xD9CC70, new < int >[ GROUP_YELLOW ] ),
+			new edit_space.ColorCollection( 0xFFF685, new < int >[ GROUP_YELLOW ] ),
+			//new edit_space.ColorCollection( 0xFFF9AF, new < int >[ GROUP_YELLOW, GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0xFFFBD6, new < int >[ GROUP_YELLOW, GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0xFFF3E6, new < int >[ GROUP_BROWN, GROUP_WHITE ] ),
+			
+			new edit_space.ColorCollection( 0xCC8C5E, new < int >[ GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xD3AC69, new < int >[ GROUP_BROWN ] ),
+			new edit_space.ColorCollection( 0xEA9366, new < int >[ GROUP_RED, GROUP_ORANGE ] ),
+			new edit_space.ColorCollection( 0xFCA74C, new < int >[ GROUP_ORANGE ] ),
+			new edit_space.ColorCollection( 0xF9AA6F, new < int >[ GROUP_PINK ] ),
+			new edit_space.ColorCollection( 0x7E576A, new < int >[ GROUP_DARK, GROUP_PURPLE ] ),
+			new edit_space.ColorCollection( 0xA2587D, new < int >[ GROUP_PURPLE, GROUP_PINK ] ),
+			//new edit_space.ColorCollection( 0xF6ACCF, new < int >[ GROUP_PINK, GROUP_WHITE ] ),
+			//new edit_space.ColorCollection( 0xC995AC, new < int >[ GROUP_PINK, GROUP_WHITE, GROUP_PURPLE ] ),
+			//new edit_space.ColorCollection( 0xA68E9C, new < int >[ GROUP_WHITE, GROUP_GREY ] ),
+			
+			new edit_space.ColorCollection( 0xFECC09, new < int >[ GROUP_YELLOW ] ),
+			//new edit_space.ColorCollection( 0xFCD19E, new < int >[ GROUP_YELLOW, GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x816951, new < int >[ GROUP_BROWN ] ),
+			new edit_space.ColorCollection( 0xA45544, new < int >[ GROUP_RED, GROUP_BROWN ] ),
+			new edit_space.ColorCollection( 0xCB6C3C, new < int >[ GROUP_RED, GROUP_BROWN, GROUP_ORANGE ] ),
+			//new edit_space.ColorCollection( 0xD0B1C1, new < int >[ GROUP_WHITE, GROUP_PINK, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0xA46999, new < int >[ GROUP_PINK, GROUP_PURPLE ] ),
+			new edit_space.ColorCollection( 0xC855A0, new < int >[ GROUP_PINK, GROUP_PURPLE ] ),
+			new edit_space.ColorCollection( 0xBD7AB0, new < int >[ GROUP_PINK, GROUP_PURPLE ] ),
+			new edit_space.ColorCollection( 0xA886A9, new < int >[ GROUP_GREY ] ),
+			
+			new edit_space.ColorCollection( 0xF38466, new < int >[ GROUP_RED, GROUP_ORANGE ] ),
+			//new edit_space.ColorCollection( 0xF8AB8F, new < int >[ GROUP_RED, GROUP_ORANGE, GROUP_WHITE, GROUP_PINK ] ),
+			//new edit_space.ColorCollection( 0xFAD6C6, new < int >[ GROUP_WHITE, GROUP_PINK ] ),
+			new edit_space.ColorCollection( 0xA67477, new < int >[ GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0xC86E6D, new < int >[ GROUP_RED, GROUP_ORANGE, GROUP_PINK ] ),
+			//new edit_space.ColorCollection( 0xC9A0CC, new < int >[ GROUP_PURPLE, GROUP_WHITE, GROUP_PINK ] ),
+			new edit_space.ColorCollection( 0x695169, new < int >[ GROUP_DARK, GROUP_PURPLE, GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x866B8A, new < int >[ GROUP_GREY ] ),
+			new edit_space.ColorCollection( 0x9E76B5, new < int >[ GROUP_PURPLE ] ),
+			new edit_space.ColorCollection( 0xA22396, new < int >[ GROUP_PURPLE, GROUP_PINK ] ),
+			
+			new edit_space.ColorCollection( 0xCB6F86, new < int >[ GROUP_PINK, GROUP_ORANGE ] ),
+			new edit_space.ColorCollection( 0xEF1551, new < int >[ GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xF58581, new < int >[ GROUP_PINK, GROUP_ORANGE, GROUP_RED ] ),
+			new edit_space.ColorCollection( 0xF05A73, new < int >[ GROUP_PINK, GROUP_ORANGE, GROUP_RED ] ),
+			//new edit_space.ColorCollection( 0xFFD5DC, new < int >[ GROUP_PINK, GROUP_WHITE ] ),
+			new edit_space.ColorCollection( 0x874489, new < int >[ GROUP_PURPLE, GROUP_PINK ] ),
+			new edit_space.ColorCollection( 0x7C51A1, new < int >[ GROUP_BLUE, GROUP_DARK_BLUE ] ),
+			new edit_space.ColorCollection( 0x6B4E7C, new < int >[ GROUP_GREY, GROUP_BLUE, GROUP_DARK_BLUE ] ),
+			new edit_space.ColorCollection( 0x6A4288, new < int >[ GROUP_GREY, GROUP_BLUE, GROUP_DARK_BLUE ] ),
+		];
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>

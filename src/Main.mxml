@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:ie="ie.*"
+			   addedToStage="onInit()" >
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
+	<mx:MenuBar id="_menuBar" labelField="@label" percentWidth="100" itemClick="onMenuItem(event)" >
+		<fx:XMLList>
+			<menuitem label="File" >
+				<menuitem label="Open project..." id="open_project" />
+				<menuitem label="Save project" id="save_project" enabled="false" />
+				<menuitem label="Save project as..." id="save_project_as" />
+			</menuitem>
+			
+			<menuitem label="Project" >
+				<menuitem label="Properties..." id="project_properties" />
+			</menuitem>
+			
+			<menuitem label="Help" >
+				<menuitem label="About" id="about" />
+			</menuitem>
+		</fx:XMLList>
+	</mx:MenuBar>
+	
+	<!-- everything below menu: -->
+	<mx:HDividedBox percentWidth="100" percentHeight="100" >
+		
+		<mx:VDividedBox percentWidth="70" percentHeight="100" >
+			
+			<s:Group percentWidth="100" percentHeight="80" dragEnter="onIsometryDragEnter(event)" dragOver="onIsometryDragOver(event)" dragDrop="onIsometryDragDrop(event)" >
+				<ie:Isometry id="_isometry" />
+			</s:Group>
+			
+			<s:Scroller percentWidth="100" percentHeight="20" >
+				<s:Group id="_resources_preview_holder" />
+			</s:Scroller>
+			
+		</mx:VDividedBox>
+		
+		
+		<mx:Accordion percentWidth="30" percentHeight="100" creationPolicy="all" >
+			
+			<mx:VBox label="Resources" percentWidth="100" percentHeight="100" >
+				<s:List id="_resources_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onResourceChoice(event)" contextMenu="onResourcesContextMenu(event)" >
+					<s:ArrayList id="_resources_list_data_provider" />
+				</s:List>
+			</mx:VBox>
+			
+			<mx:VBox label="Templates" percentWidth="100" percentHeight="100" >
+				<s:List id="_templates_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onTemplateChoice(event)" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)">
+					<s:ArrayList id="_templates_list_data_provider" />
+				</s:List>
+			</mx:VBox>
+			
+			<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
+				<s:List id="_compounds_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onCompoundsChoice(event)" contextMenu="onCompoundsContextMenu(event)" >
+					<s:ArrayList id="_compounds_list_data_provider" />
+				</s:List>
+			</mx:VBox>
+			
+			<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
+				<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" />
+			</mx:VBox>
+			
+			<mx:VBox label="Maps" percentWidth="100" percentHeight="100" >
+				<s:List id="_maps_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onMapsChoice(event)" contextMenu="onMapsContextMenu(event)" >
+					<s:ArrayList id="_maps_list_data_provider" />
+				</s:List>
+			</mx:VBox>
+			
+			<mx:VBox label="Layers" percentWidth="100" percentHeight="100" >
+				<s:List id="_layers_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onLayersChoice(event)" contextMenu="onLayersContextMenu(event)" >
+					<s:ArrayList id="_layers_list_data_provider" />
+				</s:List>
+			</mx:VBox>
+			
+			<mx:VBox label="Instance properties" enabled="false" paddingTop="10" paddingLeft="10" verticalGap="20" >
+				<mx:VBox>
+					<mx:HBox >
+						<mx:Text text="iso X" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+					<mx:HBox>
+						<mx:Text text="iso Y" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+				</mx:VBox>
+				
+				<mx:VBox>
+					<mx:HBox >
+						<mx:Text text="tile X" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+					<mx:HBox>
+						<mx:Text text="tile Y" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+				</mx:VBox>
+				
+				<mx:VBox>
+					<mx:HBox >
+						<mx:Text text="flat X" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+					<mx:HBox>
+						<mx:Text text="flat Y" />
+						<mx:TextInput width="40" />
+					</mx:HBox>
+				</mx:VBox>
+			</mx:VBox>
+			
+		</mx:Accordion>
+		
+	</mx:HDividedBox>
+	
+	
+	<fx:Script>
+		<![CDATA[
+import blisc.Blisc;
+import com.junkbyte.console.Cc;
+import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
+import flash.display.InteractiveObject;
+import flash.display.Loader;
+import flash.display.LoaderInfo;
+import flash.errors.IOError;
+import flash.events.ContextMenuEvent;
+import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.events.MouseEvent;
+import flash.events.SecurityErrorEvent;
+import flash.filesystem.File;
+import flash.filesystem.FileMode;
+import flash.filesystem.FileStream;
+import flash.geom.Point;
+import flash.net.FileFilter;
+import flash.net.FileReference;
+import flash.net.URLLoader;
+import flash.net.URLRequest;
+import flash.system.ApplicationDomain;
+import flash.ui.ContextMenu;
+import flash.utils.ByteArray;
+import flash.utils.getQualifiedClassName;
+import ie.EditingLayerWindow;
+import ie.EditingMapWindow;
+import ie.EditingProjectWindow;
+import ie.EditingTemplateWindow;
+import list_items.CompoundListItem;
+import list_items.LayerListItem;
+import list_items.MapListItem;
+import list_items.TemplateListItem;
+import mx.collections.ArrayList;
+import mx.containers.TitleWindow;
+import mx.controls.Alert;
+import mx.controls.List;
+import mx.controls.Menu;
+import mx.core.DragSource;
+import mx.core.FlexTextField;
+import mx.core.UIComponent;
+import mx.events.DragEvent;
+import mx.events.IndexChangedEvent;
+import mx.events.MenuEvent;
+import mx.managers.DragManager;
+import mx.managers.PopUpManager;
+import org.bytearray.explorer.SWFExplorer;
+import org.osmf.media.LoadableElementBase;
+import project_data.ComplexTemplate;
+import project_data.CompoundTemplate;
+import project_data.Layer;
+import project_data.Map;
+import project_data.Resource;
+import ru.etcs.utils.getDefinitionNames;
+import spark.components.DataGroup;
+import spark.components.Label;
+import spark.core.IContentLoader;
+import spark.events.IndexChangeEvent;
+import spark.skins.spark.DefaultItemRenderer;
+import utils.Utils;
+import view.Projection;
+
+		public var _projectPath:String = null;
+		
+		public var _project:Project;
+		
+		public var _resourcesPreview:ResourcesPreview = new ResourcesPreview;
+		
+		/** Currently displayed map and layers of which are displayed within "layers list".*/
+		public var _chosenMap:Map = null;
+		
+		
+		public function onInit( ... args ): void
+		{
+			_project = new Project( this );
+			
+			Cc.config.commandLineAllowed = true; // Enables full commandLine features
+			Cc.config.maxLines = 3000; // change maximum log lines to 3000, default is 1000
+			Cc.config.defaultStackDepth = 10;
+			Cc.startOnStage( stage, "`" );
+			//width and hight can be settled only AFTER console is shown:
+			Cc.width = 700;
+			Cc.height = 400;
+			
+			_resources_preview_holder.addElement( _resourcesPreview );
+			
+			_isometry.Init( _project, this );
+		}
+		
+		public function onResourceChoice( e:IndexChangeEvent ): void
+		{
+			var resource:Resource = ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ].resource as Resource;
+			_resourcesPreview.Display( resource, _project );
+		}
+		public function onTemplateChoice( e:IndexChangeEvent ): void
+		{
+			trace( "template" );
+		}
+		public function onCompoundsChoice( e:IndexChangeEvent ): void
+		{
+			trace( "compound" );
+		}
+		public function onUnitChoice( e:IndexChangeEvent ): void
+		{
+			trace( "unit" );
+		}
+		public function onMapsChoice( e:IndexChangeEvent ): void
+		{
+			_chosenMap = ( ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ] as MapListItem ).map;
+			_isometry.Display( _chosenMap );
+		}
+		public function onLayersChoice( e:IndexChangeEvent ): void
+		{
+			trace( "layer" );
+		}
+		
+		public var _resourcesContextMenu:Menu = null;
+		public function onResourcesContextMenu( e:MouseEvent ): void
+		{
+			//for now we're ignoring right clicks on resource elements (menus like "Remove" can be added at future):
+			if ( ( e.target is DataGroup ) == false )
+			{
+				return;
+			}
+			
+			if ( _resourcesContextMenu != null && _resourcesContextMenu.visible == true )
+			{
+				_resourcesContextMenu.x = e.stageX;
+				_resourcesContextMenu.y = e.stageY;
+				return;
+			}
+			_resourcesContextMenu = Menu.createMenu( null, _resourcesContextMenuData );
+			_resourcesContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_resource":
+						_project.AddResource();
+						break;
+				}
+			} );
+			_resourcesContextMenu.show( e.stageX, e.stageY );
+		}
+		[Bindable]
+		public var _resourcesContextMenuData:Array =
+		[
+			{ label:"Add resource...", id:"add_resource" }
+		];
+		
+		private function FindListItem( e:MouseEvent, type:Class ): *
+		{
+			if ( e.target is Label )
+			{
+				var label:spark.components.Label = e.target as Label;
+				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
+				if ( dir == null )
+				{
+					Cc.error( "E: Main.FindListItem(): wrong expectations." );
+					return null;
+				}
+				else
+				{
+					var looking:* = dir.data as type;
+					if ( looking == null )
+					{
+						Cc.error( "E: Main.FindListItem(): wrong data." );
+						return null;
+					}
+					else
+					{
+						return looking;
+					}
+				}
+			}
+			return null;
+		}
+		
+		public var _templatesContextMenu:Menu = null;
+		public var _singleTemplateContextMenu:Menu = null;
+		public function onTemplatesContextMenu( e:MouseEvent ): void
+		{
+			if ( e.target is Label )
+			{
+				var templateListItem:TemplateListItem = FindListItem( e, TemplateListItem ) as TemplateListItem;
+				if ( templateListItem != null )
+				{
+					ShowSingleTemplateContextMenu( templateListItem.template, e.stageX, e.stageY );
+				}
+				return;
+			}
+			else if ( ( e.target is DataGroup ) == false )
+			{
+				return;
+			}
+			
+			if ( _templatesContextMenu != null && _templatesContextMenu.visible == true )
+			{
+				_templatesContextMenu.x = e.stageX;
+				_templatesContextMenu.y = e.stageY;
+				return;
+			}
+			_templatesContextMenu = Menu.createMenu( null, _templatesContextMenuData );
+			_templatesContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_template":
+						AddTemplate();
+						break;
+				}
+			} );
+			_templatesContextMenu.show( e.stageX, e.stageY );
+		}
+		[Bindable]
+		public var _templatesContextMenuData:Array =
+		[
+			{ label:"Add template...", id:"add_template" }
+		];
+		private function ShowSingleTemplateContextMenu( complexTemplate:ComplexTemplate, x:Number, y:Number ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _singleTemplateContextMenu != null )
+			{
+				_singleTemplateContextMenu.hide();
+				_singleTemplateContextMenu = null;
+			}
+			
+			_singleTemplateContextMenu = Menu.createMenu( null, [ { label: "Edit...", id: "edit", template: complexTemplate } ] );
+			_singleTemplateContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleTemplateMenuEvent:MenuEvent ): void
+			{
+				switch ( singleTemplateMenuEvent.item.id )
+				{
+					case "edit":
+						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						editingTemplateWindow.Init( _project, complexTemplate, thisOne );
+						PopUpManager.centerPopUp( editingTemplateWindow );
+						break;
+				}
+			} );
+			_singleTemplateContextMenu.show( x, y );
+		}
+		
+		public var _compoundsContextMenu:Menu = null;
+		public var _singleCompoundContextMenu:Menu = null;
+		private function onCompoundsContextMenu( e:MouseEvent ): void
+		{
+			if ( e.target is Label )
+			{
+				var label:spark.components.Label = e.target as Label;
+				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
+				if ( dir == null )
+				{
+					Cc.error( "E: Main.onCompoundsContextMenu(): wrong expectations." );
+				}
+				else
+				{
+					var compoundListItem:CompoundListItem = dir.data as CompoundListItem;
+					if ( compoundListItem == null )
+					{
+						Cc.error( "E: Main.onCompoundsContextMenu(): wrong data." );
+					}
+					else
+					{
+						ShowSingleCompoundContextMenu( compoundListItem.compound, e.stageX, e.stageY );
+					}
+				}
+				return;
+			}
+			else if ( ( e.target is DataGroup ) == false )
+			{
+				return;
+			}
+			
+			if ( _compoundsContextMenu != null && _compoundsContextMenu.visible == true )
+			{
+				_compoundsContextMenu.x = e.stageX;
+				_compoundsContextMenu.y = e.stageY;
+				return;
+			}
+			_compoundsContextMenu = Menu.createMenu( null, _compoundsContextMenuData );
+			_compoundsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_compound":
+						AddCompound();
+						break;
+				}
+			} );
+			_compoundsContextMenu.show( e.stageX, e.stageY );
+		}
+		[Bindable]
+		public var _compoundsContextMenuData:Array =
+		[
+			{ label:"Add compound...", id:"add_compound" }
+		];
+		private function ShowSingleCompoundContextMenu( compoundTemplate:CompoundTemplate, x:Number, y:Number ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _singleCompoundContextMenu != null )
+			{
+				_singleCompoundContextMenu.hide();
+				_singleCompoundContextMenu = null;
+			}
+			
+			_singleCompoundContextMenu = Menu.createMenu( null, [ { label: "Edit...", id: "edit", compound: compoundTemplate } ] );
+			_singleCompoundContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleCompoundMenuEvent:MenuEvent ): void
+			{
+				switch ( singleCompoundMenuEvent.item.id )
+				{
+					case "edit":
+						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						editingTemplateWindow.Init( _project, compoundTemplate, thisOne );
+						PopUpManager.centerPopUp( editingTemplateWindow );
+						break;
+				}
+			} );
+			_singleCompoundContextMenu.show( x, y );
+		}
+		
+		private var _mapsContextMenu:Menu = null;
+		public var _singleMapContextMenu:Menu = null;
+		private function onMapsContextMenu( e:MouseEvent ): void
+		{
+			if ( e.target is Label )
+			{
+				var mapListItem:MapListItem = FindListItem( e, MapListItem ) as MapListItem;
+				if ( mapListItem != null )
+				{
+					ShowMapContextMenu( mapListItem.map, e.stageX, e.stageY );
+				}
+				return;
+			}
+			else if ( ( e.target is DataGroup ) == false )
+			{
+				return;
+			}
+			
+			if ( _mapsContextMenu != null && _mapsContextMenu.visible == true )
+			{
+				_mapsContextMenu.x = e.stageX;
+				_mapsContextMenu.y = e.stageY;
+				return;
+			}
+			_mapsContextMenu = Menu.createMenu( null, _mapsContextMenuData );
+			_mapsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_map":
+						AddMap();
+						break;
+				}
+			} );
+			_mapsContextMenu.show( e.stageX, e.stageY );
+		}
+		[Bindable]
+		public var _mapsContextMenuData:Array =
+		[
+			{ label:"Add map...", id:"add_map" }
+		];
+		private function ShowMapContextMenu( map:Map, x:Number, y:Number ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _singleMapContextMenu != null )
+			{
+				_singleMapContextMenu.hide();
+				_singleMapContextMenu = null;
+			}
+			
+			_singleMapContextMenu = Menu.createMenu( null, [ { label: "Edit...", id: "edit", map: map } ] );
+			_singleMapContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleMapMenuEvent:MenuEvent ): void
+			{
+				switch ( singleMapMenuEvent.item.id )
+				{
+					case "edit":
+						var editingMapWindow:EditingMapWindow = PopUpManager.createPopUp( thisOne, EditingMapWindow, false ) as EditingMapWindow;
+						editingMapWindow.Init( _project, thisOne, map );
+						PopUpManager.centerPopUp( editingMapWindow );
+						break;
+				}
+			} );
+			_singleMapContextMenu.show( x, y );
+		}
+		
+		private var _layersContextMenu:Menu = null;
+		private var _singleLayerContextMenu:Menu = null;
+		private function onLayersContextMenu( e:MouseEvent ): void
+		{
+			if ( e.target is Label )
+			{
+				var label:spark.components.Label = e.target as Label;
+				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
+				if ( dir == null )
+				{
+					Cc.error( "E: Main.onLayersContextMenu(): wrong expectations." );
+				}
+				else
+				{
+					var layerListItem:LayerListItem = dir.data as LayerListItem;
+					if ( layerListItem == null )
+					{
+						Cc.error( "E: Main.onLayersContextMenu(): wrong data." );
+					}
+					else
+					{
+						ShowSingleLayerContextMenu( layerListItem, e.stageX, e.stageY );
+					}
+				}
+				return;
+			}
+			else if ( ( e.target is DataGroup ) == false )
+			{
+				return;
+			}
+			
+			if ( _layersContextMenu != null && _layersContextMenu.visible == true )
+			{
+				_layersContextMenu.x = e.stageX;
+				_layersContextMenu.y = e.stageY;
+				return;
+			}
+			_layersContextMenu = Menu.createMenu( null, _layersContextMenuData );
+			_layersContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_layer":
+						AddLayer();
+						break;
+				}
+			} );
+			_layersContextMenu.show( e.stageX, e.stageY );
+		}
+		[Bindable]
+		public var _layersContextMenuData:Array =
+		[
+			{ label:"Add layer...", id:"add_layer" }
+		];
+		private function ShowSingleLayerContextMenu( layerListItem:LayerListItem, x:Number, y:Number ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _singleLayerContextMenu != null )
+			{
+				_singleLayerContextMenu.hide();
+				_singleLayerContextMenu = null;
+			}
+			
+			var mdp:Object = [ { label: "Edit...", id: "edit", layerListItem: layerListItem } ];
+			if ( layerListItem.index > 0 )
+			{
+				mdp.push( { label: "Move up (deeper)", id: "move_up", layerListItem: layerListItem } );
+			}
+			if ( layerListItem.index < ( _project._data._layers.length - 1 ) )
+			{
+				mdp.push( { label: "Move down (closer)", id: "move_down", layerListItem: layerListItem } );
+			}
+			
+			_singleLayerContextMenu = Menu.createMenu( null, mdp );
+			_singleLayerContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleLayerMenuEvent:MenuEvent ): void
+			{
+				var layerListItem_withinMenu:LayerListItem = singleLayerMenuEvent.item.layerListItem;
+				
+				switch ( singleLayerMenuEvent.item.id )
+				{
+					case "edit":
+						var editingLayerWindow:EditingLayerWindow = PopUpManager.createPopUp( thisOne, EditingLayerWindow, false ) as EditingLayerWindow;
+						editingLayerWindow.Init( _project, layerListItem_withinMenu.layer, thisOne );
+						PopUpManager.centerPopUp( editingLayerWindow );
+						break;
+					
+					case "move_up":
+						const previousIndex:int = layerListItem_withinMenu.index - 1;
+						var previous:Layer = _project._data._layers[ previousIndex ];
+						_project._data._layers[ previousIndex ] = layerListItem_withinMenu.layer;
+						_project._data._layers[ layerListItem_withinMenu.index ] = previous;
+						UpdateLayersList();
+						break;
+					
+					case "move_down":
+						const nextIndex:int = layerListItem_withinMenu.index + 1;
+						var next:Layer = _project._data._layers[ nextIndex ];
+						_project._data._layers[ nextIndex ] = layerListItem_withinMenu.layer;
+						_project._data._layers[ layerListItem_withinMenu.index ] = next;
+						UpdateLayersList();
+						break;
+				}
+			} );
+			_singleLayerContextMenu.show( x, y );
+		}
+		
+		
+		private var _downComplexListItem:ComplexTemplate = null;
+		private function onTemplatesMouseDown( e:MouseEvent ): void
+		{
+			var templateListItem:TemplateListItem = FindListItem( e, TemplateListItem );
+			if ( templateListItem != null )
+			{
+				_downComplexListItem = templateListItem.template;
+			}
+		}
+		private function onTemplatesMouseUp( e:MouseEvent ): void
+		{
+			_downComplexListItem = null;
+		}
+		private function onTemplatesMouseMove( e:MouseEvent ): void
+		{
+			if ( _downComplexListItem == null )
+			{
+				return;
+			}
+			
+			if ( _downComplexListItem._singleResource == null )
+			{
+				PopUp( "Specify template's graphics first.", POP_UP_ERROR );
+			}
+			else if ( _downComplexListItem._layer == null )
+			{
+				PopUp( "Specify template's layer first.", POP_UP_ERROR );
+			}
+			else
+			{
+				StartDrag( e, _downComplexListItem, Global.DRAG_FORMAT_COMPLEX_TEMPLATE, _downComplexListItem._singleResource.FindClass( _project ) );
+			}
+			
+			//to ignore other mouse moves:
+			_downComplexListItem = null;
+		}
+		
+		
+		public static function StartDrag( e:MouseEvent, data:Object, format:String, imageClass:Class ): void
+		{
+			var uiComponent:UIComponent = Utils.FindParentByType( e.target as DisplayObject, UIComponent ) as UIComponent;
+			if ( uiComponent == null )
+			{
+				Cc.error( "E: Main.StartDrag(): failed to accomplish drag/drop quest." );
+			}
+			else
+			{
+				var dragSource:DragSource = new DragSource;
+				dragSource.addData( data, format );
+				
+				var proxy:mx.controls.Image = new mx.controls.Image;
+				proxy.source = imageClass;
+				
+				var viewToGlobal:Point = ( e.target as DisplayObject ).localToGlobal( new Point );
+				var targetToGlobal:Point = uiComponent.localToGlobal( new Point );
+				
+				DragManager.doDrag( uiComponent, dragSource, e, proxy, targetToGlobal.x - viewToGlobal.x, targetToGlobal.y - viewToGlobal.y );
+			}
+		}
+		
+		
+		
+		public static const POP_UP_INFO:int = 1;
+		public static const POP_UP_WARNING:int = 2;
+		public static const POP_UP_ERROR:int = 3;
+		[ Embed( source = "info_icon.png" ) ]
+		private var _infoIconClass:Class;
+		[ Embed( source = "warning_icon.png" ) ]
+		private var _warningIconClass:Class;
+		[ Embed( source = "error_icon.png" ) ]
+		private var _errorIconClass:Class;
+		
+		public function PopUp( message:String, type:int ): void
+		{
+			var iconClass:Class = _infoIconClass;
+			var title:String = "Info";
+			switch ( type )
+			{
+				case POP_UP_WARNING:
+					iconClass = _warningIconClass;
+					title = "Warning";
+					break;
+				
+				case POP_UP_ERROR:
+					iconClass = _errorIconClass;
+					title = "Error";
+					break;
+			}
+			Alert.show( message, title, Alert.OK, null, null, iconClass );
+		}
+		
+		public function onMenuItem( e:MenuEvent ): void
+		{
+			var thisOne:Main = this;
+			
+			switch ( e.item.@id.toString() )
+			{
+				/// FILE:
+				
+				case "open_project":
+					var openingProjectFile:File = new File;
+					
+					openingProjectFile.addEventListener( Event.SELECT, function( e:Event ): void
+					{
+						projectPath = openingProjectFile.nativePath;
+						
+						var openingProjectFileStream:FileStream = new FileStream;
+						var ok:Boolean = true;
+						try
+						{
+							openingProjectFileStream.open( openingProjectFile, FileMode.READ );
+						}
+						catch ( e:Error )
+						{
+							PopUp( "Project file opening failed with error: " + e.message, POP_UP_ERROR );
+							ok = false;
+						}
+						
+						if ( ok )
+						{
+							var bytes:ByteArray = new ByteArray;
+							openingProjectFileStream.readBytes( bytes );
+							
+							//let's try clean-up currently existing instances a little:
+							_isometry.Unload();
+							//TODO
+							///...
+							
+							_project.Accept( bytes, function( errorText:String ): void
+							{
+								if ( errorText == null )
+								{
+									PopUp( "Project successfully loaded.", POP_UP_INFO );
+								}
+								else
+								{
+									PopUp( "Project file reading failed: wrong format: \"" + errorText + "\".", POP_UP_ERROR );
+								}
+							} );
+						}
+						
+						openingProjectFileStream.close();
+					} );
+					openingProjectFile.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent:IOErrorEvent ): void
+					{
+						PopUp( "Opening failed with error: " + ioErrorEvent.text, POP_UP_ERROR );
+					} );
+					openingProjectFile.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent:SecurityErrorEvent ): void
+					{
+						PopUp( "Opening failed with error: " + securityErrorEvent.text, POP_UP_ERROR );
+					} );
+					
+					openingProjectFile.browse();
+					break;
+				
+				case "save_project":
+					if ( _projectPath == null )
+					{
+						PopUp( "Program error: no path known.", POP_UP_ERROR );
+					}
+					else
+					{
+						SaveProject( _projectPath );
+					}
+					break;
+				
+				case "save_project_as":
+					var savingAsFile:File = new File;
+					savingAsFile.addEventListener( Event.SELECT, function( ... args ): void
+					{
+						projectPath = savingAsFile.nativePath;
+						
+						SaveProject( _projectPath );
+					} );
+					savingAsFile.browse();
+					break;
+				
+				
+				///PROJECT:
+				
+				case "project_properties":
+					var editingProjectWindow:EditingProjectWindow = PopUpManager.createPopUp( thisOne, EditingProjectWindow, false ) as EditingProjectWindow;
+					editingProjectWindow.Init( _project );
+					PopUpManager.centerPopUp( editingProjectWindow );
+					break;
+				
+				
+				///HELP:
+				
+				case "about":
+					PopUp( "Isometric editor as part of \"Blisc\" engine. If you have any suggestions or issues please contact SlavMFM@gmail.com", POP_UP_INFO );
+					break;
+			}
+		}
+		
+		private function set projectPath( value:String ): void
+		{
+			_menuBar.getMenuAt( 0 ).dataProvider[ 1 ].@enabled = true;
+			
+			_projectPath = value;
+		}
+		
+		private function SaveProject( path:String ): void
+		{
+			var savingStream:FileStream = new FileStream;
+			try
+			{
+				savingStream.open( new File( path ), FileMode.WRITE );
+			}
+			catch ( e:Error )
+			{
+				PopUp( "Saving failed: file \"" + path + "\" was NOT opened: " + e.message, POP_UP_ERROR );
+				return;
+			}
+			
+			savingStream.writeBytes( _project.DataToSave() );
+			savingStream.close();
+			PopUp( "Project file successfully saved.", POP_UP_INFO );
+		}
+		
+		public function AddTemplate(): void
+		{
+			_project.AddObjectTemplate( new ComplexTemplate );
+		}
+		
+		public function AddCompound(): void
+		{
+			_project.AddObjectTemplate( new CompoundTemplate );
+		}
+		
+		public function AddMap(): void
+		{
+			var map:Map = new Map;
+			
+			_project.AddMap( map );
+		}
+		
+		public function AddLayer(): void
+		{
+			_project._data._layers.push( new Layer );
+			UpdateLayersList();
+		}
+		
+		public function UpdateLayersList(): void
+		{
+			for each ( var destroyingListItem:LayerListItem in _layers_list_data_provider.source )
+			{
+				destroyingListItem.Destroy();
+			}
+			_layers_list_data_provider.source.length = 0;
+			_layers_list_data_provider.source = [];
+			
+			for ( var i:int = 0; i < _project._data._layers.length; ++i )
+			{
+				var layer:Layer = _project._data._layers[ i ];
+				_layers_list_data_provider.addItem( new LayerListItem( layer._name, layer, i ) );
+			}
+		}
+		
+		private function onIsometryDragEnter( event:DragEvent ): void
+		{
+			_isometry.onDragEnter( event );
+		}
+		
+		private function onIsometryDragOver( event:DragEvent ): void
+		{
+			_isometry.onDragOver( event );
+		}
+		
+		private function onIsometryDragDrop( event:DragEvent ): void
+		{
+			_isometry.onDragDrop( event );
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Application>
+
