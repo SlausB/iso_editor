@@ -52,6 +52,46 @@ package
 			//where everything will be drawn:
 			var grid:Sprite = new Sprite;
 			
+			//mesh:
+			const X_TILE_BOUNDARY:Number = 4;
+			const Y_TILE_BOUNDARY:Number = 4;
+			var tileBitmapData:BitmapData = new BitmapData( _project._data._tileSize * 2.0 + X_TILE_BOUNDARY * 2.0, _project._data._tileSize + Y_TILE_BOUNDARY * 2.0, true, 0 );
+			var tileTemplate:Sprite = new Sprite;
+			tileTemplate.graphics.lineStyle( 2, 0x49C221 );
+			//north:
+			tileTemplate.graphics.moveTo( X_TILE_BOUNDARY + _project._data._tileSize, Y_TILE_BOUNDARY );
+			//east:
+			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + _project._data._tileSize * 2.0, Y_TILE_BOUNDARY + _project._data._tileSize / 2.0 );
+			//south:
+			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + _project._data._tileSize, Y_TILE_BOUNDARY + _project._data._tileSize );
+			//west:
+			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY , Y_TILE_BOUNDARY + _project._data._tileSize / 2.0 );
+			//back to north:
+			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + _project._data._tileSize, Y_TILE_BOUNDARY );
+			tileBitmapData.draw( tileTemplate, null, null, null, null, true );
+			const TILES:int = Math.ceil( Math.ceil( _mapRight / _project._data._tileSize + 3 ) * Math.ceil( _mapDown / _project._data._tileSize * 2.0 + 3 ) ) * 4;
+			var tilePos:Point = new Point;
+			var boundaryRect:Rectangle = new Rectangle( -_mapRight, -_mapDown, _mapRight * 2.0, _mapDown * 2.0 );
+			var viewportRect:Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth, _viewportHeight );
+			var tileRect:Rectangle = new Rectangle( 0, 0, _project._data._tileSize * 2.0, _project._data._tileSize );
+			var destPoint:Point = new Point;
+			for ( var i:int = 0; i < TILES; ++i )
+			{
+				Utils.IsoSpriralFromTile( i, tilePos );
+				tilePos.x *= _project._data._tileSize;
+				tilePos.y *= _project._data._tileSize;
+				
+				tileRect.x = tilePos.x - _project._data._tileSize;
+				tileRect.y = tilePos.y;
+				
+				if ( boundaryRect.intersects( tileRect ) && viewportRect.intersects( tileRect ) )
+				{
+					destPoint.x = tileRect.x - cameraX - X_TILE_BOUNDARY;
+					destPoint.y = tileRect.y - cameraY - Y_TILE_BOUNDARY;
+					_bitmapData.copyPixels( tileBitmapData, tileBitmapData.rect, destPoint, null, null, true );
+				}
+			}
+			
 			//boundaries:
 			function DrawClampedLine( start:ClampedPoint, end:ClampedPoint ): void
 			{
@@ -111,51 +151,6 @@ package
 			//finally draw boundary onto canvas:
 			_bitmapData.draw( grid );
 			
-			//mesh:
-			const X_TILE_BOUNDARY:Number = 4;
-			const Y_TILE_BOUNDARY:Number = 4;
-			var tileBitmapData:BitmapData = new BitmapData( _project._data._tileSize * 2.0 + X_TILE_BOUNDARY * 2.0, _project._data._tileSize + Y_TILE_BOUNDARY * 2.0 );
-			var tileTemplate:Sprite = new Sprite;
-			tileTemplate.graphics.lineStyle( 2, 0x00FF00 );
-			tileTemplate.graphics.moveTo( X_TILE_BOUNDARY, Y_TILE_BOUNDARY );
-			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + _project._data._tileSize, Y_TILE_BOUNDARY + _project._data._tileSize / 2.0 );
-			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY, Y_TILE_BOUNDARY + _project._data._tileSize );
-			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY - _project._data._tileSize, Y_TILE_BOUNDARY - _project._data._tileSize / 2.0 );
-			tileTemplate.graphics.lineTo( X_TILE_BOUNDARY, Y_TILE_BOUNDARY );
-			tileBitmapData.draw( tileTemplate );
-			const X_STEP:Number = _project._data._tileSize * 2.0;
-			const Y_STEP:Number = _project._data._tileSize;
-			//starting from upper left corner:
-			var gridX:Number = - ( Math.floor( _mapRight / X_STEP ) + 1 ) * X_STEP;
-			var gridY:Number = - ( Math.floor( _mapDown / Y_STEP ) + 1 ) * Y_STEP;
-			function FromX( xToY:Number, x:Number, y:Number ): Number
-			{
-				return - xToY / 2.0;
-			}
-			//length of viewport's left side which we must travel to draw all lines:
-			var path:Number = _viewportHeight + _viewportWidth / 2.0;
-			const TILES:int = Math.ceil( Math.ceil( _mapRight / _project._data._tileSize ) * Math.ceil( _mapDown / _project._data._tileSize ) );
-			var tilePos:Point = new Point;
-			var viewportRect:Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth, _viewportHeight );
-			var tileRect:Rectangle = new Rectangle( 0, 0, _project._data._tileSize * 2.0, _project._data._tileSize );
-			var destPoint:Point = new Point;
-			for ( var i:int = 0; i < TILES; ++i )
-			{
-				Utils.IsoSpriralFromTile( i, tilePos );
-				tilePos.x *= _project._data._tileSize * 2.0;
-				tilePos.y *= _project._data._tileSize;
-				
-				tileRect.x = tilePos.x - _project._data._tileSize;
-				tileRect.y = tilePos.y;
-				
-				if ( viewportRect.intersects( tileRect ) )
-				{
-					destPoint.x = tileRect.x - cameraX;
-					destPoint.y = tileRect.y - cameraY;
-					_bitmapData.copyPixels( tileBitmapData, tileBitmapData.rect, destPoint );
-				}
-			}
-			
 			
 			canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ) );
 		}
@@ -179,7 +174,7 @@ package
 			{
 				_bitmapData.dispose();
 			}
-			_bitmapData = new BitmapData( _viewportWidth, _viewportHeight );
+			_bitmapData = new BitmapData( _viewportWidth, _viewportHeight, true, 0 );
 		}
 	}
 

@@ -56,7 +56,7 @@
 			</mx:VBox>
 			
 			<mx:VBox label="Templates" percentWidth="100" percentHeight="100" >
-				<s:List id="_templates_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onTemplateChoice(event)" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)">
+				<s:List id="_templates_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onTemplateChoice(event)" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)" >
 					<s:ArrayList id="_templates_list_data_provider" />
 				</s:List>
 			</mx:VBox>
@@ -68,7 +68,9 @@
 			</mx:VBox>
 			
 			<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
-				<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" />
+				<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" mouseDown="onUnitsMouseDown(event)" mouseUp="onUnitsMouseUp(event)" mouseMove="onUnitsMouseMove(event)" >
+					<s:ArrayList id="_units_list_data_provider" />
+				</s:List>
 			</mx:VBox>
 			
 			<mx:VBox label="Maps" percentWidth="100" percentHeight="100" >
@@ -158,6 +160,7 @@ import list_items.CompoundListItem;
 import list_items.LayerListItem;
 import list_items.MapListItem;
 import list_items.TemplateListItem;
+import list_items.UnitListItem;
 import mx.collections.ArrayList;
 import mx.containers.TitleWindow;
 import mx.controls.Alert;
@@ -656,6 +659,33 @@ import view.Projection;
 			
 			//to ignore other mouse moves:
 			_downComplexListItem = null;
+		}
+		
+		
+		private var _downUnitListItem:UnitDesc = null;
+		private function onUnitsMouseDown( e:MouseEvent ): void
+		{
+			var unitListItem:UnitListItem = FindListItem( e, UnitListItem );
+			if ( unitListItem != null )
+			{
+				_downUnitListItem = unitListItem.unit;
+			}
+		}
+		private function onUnitsMouseUp( e:MouseEvent ): void
+		{
+			_downUnitListItem = null;
+		}
+		private function onUnitsMouseMove( e:MouseEvent ): void
+		{
+			if ( _downUnitListItem == null )
+			{
+				return;
+			}
+			
+			StartDrag( e, _downUnitListItem, Global.DRAG_FORMAG_UNIT_DESC, _downUnitListItem._singleResource.FindClass( _project ) );
+			
+			//to ignore other mouse moves:
+			_downUnitListItem = null;
 		}
 		
 		

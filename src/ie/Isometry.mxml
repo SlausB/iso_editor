@@ -29,11 +29,13 @@ import blisc.BliscSprite;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;
+import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.TextField;
+import flash.utils.getTimer;
 import mx.core.UIComponent;
 import mx.events.DragEvent;
 import mx.managers.DragManager;
@@ -52,6 +54,8 @@ import view.Projection;
 		private var _bliscViewport:Sprite = new Sprite;
 		
 		public var _blisc:Blisc;
+		
+		private var _isometryObjects:Vector.< IsometryObject > = new Vector.< IsometryObject >;
 		
 		/** Dirty (but only one known) way to handle viewport size changes.*/
 		private var _previousWidth:Number;
@@ -82,6 +86,7 @@ import view.Projection;
 			_main = main;
 		}
 		
+		private var _previousTime:int = 0;
 		private function onEnterFrame( ... args ): void
 		{
 			if ( width != _previousWidth || height != _previousHeight )
@@ -102,13 +107,30 @@ import view.Projection;
 			
 			if ( _blisc != null )
 			{
+				var currentTime:int = getTimer();
+				var elapsedSeconds:Number = ( currentTime - _previousTime ) / 1000.0;
+				_previousTime = currentTime;
+				if ( elapsedSeconds > 0.1 )
+				{
+					elapsedSeconds = 0.1;
+				}
+				
+				for each ( var isometryObject:IsometryObject in _isometryObjects )
+				{
+					isometryObject.Update( elapsedSeconds );
+				}
+				
 				_blisc.draw();
 			}
 		}
 		
 		public function onIsometryMouseEvent( type:int, opaqueData:* ): void
 		{
-			
+			var isometryObject:IsometryObject = opaqueData as IsometryObject;
+			if ( isometryObject != null )
+			{
+				isometryObject.OnMouseEvent( type );
+			}
 		}
 		
 		/** TODO:
@@ -117,13 +139,7 @@ import view.Projection;
 		*/
 		private function CreateAnimation( singleResource:SingleResource ): BliscAnimation
 		{
-			var resourceView:DisplayObject = singleResource.Display( _project );
-			
-			var bitmapData:BitmapData = new BitmapData( resourceView.width, resourceView.height );
-			bitmapData.draw( resourceView );
-			
-			var bliscAnimation:BliscAnimation = new BliscAnimation( 0, new < BliscSprite >[ new BliscSprite( bitmapData ) ], null, singleResource._name );
-			return bliscAnimation;
+			return BliscAnimation.FromMovieClip( singleResource.Display( _project ) as MovieClip, _project.FindResource( singleResource._resourcePath )._FPS, singleResource._name );
 		}
 		
 		private function ComplexTemplateToBlisc( complex:ComplexTemplate ): BliscComplexTemplate
@@ -150,7 +166,10 @@ import view.Projection;
 				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
 			}
 			
-			var bliscCompound:BliscCompound = new BliscCompound( bliscObjectTemplate, null, _blisc );
+			var isometryObject:IsometryObject = new IsometryObject;
+			_isometryObjects.push( isometryObject );
+			var bliscCompound:BliscCompound = new BliscCompound( bliscObjectTemplate, isometryObject, _blisc );
+			isometryObject._view = bliscCompound;
 			bliscCompound.SetIsoX( objectInstance._isoCoords.x );
 			bliscCompound.SetIsoY( objectInstance._isoCoords.y );
 			_blisc.AddObject( bliscCompound );
@@ -169,12 +188,6 @@ import view.Projection;
 			Unload();
 			
 			_displaying = map;
-			
-			if ( _blisc != null )
-			{
-				_blisc.Destroy();
-				_blisc = null;
-			}
 			
 			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project._data._tileSize * Utils.TILE_SIDE );
 			
@@ -204,6 +217,18 @@ import view.Projection;
 			if ( _displaying == null )
 			{
 				return;
+			}
+			
+			if ( _blisc != null )
+			{
+				for each ( var isometryObject:IsometryObject in _isometryObjects )
+				{
+					isometryObject.Destroy();
+				}
+				_isometryObjects.length = 0;
+				
+				_blisc.Destroy();
+				_blisc = null;
 			}
 		}
 		

@@ -17,6 +17,7 @@ package
 	import list_items.MapListItem;
 	import list_items.ResourceListItem;
 	import list_items.TemplateListItem;
+	import list_items.UnitListItem;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.rpc.soap.types.MapType;
@@ -78,6 +79,8 @@ package
 			
 			//graphical resources:
 			_loadingResourceIndex = 0;
+			_main._resources_list_data_provider.removeAll();
+			_main._units_list_data_provider.removeAll();
 			LoadNextResource( function( errorText:String ): void
 			{
 				if ( errorText == null )
@@ -153,20 +156,16 @@ package
 		{
 			if ( _loadingResourceIndex >= _data._resources.length )
 			{
-				//display just loaded project:
-				_main._resources_list_data_provider.removeAll();
-				for each ( var resource:Resource in _data._resources )
-				{
-					_main._resources_list_data_provider.addItem( new ResourceListItem( resource._path, resource ) );
-				}
-				
 				onResult( null );
 			}
 			else
 			{
-				LoadResource( _data._resources[ _loadingResourceIndex ]._path, function( applicationDomain:ApplicationDomain, names:Array ): void
+				LoadResource( _data._resources[ _loadingResourceIndex ]._path, function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 				{
-					_data._resources[ _loadingResourceIndex ].Init( applicationDomain, names );
+					_data._resources[ _loadingResourceIndex ].Init( applicationDomain, names, FPS );
+					
+					DisplayResource( _data._resources[ _loadingResourceIndex ] );
+					
 					++_loadingResourceIndex;
 					LoadNextResource( onResult );
 				},
@@ -193,10 +192,13 @@ package
 			var j:int = 0;
 			for ( ; i < _data._resources.length; ++i )
 			{
-				temp.push( { ad: _data._resources[ i ]._applicationDomain, n: _data._resources[ i ]._names } );
+				var sr:Resource = _data._resources[ i ];
+				
+				temp.push( { ad: sr._applicationDomain, n: sr._names, u: sr._units, F: sr._FPS } );
 				
 				_data._resources[ i ]._applicationDomain = null;
 				_data._resources[ i ]._names = null;
+				_data._resources[ i ]._units = null;
 			}
 			
 			var byteArray:ByteArray = new ByteArray;
@@ -205,8 +207,12 @@ package
 			
 			for ( i = 0; i < _data._resources.length; ++i )
 			{
-				_data._resources[ i ]._applicationDomain = temp[ i ].ad;
-				_data._resources[ i ]._names = temp[ i ].n;
+				var lr:Resource = _data._resources[ i ];
+				
+				lr._applicationDomain = temp[ i ].ad;
+				lr._names = temp[ i ].n;
+				lr._units = temp[ i ].u;
+				lr._FPS = temp[ i ].F;
 			}
 			
 			return byteArray;
@@ -214,7 +220,7 @@ package
 		
 		/** Load specified resources.
 		\param path Full native path.
-		\param onSuccess function( applicationDomain:ApplicationDomain, names:Array ): void
+		\param onSuccess function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 		\param onFail function( why:String ): void
 		*/
 		private function LoadResource( path:String, onSuccess:Function, onFail:Function ): void
@@ -225,7 +231,8 @@ package
 				var target:LoaderInfo = e.target as LoaderInfo;
 				onSuccess(
 					target.applicationDomain,
-					getDefinitionNames( target )
+					getDefinitionNames( target ),
+					target.frameRate
 				);
 			} );
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent:IOErrorEvent ): void
@@ -248,16 +255,17 @@ package
 			{
 				var path:String = new File( File.applicationDirectory.nativePath ).getRelativePath( new File( browseToResource.nativePath ), true );
 				
-				LoadResource( path, function( applicationDomain:ApplicationDomain, names:Array ): void
+				LoadResource( path, function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 				{
 					_main.PopUp( "Resource successfully added", Main.POP_UP_INFO );
 					
 					var resource:Resource = new Resource;
 					resource._path = path;
-					resource.Init( applicationDomain, names );
+					resource.Init( applicationDomain, names, FPS );
 					
 					_data._resources.push( resource );
-					_main._resources_list_data_provider.addItem( new ResourceListItem( path, resource ) );
+					
+					DisplayResource( resource );
 					
 					if ( andDisplay )
 					{
@@ -270,6 +278,16 @@ package
 				} );
 			} );
 			browseToResource.browse();
+		}
+		
+		private function DisplayResource( resource:Resource ): void
+		{
+			_main._resources_list_data_provider.addItem( new ResourceListItem( resource._path, resource ) );
+			
+			for each ( var unitDesc:UnitDesc in resource._units)
+			{
+				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc._name, unitDesc ) );
+			}
 		}
 		
 		public function AddObjectTemplate( template:ObjectTemplate ): void
