@@ -1,6 +1,7 @@
 ///@cond
 package  
 {
+	import blisc.BliscComplexWithinCompound;
 	import blisc.BliscCompound;
 	import blisc.BliscDisplayObject;
 	import flash.filters.GlowFilter;
@@ -39,7 +40,7 @@ package
 					{
 						_main._isometry.HideTip();
 						_main._isometry._objectTip = ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY );
-						bdo.Highlight( new GlowFilter( 0x00FF00, 1, 8, 8, 3 ) );
+						Highlight( new GlowFilter( 0x00FF00, 1, 8, 8, 3 ) );
 					}
 					break;
 				
@@ -47,7 +48,7 @@ package
 					if ( _main._isometry._selected != this )
 					{
 						_main._isometry.HideTip();
-						bdo.Unhighlight();
+						Unhighlight();
 					}
 					break;
 				
@@ -59,7 +60,7 @@ package
 							_main._isometry._selected.bdo.Unhighlight();
 						}
 						_main._isometry._selected = this;
-						bdo.Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
+						Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
 						
 						_main.SetObjectTilePos( _objectInstance._tileCoords.x, _objectInstance._tileCoords.y );
 						
@@ -69,7 +70,7 @@ package
 					{
 						_main._isometry._selected = null;
 						_main.ShowObjectProperties();
-						bdo.Unhighlight();
+						Unhighlight();
 					}
 					break;
 			}
@@ -84,7 +85,26 @@ package
 		{
 			_elapsed += elapsedSeconds;
 			
-			bdo.Replicate( _view.At( 0 )._template._complex._view.Resolve( _elapsed ) );
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			{
+				complexWithinCompound._complex._bdo.Replicate( complexWithinCompound._template._complex._view.Resolve( _elapsed ) );
+			}
+		}
+		
+		public function Highlight( glowFilter:GlowFilter ): void
+		{
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			{
+				complexWithinCompound._complex._bdo.Highlight( glowFilter );
+			}
+		}
+		
+		public function Unhighlight(): void
+		{
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			{
+				complexWithinCompound._complex._bdo.Unhighlight();
+			}
 		}
 		
 		public function Destroy(): void
