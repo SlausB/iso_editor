@@ -186,7 +186,7 @@ import view.Projection;
 					complexes.push( new BliscComplexWithinCompoundTemplate(
 						ComplexTemplateToBlisc( complexWithinCompound._complex ),
 						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ),
-						Utils.FromIso( complexWithinCompound._tileDispX / _project.side, complexWithinCompound._tileDispY / _project.side )
+						Utils.FromIso( complexWithinCompound._tileDispX * _project.side, complexWithinCompound._tileDispY * _project.side, new Point )
 					) );
 				}
 				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );

@@ -36,7 +36,7 @@ package ie
 			
 			if ( withinCompound != null )
 			{
-				var planar:Point = Utils.FromIso( withinCompound._tileDispX * project.side, withinCompound._tileDispY * project.side );
+				var planar:Point = Utils.FromIso( withinCompound._tileDispX * project.side, withinCompound._tileDispY * project.side, new Point );
 				x = planar.x;
 				y = planar.y;
 			}

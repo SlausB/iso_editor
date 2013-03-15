@@ -79,21 +79,21 @@ import utils.Utils;
 		
 		private function Update(): void
 		{
-			_sideStepper.value = _sideValue = _tileSize / Utils.TILE_SIDE;
+			_sideStepper.value = _sideValue = _tileSize * Utils.TILE_SIDE;
 			_widthStepper.value = _widthValue = _tileSize * 2.0;
 			_heightStepper.value = _heightValue = _tileSize;
 			
-			var pos:Point;
+			var pos:Point = new Point;
 			
 			_sample.graphics.clear();
 			
 			_sample.graphics.beginFill( 0x0000FF );
 			_sample.graphics.moveTo( 0, 0 );
-			pos = Utils.FromIso( _sideValue, 0 );
+			Utils.FromIso( _sideValue, 0, pos );
 			_sample.graphics.lineTo( pos.x, pos.y );
-			pos = Utils.FromIso( _sideValue, _sideValue );
+			Utils.FromIso( _sideValue, _sideValue, pos );
 			_sample.graphics.lineTo( pos.x, pos.y );
-			pos = Utils.FromIso( 0, _sideValue );
+			Utils.FromIso( 0, _sideValue, pos );
 			_sample.graphics.lineTo( pos.x, pos.y );
 			_sample.graphics.lineTo( 0, 0 );
 			_sample.graphics.endFill();
@@ -103,20 +103,20 @@ import utils.Utils;
 			{
 				case MEASURE_SIDE:
 					_sample.graphics.moveTo( 0, 0 );
-					pos = Utils.FromIso( _sideValue, 0 );
+					Utils.FromIso( _sideValue, 0, pos );
 					_sample.graphics.lineTo( pos.x, pos.y );
 					break;
 				
 				case MEASURE_WIDTH:
-					pos = Utils.FromIso( 0, _sideValue );
+					Utils.FromIso( 0, _sideValue, pos );
 					_sample.graphics.moveTo( pos.x, pos.y );
-					pos = Utils.FromIso( _sideValue, 0 );
+					Utils.FromIso( _sideValue, 0, pos );
 					_sample.graphics.lineTo( pos.x, pos.y );
 					break;
 				
 				case MEASURE_HEIGHT:
 					_sample.graphics.moveTo( 0, 0 );
-					pos = Utils.FromIso( _sideValue, _sideValue );
+					Utils.FromIso( _sideValue, _sideValue, pos );
 					_sample.graphics.lineTo( pos.x, pos.y );
 					break;
 			}
@@ -132,7 +132,7 @@ import utils.Utils;
 				value = Math.round( _sideValue ) + 1.0;
 			}
 			
-			_tileSize = value / Utils.TILE_SIDE;
+			_tileSize = value * Utils.TILE_SIDE;
 			Update();
 		}
 		

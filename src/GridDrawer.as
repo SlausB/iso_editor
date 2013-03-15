@@ -78,8 +78,8 @@ package
 			for ( var i:int = 0; i < TILES; ++i )
 			{
 				Utils.IsoSpriralFromTile( i, tilePos );
-				tilePos.x *= _project._data._tileSize;
-				tilePos.y *= _project._data._tileSize;
+				tilePos.x *= _project.side;
+				tilePos.y *= _project.side;
 				
 				tileRect.x = tilePos.x - _project._data._tileSize;
 				tileRect.y = tilePos.y;

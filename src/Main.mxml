@@ -980,7 +980,7 @@ import view.Projection;
 			_objectIsoY.text = isoY.toString();
 			_objectTileX.text = _isometry._selected._objectInstance._tileCoords.x.toString();
 			_objectTileY.text = _isometry._selected._objectInstance._tileCoords.y.toString();
-			var flat:Point = Utils.FromIso( isoX, isoY );
+			var flat:Point = Utils.FromIso( isoX, isoY, new Point );
 			_objectFlatX.text = flat.x.toString();
 			_objectFlatY.text = flat.y.toString();
 		}
@@ -1021,7 +1021,7 @@ import view.Projection;
 		}
 		private function SetObjectPosFromFlat(): void
 		{
-			var iso:Point = Utils.ToIso( parseFloat( _objectFlatX.text ), parseFloat( _objectFlatY.text ) );
+			var iso:Point = Utils.ToIso( parseFloat( _objectFlatX.text ), parseFloat( _objectFlatY.text ), new Point );
 			SetObjectTilePos( iso.x, iso.y );
 		}
 		private function onObjectFlatXChange( ... args ): void

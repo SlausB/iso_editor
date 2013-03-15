@@ -269,7 +269,7 @@ import utils.Utils;
 				for each ( var template:DraggingComplex in _templates )
 				{
 					var adding:ComplexWithinCompound = new ComplexWithinCompound;
-					var iso:Point = Utils.ToIso( template.x, template.y );
+					var iso:Point = Utils.ToIso( template.x, template.y, new Point );
 					adding.Init( template._complex, iso.x / _project.side, iso.y / _project.side );
 					_compound._consisting.push( adding );
 				}
@@ -315,9 +315,9 @@ import utils.Utils;
 		
 		private function ShowIsoDisplacements(): void
 		{
-			var iso:Point = Utils.ToIso( _dispXStepper.value, _dispYStepper.value );
-			_tileDispXInput.text = ( iso.x / _project._data._tileSize ).toString();
-			_tileDispYInput.text = ( iso.y / _project._data._tileSize ).toString();
+			var iso:Point = Utils.ToIso( _dispXStepper.value, _dispYStepper.value, new Point );
+			_tileDispXInput.text = ( iso.x / _project.side ).toString();
+			_tileDispYInput.text = ( iso.y / _project.side ).toString();
 		}
 		
 		private function ApplyDisplacement( andIso:Boolean = true ): void
@@ -351,8 +351,10 @@ import utils.Utils;
 		private function ApplyTileDisplacement(): void
 		{
 			var planar:Point = Utils.FromIso(
-				parseFloat( _tileDispXInput.text ) * _project._data._tileSize,
-				parseFloat( _tileDispYInput.text ) * _project._data._tileSize );
+				parseFloat( _tileDispXInput.text ) * _project.side,
+				parseFloat( _tileDispYInput.text ) * _project.side,
+				new Point
+			);
 			
 			_dispXStepper.value = planar.x;
 			_dispYStepper.value = planar.y;
@@ -501,10 +503,10 @@ import utils.Utils;
 					
 					_pos.text = "x = " + tile.x.toString() + ", y = " + tile.y.toString();
 					
-					var planarPos:Point = Utils.FromIso( tile.x, tile.y );
+					var planarPos:Point = Utils.FromIso( tile.x * _project.side, tile.y * _project.side, new Point );
 					
-					_cursor.x = planarPos.x * _project._data._tileSize;
-					_cursor.y = planarPos.y * _project._data._tileSize;
+					_cursor.x = planarPos.x;
+					_cursor.y = planarPos.y;
 					_cursor.visible = true;
 				}
 				else if ( newDragging != _dragging )
@@ -569,8 +571,8 @@ import utils.Utils;
 		private function ResolveTile( stageX:Number, stageY:Number ): Point
 		{
 			var coords:Point = _content.globalToLocal( new Point( stageX, stageY ) );
-			var isoPos:Point = Utils.ToIso( coords.x, coords.y );
-			return new Point( Math.floor( isoPos.x / ( _project._data._tileSize/* * Utils.ISO_SLOPE_COS*/ ) ), Math.floor( isoPos.y / ( _project._data._tileSize/* * Utils.ISO_SLOPE_COS*/ ) ) );
+			var isoPos:Point = Utils.ToIso( coords.x, coords.y, new Point );
+			return new Point( Math.floor( isoPos.x / _project.side ), Math.floor( isoPos.y / _project.side ) );
 		}
 		
 		private function AddDragging( dragging:DraggingComplex ): void
@@ -672,12 +674,12 @@ import utils.Utils;
 			_cursor.graphics.clear();
 			_cursor.graphics.lineStyle( 3, 0x1EE843 );
 			_cursor.graphics.lineTo( 0, 0 );
-			var cursorCoord:Point;
-			cursorCoord = Utils.FromIso( project._data._tileSize, 0 );
+			var cursorCoord:Point = new Point;
+			Utils.FromIso( project.side, 0, cursorCoord );
 			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
-			cursorCoord = Utils.FromIso( project._data._tileSize, project._data._tileSize );
+			Utils.FromIso( project.side, project.side, cursorCoord );
 			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
-			cursorCoord = Utils.FromIso( 0, project._data._tileSize );
+			Utils.FromIso( 0, project.side, cursorCoord );
 			_cursor.graphics.lineTo( cursorCoord.x, cursorCoord.y );
 			_cursor.graphics.lineTo( 0, 0 );
 			_cursor.graphics.endFill();
@@ -705,15 +707,15 @@ import utils.Utils;
 				_grid.graphics.moveTo( x, y );
 				_grid.graphics.beginFill( color );
 				
-				var pos:Point;
+				var pos:Point = new Point;
 				
-				pos = Utils.FromIso( _project._data._tileSize, 0 );
+				Utils.FromIso( _project.side, 0, pos );
 				_grid.graphics.lineTo( x + pos.x, y + pos.y );
 				
-				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				Utils.FromIso( _project.side, _project.side, pos );
 				_grid.graphics.lineTo( x + pos.x, y + pos.y );
 				
-				pos = Utils.FromIso( 0, _project._data._tileSize );
+				Utils.FromIso( 0, _project.side, pos );
 				_grid.graphics.lineTo( x + pos.x, y + pos.y );
 				
 				_grid.graphics.lineTo( x, y );
@@ -737,29 +739,29 @@ import utils.Utils;
 			
 			
 			///DRAW COORDINATE AXIS:
-			const AXIS_LENGTH:Number = _project._data._tileSize * 4.5;
+			const AXIS_LENGTH:Number = _project.side * 4.5;
 			const ARROW_LENGTH:Number = AXIS_LENGTH * 0.1;
 			const ARROW_SIDE:Number = ARROW_LENGTH * 0.4;
 			_axis.graphics.clear();
 			//X:
 			_axis.graphics.lineStyle( 3, 0xFF0000 );
 			_axis.graphics.moveTo( 0, 0 );
-			var xAxis:Point = Utils.FromIso( AXIS_LENGTH, 0 );
+			var xAxis:Point = Utils.FromIso( AXIS_LENGTH, 0, new Point );
 			_axis.graphics.lineTo( xAxis.x, xAxis.y );
-			pos = Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, ARROW_SIDE );
+			Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, ARROW_SIDE, pos );
 			_axis.graphics.lineTo( pos.x, pos.y );
 			_axis.graphics.moveTo( xAxis.x, xAxis.y );
-			pos = Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, -ARROW_SIDE );
+			Utils.FromIso( AXIS_LENGTH - ARROW_LENGTH, -ARROW_SIDE, pos );
 			_axis.graphics.lineTo( pos.x, pos.y );
 			//Y:
 			_axis.graphics.lineStyle( 3, 0x00FF00 );
 			_axis.graphics.moveTo( 0, 0 );
-			var yAxis:Point = Utils.FromIso( 0, AXIS_LENGTH );
+			var yAxis:Point = Utils.FromIso( 0, AXIS_LENGTH, new Point );
 			_axis.graphics.lineTo( yAxis.x, yAxis.y );
-			pos = Utils.FromIso( ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH );
+			Utils.FromIso( ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH, pos );
 			_axis.graphics.lineTo( pos.x, pos.y );
 			_axis.graphics.moveTo( yAxis.x, yAxis.y );
-			pos = Utils.FromIso( -ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH );
+			Utils.FromIso( -ARROW_SIDE, AXIS_LENGTH - ARROW_LENGTH, pos );
 			_axis.graphics.lineTo( pos.x, pos.y );
 			//Z:
 			_axis.graphics.lineStyle( 3, 0x0000FF );
@@ -780,27 +782,25 @@ import utils.Utils;
 			for each ( var tile:Point in _tiles )
 			{
 				//north:
-				var origin:Point = Utils.FromIso( tile.x, tile.y );
-				origin.x *= _project._data._tileSize;
-				origin.y *= _project._data._tileSize;
+				var origin:Point = Utils.FromIso( tile.x * _project.side, tile.y * _project.side, new Point );
 				_occupiying.graphics.moveTo( origin.x, origin.y );
 				//east:
-				var pos:Point = Utils.FromIso( _project._data._tileSize, 0 );
+				var pos:Point = Utils.FromIso( _project.side, 0, new Point );
 				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//south:
-				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				Utils.FromIso( _project.side, _project.side, pos );
 				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//west:
-				pos = Utils.FromIso( 0, _project._data._tileSize );
+				Utils.FromIso( 0, _project.side, pos );
 				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//back to north:
 				_occupiying.graphics.lineTo( origin.x, origin.y );
 				//inner crossing:
-				pos = Utils.FromIso( _project._data._tileSize, _project._data._tileSize );
+				Utils.FromIso( _project.side, _project.side, pos );
 				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
-				pos = Utils.FromIso( _project._data._tileSize, 0 );
+				Utils.FromIso( _project.side, 0, pos );
 				_occupiying.graphics.moveTo( origin.x + pos.x, origin.y + pos.y );
-				pos = Utils.FromIso( 0, _project._data._tileSize );
+				Utils.FromIso( 0, _project.side, pos );
 				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 			}
 			
