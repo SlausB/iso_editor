@@ -62,7 +62,7 @@
 			</mx:VBox>
 			
 			<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
-				<s:List id="_compounds_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onCompoundsChoice(event)" contextMenu="onCompoundsContextMenu(event)" >
+				<s:List id="_compounds_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onCompoundsChoice(event)" contextMenu="onCompoundsContextMenu(event)" mouseDown="onCompoundsMouseDown(event)" mouseUp="onCompoundsMouseUp(event)" mouseMove="onCompoundsMouseMove(event)" >
 					<s:ArrayList id="_compounds_list_data_provider" />
 				</s:List>
 			</mx:VBox>
@@ -85,37 +85,43 @@
 				</s:List>
 			</mx:VBox>
 			
-			<mx:VBox label="Instance properties" enabled="false" paddingTop="10" paddingLeft="10" verticalGap="20" >
+			<mx:VBox id="_instanceProperties" label="Instance properties" enabled="false" paddingTop="10" paddingLeft="10" verticalGap="20" >
+				<mx:VBox>
+					<mx:HBox>
+						<mx:Label text="Name:" />
+						<mx:Label id="_objectName" />
+					</mx:HBox>
+				</mx:VBox>
 				<mx:VBox>
 					<mx:HBox >
-						<mx:Text text="iso X" />
-						<mx:TextInput width="40" />
+						<mx:Text text="iso X:" />
+						<mx:TextInput id="_objectIsoX" width="60" restrict="-1234567890." change="onObjectIsoXChange(event)" />
 					</mx:HBox>
 					<mx:HBox>
-						<mx:Text text="iso Y" />
-						<mx:TextInput width="40" />
+						<mx:Text text="iso Y:" />
+						<mx:TextInput id="_objectIsoY" width="60" restrict="-1234567890." change="onObjectIsoYChange(event)" />
 					</mx:HBox>
 				</mx:VBox>
 				
 				<mx:VBox>
 					<mx:HBox >
-						<mx:Text text="tile X" />
-						<mx:TextInput width="40" />
+						<mx:Text text="tile X:" />
+						<mx:TextInput id="_objectTileX" width="60" restrict="-1234567890." change="onObjectTileXChange(event)" />
 					</mx:HBox>
 					<mx:HBox>
-						<mx:Text text="tile Y" />
-						<mx:TextInput width="40" />
+						<mx:Text text="tile Y:" />
+						<mx:TextInput id="_objectTileY" width="60" restrict="-1234567890." change="onObjectTileYChange(event)" />
 					</mx:HBox>
 				</mx:VBox>
 				
 				<mx:VBox>
 					<mx:HBox >
-						<mx:Text text="flat X" />
-						<mx:TextInput width="40" />
+						<mx:Text text="flat X:" />
+						<mx:TextInput id="_objectFlatX" width="60" restrict="-1234567890." change="onObjectFlatXChange(event)" />
 					</mx:HBox>
 					<mx:HBox>
-						<mx:Text text="flat Y" />
-						<mx:TextInput width="40" />
+						<mx:Text text="flat Y:" />
+						<mx:TextInput id="_objectFlatY" width="60" restrict="-1234567890." change="onObjectFlatYChange(event)" />
 					</mx:HBox>
 				</mx:VBox>
 			</mx:VBox>
@@ -127,6 +133,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+import adobe.utils.CustomActions;
 import blisc.Blisc;
 import com.junkbyte.console.Cc;
 import flash.display.DisplayObject;
@@ -279,9 +286,9 @@ import view.Projection;
 		
 		private function FindListItem( e:MouseEvent, type:Class ): *
 		{
-			if ( e.target is Label )
+			if ( e.target is spark.components.Label )
 			{
-				var label:spark.components.Label = e.target as Label;
+				var label:spark.components.Label = e.target as spark.components.Label;
 				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
 				if ( dir == null )
 				{
@@ -309,7 +316,7 @@ import view.Projection;
 		public var _singleTemplateContextMenu:Menu = null;
 		public function onTemplatesContextMenu( e:MouseEvent ): void
 		{
-			if ( e.target is Label )
+			if ( e.target is spark.components.Label )
 			{
 				var templateListItem:TemplateListItem = FindListItem( e, TemplateListItem ) as TemplateListItem;
 				if ( templateListItem != null )
@@ -375,9 +382,9 @@ import view.Projection;
 		public var _singleCompoundContextMenu:Menu = null;
 		private function onCompoundsContextMenu( e:MouseEvent ): void
 		{
-			if ( e.target is Label )
+			if ( e.target is spark.components.Label )
 			{
-				var label:spark.components.Label = e.target as Label;
+				var label:spark.components.Label = e.target as spark.components.Label;
 				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
 				if ( dir == null )
 				{
@@ -454,7 +461,7 @@ import view.Projection;
 		public var _singleMapContextMenu:Menu = null;
 		private function onMapsContextMenu( e:MouseEvent ): void
 		{
-			if ( e.target is Label )
+			if ( e.target is spark.components.Label )
 			{
 				var mapListItem:MapListItem = FindListItem( e, MapListItem ) as MapListItem;
 				if ( mapListItem != null )
@@ -520,9 +527,9 @@ import view.Projection;
 		private var _singleLayerContextMenu:Menu = null;
 		private function onLayersContextMenu( e:MouseEvent ): void
 		{
-			if ( e.target is Label )
+			if ( e.target is spark.components.Label )
 			{
-				var label:spark.components.Label = e.target as Label;
+				var label:spark.components.Label = e.target as spark.components.Label;
 				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
 				if ( dir == null )
 				{
@@ -655,6 +662,36 @@ import view.Projection;
 			else
 			{
 				StartDrag( e, _downComplexListItem, Global.DRAG_FORMAT_COMPLEX_TEMPLATE, _downComplexListItem._singleResource.FindClass( _project ) );
+			}
+			
+			//to ignore other mouse moves:
+			_downComplexListItem = null;
+		}
+		
+		
+		private var _downCompoundListItem:CompoundListItem = null;
+		private function onCompoundsMouseDown( e:MouseEvent ): void
+		{
+			_downCompoundListItem = FindListItem( e, CompoundListItem );
+		}
+		private function onCompoundsMouseUp( e:MouseEvent ): void
+		{
+			_downCompoundListItem = null;
+		}
+		private function onCompoundsMouseMove( e:MouseEvent ): void
+		{
+			if ( _downCompoundListItem == null )
+			{
+				return;
+			}
+			
+			if ( _downCompoundListItem.compound._consisting.length <= 0 )
+			{
+				PopUp( "Specify at least one complex within chosen compound first.", POP_UP_ERROR );
+			}
+			else
+			{
+				StartDrag( e, _downCompoundListItem.compound, Global.DRAG_FORMAT_COMPOUND_TEMPLATE, _downCompoundListItem.compound._consisting[ 0 ]._complex._singleResource.FindClass( _project ) );
 			}
 			
 			//to ignore other mouse moves:
@@ -923,6 +960,77 @@ import view.Projection;
 		private function onIsometryDragDrop( event:DragEvent ): void
 		{
 			_isometry.onDragDrop( event );
+		}
+		
+		
+		public function ShowObjectProperties(): void
+		{
+			if ( _isometry._selected == null )
+			{
+				_instanceProperties.enabled = false;
+				return;
+			}
+			
+			_instanceProperties.enabled = true;
+			
+			_objectName.text = _isometry._selected._objectInstance._template._name;
+			const isoX:Number = _isometry._selected._objectInstance._tileCoords.x * _project.side;
+			const isoY:Number = _isometry._selected._objectInstance._tileCoords.y * _project.side;
+			_objectIsoX.text = isoX.toString();
+			_objectIsoY.text = isoY.toString();
+			_objectTileX.text = _isometry._selected._objectInstance._tileCoords.x.toString();
+			_objectTileY.text = _isometry._selected._objectInstance._tileCoords.y.toString();
+			var flat:Point = Utils.FromIso( isoX, isoY );
+			_objectFlatX.text = flat.x.toString();
+			_objectFlatY.text = flat.y.toString();
+		}
+		public function SetObjectTilePos( x:Number, y:Number ): void
+		{
+			if ( _isometry._selected != null )
+			{
+				_isometry._selected._objectInstance._tileCoords.setTo( x, y );
+				_isometry._selected._view.SetTileX( x );
+				_isometry._selected._view.SetTileY( y );
+			}
+			
+			ShowObjectProperties();
+		}
+		private function SetObjectPosFromIso(): void
+		{
+			SetObjectTilePos( parseFloat( _objectIsoX.text ) / _project.side, parseFloat( _objectIsoY.text ) / _project.side );
+		}
+		private function onObjectIsoXChange( ... args ): void
+		{
+			SetObjectPosFromIso();
+		}
+		private function onObjectIsoYChange( ... args ): void
+		{
+			SetObjectPosFromIso();
+		}
+		private function SetObjectPosFromTile(): void
+		{
+			SetObjectTilePos( parseFloat( _objectTileX.text ), parseFloat( _objectTileY.text ) );
+		}
+		private function onObjectTileXChange( ... args ): void
+		{
+			SetObjectPosFromTile();
+		}
+		private function onObjectTileYChange( ... args ): void
+		{
+			SetObjectPosFromTile();
+		}
+		private function SetObjectPosFromFlat(): void
+		{
+			var iso:Point = Utils.ToIso( parseFloat( _objectFlatX.text ), parseFloat( _objectFlatY.text ) );
+			SetObjectTilePos( iso.x, iso.y );
+		}
+		private function onObjectFlatXChange( ... args ): void
+		{
+			SetObjectPosFromFlat();
+		}
+		private function onObjectFlatYChange( ... args ): void
+		{
+			SetObjectPosFromFlat();
 		}
 		
 		]]>

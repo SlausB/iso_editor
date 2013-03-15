@@ -4,6 +4,9 @@ package
 	import blisc.BliscCompound;
 	import blisc.BliscDisplayObject;
 	import flash.filters.GlowFilter;
+	import ie.Isometry;
+	import mx.managers.ToolTipManager;
+	import project_data.ObjectInstance;
 	import view.View;
 	
 	///@endcond
@@ -11,13 +14,17 @@ package
 	/** Plays animation, shows selections. allow controlling and so on.*/
 	public class IsometryObject 
 	{
+		public var _objectInstance:ObjectInstance;
+		public var _main:Main;
 		public var _view:BliscCompound;
 		
 		private var _elapsed:Number = 0;
 		
 		
-		public function IsometryObject( view:BliscCompound = null )
+		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view:BliscCompound = null )
 		{
+			_objectInstance = objectInstance;
+			_main = main;
 			_view = view;
 		}
 		
@@ -28,11 +35,42 @@ package
 			switch ( type )
 			{
 				case View.MOUSE_OVER:
-					bdo.Highlight( new GlowFilter( 0x00FF00, 1, 4, 4, 3 ) );
+					if ( _main._isometry._selected != this )
+					{
+						_main._isometry.HideTip();
+						_main._isometry._objectTip = ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY );
+						bdo.Highlight( new GlowFilter( 0x00FF00, 1, 8, 8, 3 ) );
+					}
 					break;
 				
 				case View.MOUSE_OUT:
-					bdo.Unhighlight();
+					if ( _main._isometry._selected != this )
+					{
+						_main._isometry.HideTip();
+						bdo.Unhighlight();
+					}
+					break;
+				
+				case View.MOUSE_CLICK:
+					if ( _main._isometry._selected != this )
+					{
+						if ( _main._isometry._selected != null )
+						{
+							_main._isometry._selected.bdo.Unhighlight();
+						}
+						_main._isometry._selected = this;
+						bdo.Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
+						
+						_main.SetObjectTilePos( _objectInstance._tileCoords.x, _objectInstance._tileCoords.y );
+						
+						_main._isometry.HideTip();
+					}
+					else
+					{
+						_main._isometry._selected = null;
+						_main.ShowObjectProperties();
+						bdo.Unhighlight();
+					}
 					break;
 			}
 		}
@@ -51,6 +89,7 @@ package
 		
 		public function Destroy(): void
 		{
+			_main = null;
 			_view = null;
 		}
 		

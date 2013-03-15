@@ -11,8 +11,8 @@ package project_data
 	{
 		public var _template:ObjectTemplate;
 		
-		/** Physical (not tile) isometric coordinates. Other coordinates (screen or tile) are resolved using it.*/
-		public var _isoCoords:Point = new Point( 0, 0 );
+		/** Tile (not physical) isometric coordinates. Other coordinates (screen or physical) are resolved using it.*/
+		public var _tileCoords:Point = new Point;
 		
 		
 		public function Init( template:ObjectTemplate ): void

@@ -30,7 +30,7 @@ package
 		
 		public function GridDrawer( mapRight:Number, mapDown:Number, viewportWidth:Number, viewportHeight:Number, project:Project )
 		{
-			super( null, 0, 1 );
+			super( null, 0, 1, new Point );
 			
 			_mapRight = mapRight;
 			_mapDown = mapDown;

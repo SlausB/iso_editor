@@ -215,8 +215,7 @@ import utils.Utils;
 			
 			if ( _complex != null )
 			{
-				_complex._centerX = _centerImage.x + CENTER_DISP_X;
-				_complex._centerY = _centerImage.y + CENTER_DISP_Y;
+				_complex._center.setTo( _centerImage.x + CENTER_DISP_X, _centerImage.y + CENTER_DISP_Y );
 				
 				if ( _layerDropDownList.selectedItem != null )
 				{
@@ -231,8 +230,7 @@ import utils.Utils;
 				{
 					var draggingComplex:DraggingComplex = _templates[ 0 ];
 					
-					_complex._dispX = draggingComplex.x;
-					_complex._dispY = draggingComplex.y;
+					_complex._disp.setTo( draggingComplex.x, draggingComplex.y );
 					
 					_complex._singleResource = draggingComplex._aimingResource;
 				}
@@ -272,7 +270,7 @@ import utils.Utils;
 				{
 					var adding:ComplexWithinCompound = new ComplexWithinCompound;
 					var iso:Point = Utils.ToIso( template.x, template.y );
-					adding.Init( template._complex, iso.x, iso.y );
+					adding.Init( template._complex, iso.x / _project.side, iso.y / _project.side );
 					_compound._consisting.push( adding );
 				}
 				
@@ -427,8 +425,8 @@ import utils.Utils;
 			if ( _dragging is DraggingComplex )
 			{
 				_lastDragged = _dragging as DraggingComplex;
-				_dispXStepper.value = _lastDragged._complex._dispX;
-				_dispYStepper.value = _lastDragged._complex._dispY;
+				_dispXStepper.value = _lastDragged._complex._disp.x;
+				_dispYStepper.value = _lastDragged._complex._disp.y;
 				ShowIsoDisplacements();
 			}
 			
@@ -629,8 +627,8 @@ import utils.Utils;
 			//center image:
 			if ( _complex != null )
 			{
-				_centerImage.x = _complex._centerX - CENTER_DISP_X;
-				_centerImage.y = _complex._centerY - CENTER_DISP_Y;
+				_centerImage.x = _complex._center.x - CENTER_DISP_X;
+				_centerImage.y = _complex._center.y - CENTER_DISP_Y;
 				_centerHolder.addChild( _centerImage );
 			}
 			
@@ -646,7 +644,7 @@ import utils.Utils;
 					AddDragging( new DraggingComplex( consisting._complex, _project, consisting ) );
 				}
 				
-				//again - to allow change object's coordinates using TextInputss without touching him:
+				//again - to allow change object's coordinates using TextInputs without touching him:
 				if ( _templates.length > 0 )
 				{
 					_lastDragged = _templates[ _templates.length - 1 ];
@@ -660,8 +658,8 @@ import utils.Utils;
 			{
 				title = "Complex";
 				
-				_dispXStepper.value = _complex._dispX;
-				_dispYStepper.value = _complex._dispY;
+				_dispXStepper.value = _complex._disp.x;
+				_dispYStepper.value = _complex._disp.y;
 			}
 			else
 			{

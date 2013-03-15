@@ -5,8 +5,10 @@ package project_data
 	import blisc.BliscSprite;
 	import flash.display.FrameLabel;
 	import flash.display.MovieClip;
+	import flash.geom.Point;
 	import flash.system.ApplicationDomain;
 	import iso.orient.Orientation;
+	import org.osmf.layout.AnchorLayoutMetadata;
 	///@endcond
 	
 	/** SWF file with graphical resources.*/
@@ -74,7 +76,7 @@ package project_data
 					{
 						endingFrame = currentLabels[ currentLabelIndex + 1 ].frame;
 					}
-					var bliscAnimation:BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, name, frameLabel.frame, endingFrame );
+					var bliscAnimation:BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, new Point, name, frameLabel.frame, endingFrame );
 					unitDesc._views.push( new UnitView( orientation, bliscAnimation ) );
 				}
 			}

@@ -36,9 +36,11 @@ import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.TextField;
 import flash.utils.getTimer;
+import mx.core.IToolTip;
 import mx.core.UIComponent;
 import mx.events.DragEvent;
 import mx.managers.DragManager;
+import mx.managers.ToolTipManager;
 import project_data.ComplexTemplate;
 import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
@@ -69,6 +71,19 @@ import view.Projection;
 		
 		private var _gridDrawer:GridDrawer = null;
 		
+		public var _objectTip:IToolTip = null;
+		/** Object which is currently can be edited using "Instance properties" window.*/
+		public var _selected:IsometryObject = null;
+		
+		
+		public function HideTip(): void
+		{
+			if ( _objectTip != null )
+			{
+				ToolTipManager.destroyToolTip( _objectTip );
+				_objectTip = null;
+			}
+		}
 		
 		private function onInit( ... args ): void
 		{
@@ -137,14 +152,21 @@ import view.Projection;
 			1: need to use it with some cashing - avoid creating animations for each similar object.
 			2: create prope animations from MovieClip's
 		*/
-		private function CreateAnimation( singleResource:SingleResource ): BliscAnimation
+		private function CreateAnimation( singleResource:SingleResource, center:Point ): BliscAnimation
 		{
-			return BliscAnimation.FromMovieClip( singleResource.Display( _project ) as MovieClip, _project.FindResource( singleResource._resourcePath )._FPS, singleResource._name );
+			return BliscAnimation.FromMovieClip( singleResource.Display( _project ) as MovieClip, _project.FindResource( singleResource._resourcePath )._FPS, center, singleResource._name );
 		}
 		
 		private function ComplexTemplateToBlisc( complex:ComplexTemplate ): BliscComplexTemplate
 		{
-			return new BliscComplexTemplate( complex._name, CreateAnimation( complex._singleResource ), complex._centerX, complex._centerY, complex._layer._name, complex._tiles.concat() );
+			return new BliscComplexTemplate(
+				complex._name,
+				CreateAnimation( complex._singleResource, complex._center ),
+				complex._disp,
+				complex._center,
+				complex._layer._name,
+				complex._tiles.concat()
+			);
 		}
 		
 		private function AddObject( objectInstance:ObjectInstance ): void
@@ -161,17 +183,21 @@ import view.Projection;
 				var complexes:Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >;
 				for each ( var complexWithinCompound:ComplexWithinCompound in compound._consisting )
 				{
-					complexes.push( new BliscComplexWithinCompoundTemplate( ComplexTemplateToBlisc( complexWithinCompound._complex ), new Point( complexWithinCompound._isoDispX, complexWithinCompound._isoDispY ) ) );
+					complexes.push( new BliscComplexWithinCompoundTemplate(
+						ComplexTemplateToBlisc( complexWithinCompound._complex ),
+						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ),
+						Utils.FromIso( complexWithinCompound._tileDispX / _project.side, complexWithinCompound._tileDispY / _project.side )
+					) );
 				}
 				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
 			}
 			
-			var isometryObject:IsometryObject = new IsometryObject;
+			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
 			var bliscCompound:BliscCompound = new BliscCompound( bliscObjectTemplate, isometryObject, _blisc );
 			isometryObject._view = bliscCompound;
-			bliscCompound.SetIsoX( objectInstance._isoCoords.x );
-			bliscCompound.SetIsoY( objectInstance._isoCoords.y );
+			bliscCompound.SetTileX( objectInstance._tileCoords.x );
+			bliscCompound.SetTileY( objectInstance._tileCoords.y );
 			_blisc.AddObject( bliscCompound );
 		}
 		
@@ -193,7 +219,14 @@ import view.Projection;
 			
 			//adding an ability to draw map's grid:
 			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
-			var drawerComplexTemplate:BliscComplexTemplate = new BliscComplexTemplate( "grid_drawer", null, 0, 0, GRID_DRAWER_LAYER_NAME, new Vector.< Point > );
+			var drawerComplexTemplate:BliscComplexTemplate = new BliscComplexTemplate(
+				"grid_drawer",
+				null,
+				new Point,
+				new Point,
+				GRID_DRAWER_LAYER_NAME,
+				new Vector.< Point >
+			);
 			var drawerCompound:BliscCompound = new BliscCompound( drawerComplexTemplate, null, _blisc );
 			_gridDrawer = new GridDrawer( map._right, map._right, width, height, _project );
 			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
@@ -214,6 +247,9 @@ import view.Projection;
 		/** Remove currently displaying map (if there is such) and abandon it.*/
 		public function Unload(): void
 		{
+			_selected = null;
+			_main.ShowObjectProperties();
+			
 			if ( _displaying == null )
 			{
 				return;
@@ -230,6 +266,8 @@ import view.Projection;
 				_blisc.Destroy();
 				_blisc = null;
 			}
+			
+			_displaying = null;
 		}
 		
 		public function onDragEnter( event:DragEvent ): void
@@ -276,6 +314,8 @@ import view.Projection;
 			{
 				var addingInstance:ObjectInstance = new ObjectInstance;
 				addingInstance.Init( addingTemplate );
+				
+				_displaying._instances.push( addingInstance );
 				
 				AddObject( addingInstance );
 			}

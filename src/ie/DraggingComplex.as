@@ -36,7 +36,7 @@ package ie
 			
 			if ( withinCompound != null )
 			{
-				var planar:Point = Utils.FromIso( withinCompound._isoDispX, withinCompound._isoDispY );
+				var planar:Point = Utils.FromIso( withinCompound._tileDispX * project.side, withinCompound._tileDispY * project.side );
 				x = planar.x;
 				y = planar.y;
 			}
@@ -51,8 +51,8 @@ package ie
 			_view = singleResource.Display( project );
 			if ( _withinCompound != null )
 			{
-				_view.x = _complex._dispX;
-				_view.y = _complex._dispY;
+				_view.x = _complex._disp.x;
+				_view.y = _complex._disp.y;
 			}
 			addChild( _view );
 		}

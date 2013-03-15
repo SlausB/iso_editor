@@ -9,17 +9,17 @@ package project_data
 	{
 		public var _complex:ComplexTemplate;
 		
-		/** Physical (not tile) isometric displacement relative to compound coordinates.*/
-		public var _isoDispX:Number;
-		public var _isoDispY:Number;
+		/** Tile (not physical) isometric displacement relative to compound coordinates.*/
+		public var _tileDispX:Number;
+		public var _tileDispY:Number;
 		
 		
-		public function Init( complex:ComplexTemplate, isoDispX:Number, isoDispY:Number ): void
+		public function Init( complex:ComplexTemplate, tileDispX:Number, tileDispY:Number ): void
 		{
 			_complex = complex;
 			
-			_isoDispX = isoDispX;
-			_isoDispY = isoDispY;
+			_tileDispX = tileDispX;
+			_tileDispY = tileDispY;
 		}
 		
 		public function Destroy(): void

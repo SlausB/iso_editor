@@ -8,6 +8,7 @@ package
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.filesystem.File;
+	import flash.geom.Point;
 	import flash.net.registerClassAlias;
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
@@ -32,6 +33,7 @@ package
 	import project_data.Resource;
 	import project_data.SingleResource;
 	import ru.etcs.utils.getDefinitionNames;
+	import utils.Utils;
 	
 	///@endcond
 	
@@ -59,6 +61,7 @@ package
 			registerClassAlias( "project_data.ObjectTemplate", ObjectTemplate );
 			registerClassAlias( "project_data.Resource", Resource );
 			registerClassAlias( "project_data.SingleResource", SingleResource );
+			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;
 		}
@@ -321,6 +324,11 @@ package
 				}
 			}
 			return null;
+		}
+		
+		public function get side(): Number
+		{
+			return _data._tileSize * Utils.TILE_SIDE;
 		}
 		
 	}
