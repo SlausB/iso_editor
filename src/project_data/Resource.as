@@ -26,7 +26,7 @@ package project_data
 		public var _FPS:Number;
 		
 		/** Recognized units' specifications.*/
-		public var _units:Vector.< UnitDesc >;
+		public var _units:Vector.< UnitDesc > = new Vector.< UnitDesc >;
 		
 		
 		public function Init( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void

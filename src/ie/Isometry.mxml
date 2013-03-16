@@ -35,12 +35,14 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.TextField;
+import flash.ui.Keyboard;
 import flash.utils.getTimer;
 import mx.core.IToolTip;
 import mx.core.UIComponent;
 import mx.events.DragEvent;
 import mx.managers.DragManager;
 import mx.managers.ToolTipManager;
+import objects.Isometric;
 import project_data.ComplexTemplate;
 import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
@@ -74,6 +76,8 @@ import view.Projection;
 		public var _objectTip:IToolTip = null;
 		/** Object which is currently can be edited using "Instance properties" window.*/
 		public var _selected:IsometryObject = null;
+		/** Object which is currently under mouse (if isometry was in selecting mode).*/
+		public var _over:IsometryObject = null;
 		
 		
 		public function HideTip(): void
@@ -215,7 +219,13 @@ import view.Projection;
 			
 			_displaying = map;
 			
-			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project._data._tileSize * Utils.TILE_SIDE );
+			_main._mapPropertiesArea.enabled = true;
+			_main._isoTileX.text = _main._isoTileY.text = "N/A";
+			_main._drawBorder.selected = _displaying._drawBorder;
+			_main._drawGrid.selected = _displaying._drawGrid;
+			_main._clampToTile.selected = _displaying._clampToTiles;
+			
+			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side );
 			
 			//adding an ability to draw map's grid:
 			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
@@ -228,7 +238,7 @@ import view.Projection;
 				new Vector.< Point >
 			);
 			var drawerCompound:BliscCompound = new BliscCompound( drawerComplexTemplate, null, _blisc );
-			_gridDrawer = new GridDrawer( map._right, map._right, width, height, _project );
+			_gridDrawer = new GridDrawer( map, width, height, _project );
 			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
 			drawerCompound._complexes[ 0 ]._complex = new BliscComplex( drawerComplexTemplate, _gridDrawer );
 			_blisc.AddObject( drawerCompound );
@@ -247,8 +257,13 @@ import view.Projection;
 		/** Remove currently displaying map (if there is such) and abandon it.*/
 		public function Unload(): void
 		{
+			_main._mapPropertiesArea.enabled = false;
+			_main._isoTileX.text = _main._isoTileY.text = "N/A";
+			
 			_selected = null;
 			_main.ShowObjectProperties();
+			
+			_over = null;
 			
 			if ( _displaying == null )
 			{
@@ -268,6 +283,9 @@ import view.Projection;
 			}
 			
 			_displaying = null;
+			
+			_dragging = null;
+			_isDragging = null;
 		}
 		
 		public function onDragEnter( event:DragEvent ): void
@@ -326,29 +344,109 @@ import view.Projection;
 			return _displaying;
 		}
 		
+		
+		/** Object which was captured to drag.*/
+		private var _dragging:IsometryObject = null;
+		/** Did any mouse movement happened after mouse was pushed down.*/
+		private var _wasDrag:Boolean = false;
+		/** Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
+		private var _isDragging:Point = null;
+		private function GetObj( e:MouseEvent, local:Point = null ): IsometryObject
+		{
+			if ( _blisc == null )
+			{
+				return null;
+			}
+			
+			if ( local == null )
+			{
+				local = globalToLocal( new Point( e.stageX, e.stageY ) );
+			}
+			return _blisc.GetOpaqueDataAt( local.x, local.y ) as IsometryObject;
+		}
 		private function onMouseDown( e:MouseEvent ): void
 		{
-			if ( _blisc != null )
+			if ( _blisc == null )
 			{
-				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				return;
+			}
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			if ( _main._ctrlDown )
+			{
+				var newDragging:IsometryObject = GetObj( e, local );
+				if ( newDragging != null )
+				{
+					_isDragging = new Point( local.x - newDragging._view.GetX(), local.y - newDragging._view.GetY() );
+					_dragging = newDragging;
+					_wasDrag = false;
+					
+					if ( _selected != null )
+					{
+						_selected.Deselect();
+					}
+					newDragging.Select();
+					_main.ShowObjectProperties();
+					_main._isometry.HideTip();
+				}
+			}
+			else
+			{
 				_blisc.OnMouseDown( local.x, local.y );
 			}
 		}
-		
 		private function onMouseUp( e:MouseEvent ): void
 		{
-			if ( _blisc != null )
+			if ( _blisc == null )
 			{
-				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				return;
+			}
+			
+			_isDragging = null;
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			if ( _main._ctrlDown )
+			{
+			}
+			else
+			{
 				_blisc.OnMouseUp( local.x, local.y );
 			}
 		}
-		
 		private function onMouseMove( e:MouseEvent ): void
 		{
-			if ( _blisc != null )
+			if ( _blisc == null )
 			{
-				var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+				return;
+			}
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			//displaying hovering tile coordinates:
+			var iso:Point = new Point;
+			_blisc.ScreenToIso( local.x, local.y, iso );
+			_main._isoTileX.text = Math.floor( iso.x / _project.side ).toString();
+			_main._isoTileY.text = Math.floor( iso.y / _project.side ).toString();
+			
+			if ( _main._ctrlDown && _isDragging != null )
+			{
+				var newIsoPos:Point = Utils.ToIso( local.x - _isDragging.x, local.y - _isDragging.y, new Point );
+				var newTilePos:Point = new Point( newIsoPos.x / _project.side, newIsoPos.y / _project.side );
+				if ( displaying._clampToTiles )
+				{
+					newTilePos.x = Math.round( newTilePos.x );
+					newTilePos.y = Math.round( newTilePos.y );
+				}
+				_dragging._view.SetTileX( newTilePos.x );
+				_dragging._view.SetTileY( newTilePos.y );
+				_dragging._objectInstance._tileCoords.x = newTilePos.x;
+				_dragging._objectInstance._tileCoords.y = newTilePos.y;
+				_main.ShowObjectProperties();
+			}
+			else
+			{
 				_blisc.OnMouseMove( local.x, local.y );
 			}
 		}

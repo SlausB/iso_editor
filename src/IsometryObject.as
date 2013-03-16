@@ -21,12 +21,95 @@ package
 		
 		private var _elapsed:Number = 0;
 		
+		private var _selected:Boolean = false;
+		private var _over:Boolean = false;
+		
 		
 		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view:BliscCompound = null )
 		{
 			_objectInstance = objectInstance;
 			_main = main;
 			_view = view;
+		}
+		
+		public function Select(): void
+		{
+			if ( _selected )
+			{
+				return;
+			}
+			
+			_selected = true;
+			
+			_main._isometry._selected = this;
+			_main.ShowObjectProperties();
+			
+			ShowSelectHighlight();
+		}
+		
+		public function Deselect(): void
+		{
+			if ( _selected == false )
+			{
+				return;
+			}
+			
+			_selected = false;
+			_main._isometry._selected = null;
+			_main.ShowObjectProperties();
+			
+			Unhighlight();
+			
+			if ( _over )
+			{
+				ShowOverHighlight();
+			}
+		}
+		
+		public function Over(): void
+		{
+			if ( _over )
+			{
+				return;
+			}
+			
+			_over = true;
+			
+			if ( _selected == false )
+			{
+				_main._isometry.HideTip();
+				_main._isometry._objectTip = ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY );
+				
+				ShowOverHighlight();
+			}
+		}
+		
+		private function ShowOverHighlight(): void
+		{
+			Highlight( new GlowFilter( 0x00FF00, 1, 8, 8, 3 ) );
+		}
+		
+		private function ShowSelectHighlight(): void
+		{
+			Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
+		}
+		
+		public function Out(): void
+		{
+			if ( _over == false )
+			{
+				return;
+			}
+			
+			_over = false;
+			
+			Unhighlight();
+			_main._isometry.HideTip();
+			
+			if ( _selected )
+			{
+				ShowSelectHighlight();
+			}
 		}
 		
 		public function OnMouseEvent( type:int ): void
@@ -36,41 +119,37 @@ package
 			switch ( type )
 			{
 				case View.MOUSE_OVER:
-					if ( _main._isometry._selected != this )
+					if ( _main._isometry._over != this )
 					{
-						_main._isometry.HideTip();
-						_main._isometry._objectTip = ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY );
-						Highlight( new GlowFilter( 0x00FF00, 1, 8, 8, 3 ) );
+						if ( _main._isometry._over != null )
+						{
+							_main._isometry._over.Out();
+						}
+						
+						Over();
+						_main._isometry._over = this;
 					}
 					break;
 				
 				case View.MOUSE_OUT:
-					if ( _main._isometry._selected != this )
-					{
-						_main._isometry.HideTip();
-						Unhighlight();
-					}
+					Out();
+					_main._isometry._over = null;
 					break;
 				
 				case View.MOUSE_CLICK:
-					if ( _main._isometry._selected != this )
+					if ( _main._isometry._selected == this )
 					{
-						if ( _main._isometry._selected != null )
-						{
-							_main._isometry._selected.bdo.Unhighlight();
-						}
-						_main._isometry._selected = this;
-						Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
-						
-						_main.SetObjectTilePos( _objectInstance._tileCoords.x, _objectInstance._tileCoords.y );
-						
-						_main._isometry.HideTip();
+						Deselect();
 					}
 					else
 					{
-						_main._isometry._selected = null;
-						_main.ShowObjectProperties();
-						Unhighlight();
+						if ( _main._isometry._selected != null )
+						{
+							_main._isometry._selected.Deselect();
+						}
+						
+						Select();
+						_main._isometry._selected = this;
 					}
 					break;
 			}

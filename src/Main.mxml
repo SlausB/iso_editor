@@ -34,17 +34,39 @@
 	<!-- everything below menu: -->
 	<mx:HDividedBox percentWidth="100" percentHeight="100" >
 		
-		<mx:VDividedBox percentWidth="70" percentHeight="100" >
+		<mx:VBox percentWidth="70" percentHeight="100" >
 			
-			<s:Group percentWidth="100" percentHeight="80" dragEnter="onIsometryDragEnter(event)" dragOver="onIsometryDragOver(event)" dragDrop="onIsometryDragDrop(event)" >
-				<ie:Isometry id="_isometry" />
+			<s:Group percentWidth="100" height="54" >
+				<s:BorderContainer id="_mapPropertiesArea" x="6" percentWidth="100" percentHeight="100" enabled="false" >
+					<s:Label x="10" y="10" text="Tile X:" />
+					<s:Label x="60" y="10" id="_isoTileX" text="N/A" />
+					
+					<s:Label x="10" y="30" text="Tile Y:" />
+					<s:Label x="60" y="30" id="_isoTileY" text="N/A" />
+					
+					<s:Label x="100" y="10" text="Draw border:" />
+					<s:CheckBox x="180" y="5" id="_drawBorder" change="onDrawBorderFlagChange(event)" />
+					
+					<s:Label x="100" y="30" text="Draw grid:" />
+					<s:CheckBox x="162" y="25" id="_drawGrid" change="onDrawGridFlagChange(event)" />
+					
+					<s:Label x="220" y="10" text="Clamp to tile:" />
+					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" />
+				</s:BorderContainer>
 			</s:Group>
 			
-			<s:Scroller percentWidth="100" percentHeight="20" >
-				<s:Group id="_resources_preview_holder" />
-			</s:Scroller>
-			
-		</mx:VDividedBox>
+			<mx:VDividedBox percentWidth="100" percentHeight="100" >
+				
+				<s:Group percentWidth="100" percentHeight="80" dragEnter="onIsometryDragEnter(event)" dragOver="onIsometryDragOver(event)" dragDrop="onIsometryDragDrop(event)" >
+					<ie:Isometry id="_isometry" percentWidth="100" percentHeight="100" />
+				</s:Group>
+				
+				<s:Scroller percentWidth="100" percentHeight="20" >
+					<s:Group id="_resources_preview_holder" />
+				</s:Scroller>
+				
+			</mx:VDividedBox>
+		</mx:VBox>
 		
 		
 		<mx:Accordion percentWidth="30" percentHeight="100" creationPolicy="all" >
@@ -145,6 +167,7 @@ import flash.errors.IOError;
 import flash.events.ContextMenuEvent;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.SecurityErrorEvent;
 import flash.filesystem.File;
@@ -206,6 +229,8 @@ import view.Projection;
 		/** Currently displayed map and layers of which are displayed within "layers list".*/
 		public var _chosenMap:Map = null;
 		
+		public var _ctrlDown:Boolean = false;
+		
 		
 		public function onInit( ... args ): void
 		{
@@ -222,6 +247,14 @@ import view.Projection;
 			_resources_preview_holder.addElement( _resourcesPreview );
 			
 			_isometry.Init( _project, this );
+			
+			stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyboardEvent );
+			stage.addEventListener( KeyboardEvent.KEY_UP, onKeyboardEvent );
+		}
+		
+		private function onKeyboardEvent( e:KeyboardEvent ): void
+		{
+			_ctrlDown = e.ctrlKey;
 		}
 		
 		public function onResourceChoice( e:IndexChangeEvent ): void
@@ -1031,6 +1064,36 @@ import view.Projection;
 		private function onObjectFlatYChange( ... args ): void
 		{
 			SetObjectPosFromFlat();
+		}
+		
+		
+		private function onDrawBorderFlagChange( ... args ): void
+		{
+			if ( _isometry.displaying == null )
+			{
+				return;
+			}
+			
+			_isometry.displaying._drawBorder = _drawBorder.selected;
+		}
+		private function onDrawGridFlagChange( ... args ): void
+		{
+			if ( _isometry.displaying == null )
+			{
+				return;
+			}
+			
+			_isometry.displaying._drawGrid = _drawGrid.selected;
+		}
+		
+		private function onClampToTileFlagChange( ... args ): void
+		{
+			if ( _isometry.displaying == null )
+			{
+				return;
+			}
+			
+			_isometry.displaying._clampToTiles = _clampToTile.selected;
 		}
 		
 		]]>
