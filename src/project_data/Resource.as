@@ -29,8 +29,14 @@ package project_data
 		public var _units:Vector.< UnitDesc > = new Vector.< UnitDesc >;
 		
 		
-		public function Init( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
+		public function Init( applicationDomain:ApplicationDomain, names:Array, FPS:Number, main:Main ): void
 		{
+			//dunno why but it's null while loading:
+			if ( _units == null )
+			{
+				_units = new Vector.< UnitDesc >;
+			}
+			
 			_applicationDomain = applicationDomain;
 			
 			_names = names;
@@ -53,12 +59,10 @@ package project_data
 					continue;
 				}
 				
-				var unitsSingleResource:SingleResource = new SingleResource;
-				unitsSingleResource.Init( _path, name );
-				var unitDesc:UnitDesc = new UnitDesc( name, unitsSingleResource );
-				_units.push( unitDesc );
 				
 				var currentLabels:Array = unitGraphics.currentLabels;
+				
+				//remove all labels which doesn't display any orientation:
 				for ( var splicingLabelIndex:int = 0; splicingLabelIndex < currentLabels.length; ++splicingLabelIndex )
 				{
 					if ( Orientation.ToInt( currentLabels[ splicingLabelIndex ].name ) == Orientation.U )
@@ -67,6 +71,18 @@ package project_data
 						--splicingLabelIndex;
 					}
 				}
+				
+				if ( currentLabels.length <= 0 )
+				{
+					main.PopUp( "Not a single orientation was specified for unit \"" + name + "\". It will not be displayed within \"Units\" list.", Main.POP_UP_WARNING );
+					continue;
+				}
+				
+				var unitsSingleResource:SingleResource = new SingleResource;
+				unitsSingleResource.Init( _path, name );
+				var unitDesc:UnitDesc = new UnitDesc( name, unitsSingleResource );
+				_units.push( unitDesc );
+				
 				for ( var currentLabelIndex:int = 0; currentLabelIndex < currentLabels.length; ++currentLabelIndex )
 				{
 					var frameLabel:FrameLabel = currentLabels[ currentLabelIndex ] as FrameLabel;

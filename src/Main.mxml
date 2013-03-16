@@ -54,7 +54,7 @@
 					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" />
 					
 					<s:Label x="220" y="30" text="Units speed:" />
-					<s:TextInput x="300" y="30" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" />
+					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" />
 				</s:BorderContainer>
 			</s:Group>
 			

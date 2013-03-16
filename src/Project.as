@@ -165,7 +165,7 @@ package
 			{
 				LoadResource( _data._resources[ _loadingResourceIndex ]._path, function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 				{
-					_data._resources[ _loadingResourceIndex ].Init( applicationDomain, names, FPS );
+					_data._resources[ _loadingResourceIndex ].Init( applicationDomain, names, FPS, _main );
 					
 					DisplayResource( _data._resources[ _loadingResourceIndex ] );
 					
@@ -264,7 +264,7 @@ package
 					
 					var resource:Resource = new Resource;
 					resource._path = path;
-					resource.Init( applicationDomain, names, FPS );
+					resource.Init( applicationDomain, names, FPS, _main );
 					
 					_data._resources.push( resource );
 					

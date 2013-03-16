@@ -115,8 +115,6 @@ package
 		
 		public function OnMouseEvent( type:int ): void
 		{
-			trace( "mouse event: " + type.toString() );
-			
 			switch ( type )
 			{
 				case View.MOUSE_OVER:
