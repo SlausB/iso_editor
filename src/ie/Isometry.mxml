@@ -176,11 +176,26 @@ import view.Projection;
 		
 		private function AddUnit( unitDesc:UnitDesc ): void
 		{
+			var foundLayer:String = null;
+			for each ( var layer:Layer in _project._data._layers )
+			{
+				if ( layer._units )
+				{
+					foundLayer = layer._name;
+				}
+			}
+			
+			if ( foundLayer == null )
+			{
+				_main.PopUp( "Specify \"units\" field for at least one layer.", Main.POP_UP_ERROR );
+				return;
+			}
+			
+			
 			var unit:Unit = new Unit( _main, unitDesc );
 			_isometryObjects.push( unit );
 			
-			//TODO: lookup layer:
-			var bliscUnit:BliscUnit = new BliscUnit( unit, _blisc, "common" );
+			var bliscUnit:BliscUnit = new BliscUnit( unit, _blisc, foundLayer );
 			unit._view = bliscUnit;
 			_blisc.AddObject( bliscUnit );
 		}
@@ -219,14 +234,18 @@ import view.Projection;
 		
 		private static const GRID_DRAWER_LAYER_NAME:String = "grid_drawer_holder";
 		
-		/** Display specified map if it is not currently displayed yet. Abandon any other maps if there are.*/
+		/** Unload currently displaying map and display it again.*/
+		public function Reinit(): void
+		{
+			if ( displaying != null )
+			{
+				Display( displaying );
+			}
+		}
+		
+		/** Display specified map. Abandon any other maps if there are.*/
 		public function Display( map:Map ): void
 		{
-			if ( map == _displaying )
-			{
-				return;
-			}
-			
 			Unload();
 			
 			_displaying = map;

@@ -65,7 +65,7 @@
 				</s:Group>
 				
 				<s:Scroller percentWidth="100" percentHeight="20" >
-					<s:Group id="_resources_preview_holder" />
+					<s:Group id="_resources_preview_holder" resize="onResourcesPreviewHolderResize(event)" />
 				</s:Scroller>
 				
 			</mx:VDividedBox>
@@ -652,6 +652,7 @@ import view.Projection;
 						_project._data._layers[ previousIndex ] = layerListItem_withinMenu.layer;
 						_project._data._layers[ layerListItem_withinMenu.index ] = previous;
 						UpdateLayersList();
+						_isometry.Reinit();
 						break;
 					
 					case "move_down":
@@ -660,6 +661,7 @@ import view.Projection;
 						_project._data._layers[ nextIndex ] = layerListItem_withinMenu.layer;
 						_project._data._layers[ layerListItem_withinMenu.index ] = next;
 						UpdateLayersList();
+						_isometry.Reinit();
 						break;
 				}
 			} );
@@ -965,6 +967,8 @@ import view.Projection;
 		{
 			_project._data._layers.push( new Layer );
 			UpdateLayersList();
+			
+			_isometry.Reinit();
 		}
 		
 		public function UpdateLayersList(): void
@@ -1107,6 +1111,13 @@ import view.Projection;
 			}
 			
 			_isometry.displaying._unitsSpeed = parseFloat( _unitsSpeed.text );
+		}
+		
+		
+		
+		private function onResourcesPreviewHolderResize( ... args ): void
+		{
+			_resourcesPreview.Resize( _resources_preview_holder.width, _resources_preview_holder.height );
 		}
 		
 		]]>

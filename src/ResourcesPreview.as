@@ -24,9 +24,7 @@ package
 	/** Displays graphical part of a resources.*/
 	public class ResourcesPreview extends UIComponent
 	{
-		private var _downPos:Point = new Point;
-		private var _down:Boolean = false;
-		
+		/** Virtual dimensions of whole resources preview at least part of which is currently displayed.*/
 		private var _width:Number = 0;
 		private var _height:Number = 0;
 		
@@ -34,31 +32,10 @@ package
 		
 		private var _previews:Vector.< SingleResourcePreview > = new Vector.< SingleResourcePreview >;
 		
+		/** Dimensions of scroller where at least part of everything is displayed.*/
+		private var _scrollerWidth:Number = 0;
+		private var _scrollerHeight:Number = 0;
 		
-		public function ResourcesPreview()
-		{
-			//using scrollers instead of dragging:
-			/*addEventListener( MouseEvent.MOUSE_DOWN, function( e:MouseEvent ): void
-			{
-				_downPos.x = e.stageX - x;
-				_downPos.y = e.stageY - y;
-				_down = true;
-			} );
-			addEventListener( MouseEvent.MOUSE_MOVE, function( e:MouseEvent ): void
-			{
-				if ( _down )
-				{
-					x = e.stageX - _downPos.x;
-					y = e.stageY - _downPos.y;
-					
-					FitBounds();
-				}
-			} );
-			addEventListener( MouseEvent.MOUSE_UP, function( e:MouseEvent ): void
-			{
-				_down = false;
-			} );*/
-		}
 		
 		public static function HideTip(): void
 		{
@@ -82,21 +59,59 @@ package
 			}
 		}
 		
+		private function Position(): void
+		{
+			const H_GAP:Number = 60;
+			const V_GAP:Number = 20;
+			
+			//upper left corner coordinates of preview which will be added next:
+			var xPos:Number = H_GAP;
+			var yPos:Number = V_GAP;
+			_width = 0;
+			_height = 0;
+			
+			//height of currently forming row:
+			var curHeight:Number = 0;
+			
+			
+			for each ( var singleResourcePreview:SingleResourcePreview in _previews )
+			{
+				if ( ( xPos + 40 ) >= _scrollerWidth )
+				{
+					xPos = H_GAP;
+					yPos += curHeight;
+					curHeight = 0;
+				}
+				
+				singleResourcePreview.x = xPos;
+				singleResourcePreview.y = yPos;
+				
+				xPos += singleResourcePreview.width + H_GAP;
+				
+				curHeight = Math.max( singleResourcePreview.height + V_GAP, curHeight );
+				
+				_width = Math.max( xPos, _width );
+				_height = Math.max( yPos + curHeight, _height );
+			}
+			
+			FitBounds();
+			
+			//if not to call this (or just call measure()) scroller will not draw scroll bars until you'll change application's size or grag VDividedBox a little:
+			invalidateSize();
+		}
+		
 		public function Display( resource:Resource, project:Project ): void
 		{
 			for each ( var singlePreview:SingleResourcePreview in _previews )
 			{
 				singlePreview.Destroy();
+				if ( singlePreview.parent != null )
+				{
+					singlePreview.parent.removeChild( singlePreview );
+				}
 			}
 			_previews.length = 0;
 			Utils.RemoveAllChildren( this );
-			
-			const H_GAP:Number = 60;
-			const V_GAP:Number = 20;
-			
-			_width = H_GAP;
-			_height = V_GAP;
-			
 			
 			for each ( var className:String in resource._names )
 			{
@@ -110,42 +125,12 @@ package
 					continue;
 				}
 				
-				const NAME_HEIGHT:Number = 20;
-				const NAME_GAP:Number = 20;
-				
-				var name:TextField = new TextField;
-				name.selectable = false;
-				name.mouseEnabled = false;
-				name.x = _width;
-				name.y = V_GAP;
-				var textFormat:TextFormat = name.defaultTextFormat;
-				textFormat.size = 22;
-				name.defaultTextFormat = textFormat;
-				name.text = singleResource._name;
-				name.filters = [ new GlowFilter( 0xffffff, 1, 3, 3, 10 ) ];
-				
-				view.x = _width;
-				view.y = name.y + 10;
-				addChild( view );
-				
-				addChild( name );
-				
-				_previews.push( new SingleResourcePreview( singleResource, view, project ) );
-				
-				_height = Math.max( _height, view.y + view.height );
-				_width += Math.max( name.textWidth, view.width ) + H_GAP;
+				var singleResourcePreview:SingleResourcePreview = new SingleResourcePreview( singleResource, project, view );
+				addChild( singleResourcePreview );
+				_previews.push( singleResourcePreview );
 			}
-			_height += V_GAP;
 			
-			/*graphics.clear();
-			graphics.beginFill( 0x369E24 );
-			graphics.drawRect( 0, 0, _width, _height );
-			graphics.endFill();*/
-			
-			FitBounds();
-			
-			//if not to call this (or just call measure()) scroller will not draw scroll bars until you'll change application's size or grag VDividedBox a little:
-			invalidateSize();
+			Position();
 		}
 		
 		override protected function measure(): void
@@ -154,6 +139,14 @@ package
 			
 			measuredWidth = _width;
 			measuredHeight = _height;
+		}
+		
+		public function Resize( scrollerWidth:Number, scrollerHeight:Number ): void
+		{
+			_scrollerWidth = scrollerWidth;
+			_scrollerHeight = scrollerHeight;
+			
+			Position();
 		}
 	}
 
