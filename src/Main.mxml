@@ -52,6 +52,9 @@
 					
 					<s:Label x="220" y="10" text="Clamp to tile:" />
 					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" />
+					
+					<s:Label x="220" y="30" text="Units speed:" />
+					<s:TextInput x="300" y="30" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" />
 				</s:BorderContainer>
 			</s:Group>
 			
@@ -1094,6 +1097,16 @@ import view.Projection;
 			}
 			
 			_isometry.displaying._clampToTiles = _clampToTile.selected;
+		}
+		
+		private function onUnitsSpeedChange( ... args ): void
+		{
+			if ( _isometry.displaying == null )
+			{
+				return;
+			}
+			
+			_isometry.displaying._unitsSpeed = parseFloat( _unitsSpeed.text );
 		}
 		
 		]]>

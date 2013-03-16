@@ -24,8 +24,10 @@ import blisc.BliscComplexWithinCompound;
 import blisc.BliscComplexWithinCompoundTemplate;
 import blisc.BliscCompound;
 import blisc.BliscCompoundTemplate;
+import blisc.BliscDisplayObject;
 import blisc.BliscObjectTemplate;
 import blisc.BliscSprite;
+import blisc.BliscUnit;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;
@@ -42,7 +44,6 @@ import mx.core.UIComponent;
 import mx.events.DragEvent;
 import mx.managers.DragManager;
 import mx.managers.ToolTipManager;
-import objects.Isometric;
 import project_data.ComplexTemplate;
 import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
@@ -173,6 +174,17 @@ import view.Projection;
 			);
 		}
 		
+		private function AddUnit( unitDesc:UnitDesc ): void
+		{
+			var unit:Unit = new Unit( _main, unitDesc );
+			_isometryObjects.push( unit );
+			
+			//TODO: lookup layer:
+			var bliscUnit:BliscUnit = new BliscUnit( unit, _blisc, "common" );
+			unit._view = bliscUnit;
+			_blisc.AddObject( bliscUnit );
+		}
+		
 		private function AddObject( objectInstance:ObjectInstance ): void
 		{
 			var bliscObjectTemplate:BliscObjectTemplate;
@@ -198,7 +210,7 @@ import view.Projection;
 			
 			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
-			var bliscCompound:BliscCompound = new BliscCompound( bliscObjectTemplate, isometryObject, _blisc );
+			var bliscCompound:BliscCompound = new BliscCompound( isometryObject, _blisc, bliscObjectTemplate );
 			isometryObject._view = bliscCompound;
 			bliscCompound.SetTileX( objectInstance._tileCoords.x );
 			bliscCompound.SetTileY( objectInstance._tileCoords.y );
@@ -224,6 +236,7 @@ import view.Projection;
 			_main._drawBorder.selected = _displaying._drawBorder;
 			_main._drawGrid.selected = _displaying._drawGrid;
 			_main._clampToTile.selected = _displaying._clampToTiles;
+			_main._unitsSpeed.text = _displaying._unitsSpeed.toString();
 			
 			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side );
 			
@@ -237,7 +250,7 @@ import view.Projection;
 				GRID_DRAWER_LAYER_NAME,
 				new Vector.< Point >
 			);
-			var drawerCompound:BliscCompound = new BliscCompound( drawerComplexTemplate, null, _blisc );
+			var drawerCompound:BliscCompound = new BliscCompound( null, _blisc, drawerComplexTemplate );
 			_gridDrawer = new GridDrawer( map, width, height, _project );
 			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
 			drawerCompound._complexes[ 0 ]._complex = new BliscComplex( drawerComplexTemplate, _gridDrawer );
@@ -259,6 +272,7 @@ import view.Projection;
 		{
 			_main._mapPropertiesArea.enabled = false;
 			_main._isoTileX.text = _main._isoTileY.text = "N/A";
+			_main._unitsSpeed.text = "N/A";
 			
 			_selected = null;
 			_main.ShowObjectProperties();
@@ -291,7 +305,8 @@ import view.Projection;
 		public function onDragEnter( event:DragEvent ): void
 		{
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) ||
-				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) )
+				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
+				event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 			{
 				DragManager.acceptDragDrop( event.currentTarget as UIComponent );
 			}
@@ -300,7 +315,8 @@ import view.Projection;
 		public function onDragOver( event:DragEvent ): void
 		{
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) || 
-				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) )
+				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
+				event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 			{
 				DragManager.showFeedback( DragManager.COPY );
 				return;
@@ -314,6 +330,12 @@ import view.Projection;
 			if ( _displaying == null )
 			{
 				_main.PopUp( "Select some map first.", Main.POP_UP_ERROR );
+				return;
+			}
+			
+			if ( event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
+			{
+				AddUnit( event.dragSource.dataForFormat( Global.DRAG_FORMAG_UNIT_DESC ) as UnitDesc );
 				return;
 			}
 			

@@ -22,8 +22,12 @@ package project_data
 		public var _drawBorder:Boolean = true;
 		/** Is it need to display tiled grid within map editing window.*/
 		public var _drawGrid:Boolean = true;
+		
 		/** Is it need to floor dragging object's coordinates to tile.*/
 		public var _clampToTiles:Boolean = false;
+		
+		/** Per second.*/
+		public var _unitsSpeed:Number = 100;
 	}
 
 }

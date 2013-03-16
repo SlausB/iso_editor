@@ -4,6 +4,7 @@ package
 	import blisc.BliscComplexWithinCompound;
 	import blisc.BliscCompound;
 	import blisc.BliscDisplayObject;
+	import blisc.BliscIsometric;
 	import flash.filters.GlowFilter;
 	import ie.Isometry;
 	import mx.managers.ToolTipManager;
@@ -17,7 +18,7 @@ package
 	{
 		public var _objectInstance:ObjectInstance;
 		public var _main:Main;
-		public var _view:BliscCompound;
+		public var _view:BliscIsometric;
 		
 		private var _elapsed:Number = 0;
 		
@@ -25,7 +26,7 @@ package
 		private var _over:Boolean = false;
 		
 		
-		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view:BliscCompound = null )
+		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view:BliscIsometric = null )
 		{
 			_objectInstance = objectInstance;
 			_main = main;
@@ -157,14 +158,16 @@ package
 		
 		private function get bdo(): BliscDisplayObject
 		{
-			return _view.At( 0 )._complex._bdo;
+			return _view.bdo;
 		}
 		
 		public function Update( elapsedSeconds:Number ): void
 		{
 			_elapsed += elapsedSeconds;
 			
-			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			var compound:BliscCompound = _view as BliscCompound;
+			
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in compound._complexes )
 			{
 				complexWithinCompound._complex._bdo.Replicate( complexWithinCompound._template._complex._view.Resolve( _elapsed ) );
 			}
@@ -172,7 +175,9 @@ package
 		
 		public function Highlight( glowFilter:GlowFilter ): void
 		{
-			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			var compound:BliscCompound = _view as BliscCompound;
+			
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in compound._complexes )
 			{
 				complexWithinCompound._complex._bdo.Highlight( glowFilter );
 			}
@@ -180,7 +185,9 @@ package
 		
 		public function Unhighlight(): void
 		{
-			for each ( var complexWithinCompound:BliscComplexWithinCompound in _view._complexes )
+			var compound:BliscCompound = _view as BliscCompound;
+			
+			for each ( var complexWithinCompound:BliscComplexWithinCompound in compound._complexes )
 			{
 				complexWithinCompound._complex._bdo.Unhighlight();
 			}
@@ -189,6 +196,7 @@ package
 		public function Destroy(): void
 		{
 			_main = null;
+			_view.Destroy();
 			_view = null;
 		}
 		
