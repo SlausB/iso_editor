@@ -10,8 +10,14 @@
 	<s:Label text="Name:" x="10" y="16" />
 	<s:TextInput id="_name" x="60" y="10" width="180" />
 	
-	<s:Label text="Units:" x="10" y="45" />
-	<s:CheckBox id="_units" x="50" y="40" />
+	<s:Label text="Units:" x="10" y="48" />
+	<s:CheckBox id="_units" x="50" y="43" />
+	
+	<s:Label text="Grid holder:" x="10" y="74" />
+	<s:CheckBox id="_gridHolder" x="80" y="70" />
+	
+	<s:Label text="Visible:" x="110" y="48" />
+	<s:CheckBox id="_visibleCheckBox" x="160" y="43" />
 	
 	<s:Button label="Ok" x="100" y="100" click="onOk(event)" />
 	<s:Button label="Cancel" x="200" y="100" click="onCancel(event)" />
@@ -38,12 +44,16 @@ import project_data.Layer;
 			
 			_name.text = layer._name;
 			_units.selected = layer._units;
+			_gridHolder.selected = layer._gridHolder;
+			_visibleCheckBox.selected = layer._visible;
 		}
 		
 		private function onOk( ... args ): void
 		{
 			_layer._name = _name.text;
 			_layer._units = _units.selected;
+			_layer._gridHolder = _gridHolder.selected;
+			_layer._visible = _visibleCheckBox.selected;
 			
 			if ( _main != null )
 			{
@@ -66,6 +76,8 @@ import project_data.Layer;
 					associatedItem.label = _layer._name;
 					_main._layers_list_data_provider.itemUpdated( associatedItem );
 				}
+				
+				_main._isometry.Reinit();
 			}
 			
 			Destroy();

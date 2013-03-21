@@ -250,7 +250,30 @@ import view.Projection;
 		{
 			if ( displaying != null )
 			{
+				const cameraFocusX:Number = _blisc.cameraFocusX;
+				const cameraFocusY:Number = _blisc.cameraFocusY;
+				
+				
+				var units:Vector.< UnitDesc > = new Vector.< UnitDesc >;
+				for each ( var potentialUnit:IsometryObject in _isometryObjects )
+				{
+					var unit:Unit = potentialUnit as Unit;
+					if ( unit == null )
+					{
+						continue;
+					}
+					
+					units.push( unit.unitDesc );
+				}
+				
 				Display( displaying );
+				
+				_blisc.MoveCameraTo( cameraFocusX, cameraFocusY );
+				
+				for each ( var unitDesc:UnitDesc in units )
+				{
+					AddUnit( unitDesc );
+				}
 			}
 		}
 		
@@ -284,12 +307,18 @@ import view.Projection;
 			_gridDrawer = new GridDrawer( map, width, height, _project );
 			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
 			drawerCompound._complexes[ 0 ]._complex = new BliscComplex( drawerComplexTemplate, _gridDrawer );
-			_blisc.AddObject( drawerCompound );
 			
 			for each ( var layer:Layer in _project._data._layers )
 			{
-				_blisc.AddLayer( layer._name );
+				_blisc.AddLayer( layer._name, layer._visible );
+				
+				if ( layer._gridHolder )
+				{
+					_gridDrawer._layerId = layer._name;
+				}
 			}
+			
+			_blisc.AddObject( drawerCompound );
 			
 			for each ( var objectInstance:ObjectInstance in map._instances )
 			{

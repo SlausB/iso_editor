@@ -3,6 +3,7 @@ package
 {
 	import blisc.BliscDisplayObject;
 	import flash.display.BitmapData;
+	import flash.display.BlendMode;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.geom.Point;
@@ -52,7 +53,7 @@ package
 				return;
 			}
 			
-			_bitmapData.fillRect( _bitmapData.rect, 0xFFFFFFFF );
+			_bitmapData.fillRect( _bitmapData.rect, 0 );
 			
 			
 			if ( _map._drawGrid )
@@ -75,7 +76,7 @@ package
 				tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + TILE_EXTINGUISH, Y_TILE_BOUNDARY + TILE_HALF / 2.0 );
 				//back to north:
 				tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + TILE_HALF, Y_TILE_BOUNDARY + TILE_EXTINGUISH );
-				tileBitmapData.draw( tileTemplate, null, null, null, null, true );
+				tileBitmapData.draw( tileTemplate, null, null, BlendMode.NORMAL );
 				const TILES:int = Math.ceil( Math.ceil( _map._right / _project._data._tileSize + 3 ) * Math.ceil( _map._down / _project._data._tileSize * 2.0 + 3 ) ) * 4;
 				var tilePos:Point = new Point;
 				var boundaryRect:Rectangle = new Rectangle( -_map._right, -_map._down, _map._right * 2.0, _map._down * 2.0 );
@@ -164,7 +165,7 @@ package
 			}
 			
 			
-			canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ) );
+			canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ), null, null, true );
 		}
 		
 		override public function get width(): int
@@ -187,6 +188,18 @@ package
 				_bitmapData.dispose();
 			}
 			_bitmapData = new BitmapData( _viewportWidth, _viewportHeight, true, 0 );
+		}
+		
+		override public function Destroy(): void
+		{
+			super.Destroy();
+			
+			_bitmapData.dispose();
+			_bitmapData = null;
+			
+			_map = null;
+			
+			_project = null;
 		}
 	}
 

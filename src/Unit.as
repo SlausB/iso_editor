@@ -36,6 +36,11 @@ package
 			_unitDesc = unitDesc;
 		}
 		
+		public function get unitDesc(): UnitDesc
+		{
+			return _unitDesc;
+		}
+		
 		override public function OnMouseEvent( type:int ): void
 		{
 		}

@@ -185,7 +185,12 @@ import utils.Utils;
 			{
 				if ( _complex != null && _templates.length > 0 )
 				{
-					_templates[ 0 ].Aim( event.dragSource.dataForFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) as SingleResource, _project );
+					var draggingComplex:DraggingComplex = _templates[ 0 ];
+					draggingComplex.Aim( event.dragSource.dataForFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) as SingleResource, _project );
+					if ( _name.text == ObjectTemplate.DEFAULT_NAME )
+					{
+						_name.text = draggingComplex._complex._name;
+					}
 				}
 			}
 			else if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
