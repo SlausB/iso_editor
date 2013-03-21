@@ -80,6 +80,13 @@ import view.Projection;
 		/** Object which is currently under mouse (if isometry was in selecting mode).*/
 		public var _over:IsometryObject = null;
 		
+		/** Arrow which must point to object adding position.*/
+		[ Embed( source = "../arrow-down-blue.png" ) ]
+		private var _pointerClass:Class;
+		private static const POINTER_X:Number = 18;
+		private static const POINTER_Y:Number = 35;
+		private var _pointer:DisplayObject;
+		
 		
 		public function HideTip(): void
 		{
@@ -96,6 +103,10 @@ import view.Projection;
 			
 			_previousWidth = width;
 			_previousHeight = height;
+			
+			_pointer = ( new _pointerClass ) as DisplayObject;
+			_pointer.visible = false;
+			addChild( _pointer );
 			
 			stage.addEventListener( Event.ENTER_FRAME, onEnterFrame );
 		}
@@ -323,22 +334,62 @@ import view.Projection;
 		
 		public function onDragEnter( event:DragEvent ): void
 		{
-			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) ||
-				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
-				event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
+			if ( _blisc != null )
 			{
-				DragManager.acceptDragDrop( event.currentTarget as UIComponent );
+				if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) ||
+					event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
+					event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
+				{
+					DragManager.acceptDragDrop( event.currentTarget as UIComponent );
+				}
 			}
+		}
+		
+		/** Returns isometric coordinates of the mouse within Blisc view.*/
+		private function ResolveMouseIso( clampToTiles:Boolean = false, tilePosToFill:Point = null ): Point
+		{
+			var result:Point = new Point;
+			if ( _blisc != null )
+			{
+				_blisc.ScreenToIso( _bliscViewport.mouseX, _bliscViewport.mouseY, result );
+				
+				var tileX:Number = result.x / _project.side;
+				var tileY:Number = result.y / _project.side;
+				
+				if ( clampToTiles )
+				{
+					tileX = Math.floor( tileX );
+					tileY = Math.floor( tileY );
+				}
+				
+				result.x = tileX * _project.side;
+				result.y = tileY * _project.side;
+				
+				if ( tilePosToFill != null )
+				{
+					tilePosToFill.setTo( tileX, tileY );
+				}
+			}
+			return result;
 		}
 		
 		public function onDragOver( event:DragEvent ): void
 		{
-			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) || 
-				event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
-				event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
+			if ( _blisc != null )
 			{
-				DragManager.showFeedback( DragManager.COPY );
-				return;
+				if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) || 
+					event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
+					event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
+				{
+					_pointer.visible = true;
+					var mouse:Point = ResolveMouseIso( displaying._clampToTiles );
+					var flatMouse:Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
+					_pointer.x = flatMouse.x - POINTER_X;
+					_pointer.y = flatMouse.y - POINTER_Y;
+					
+					DragManager.showFeedback( DragManager.COPY );
+					return;
+				}
 			}
 			
 			DragManager.showFeedback( DragManager.NONE );
@@ -346,11 +397,15 @@ import view.Projection;
 		
 		public function onDragDrop( event:DragEvent ): void
 		{
-			if ( _displaying == null )
+			if ( _displaying == null || _blisc == null )
 			{
 				_main.PopUp( "Select some map first.", Main.POP_UP_ERROR );
 				return;
 			}
+			
+			_pointer.visible = false;
+			var tileMousePos:Point = new Point;
+			var mouse:Point = ResolveMouseIso( displaying._clampToTiles, tileMousePos );
 			
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 			{
@@ -373,6 +428,8 @@ import view.Projection;
 			{
 				var addingInstance:ObjectInstance = new ObjectInstance;
 				addingInstance.Init( addingTemplate );
+				addingInstance._tileCoords.x = tileMousePos.x;
+				addingInstance._tileCoords.y = tileMousePos.y;
 				
 				_displaying._instances.push( addingInstance );
 				
