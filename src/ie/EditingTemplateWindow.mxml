@@ -31,6 +31,11 @@
 	<s:Label id="_tileDispYName" x="400" y="40" text="Tile Y:" />
 	<s:TextInput x="450" y="34" id="_tileDispYInput" change="onTileDispYChange(event)" width="60" restrict="-1234567890." />
 	
+	<s:Label id="_centerXName" x="400" y="14" text="Center X:" />
+	<s:TextInput x="454" y="6" id="_centerXInput" change="onCenterXChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_centerYName" x="400" y="40" text="Center Y:" />
+	<s:TextInput x="454" y="34" id="_centerYInput" change="onCenterYChange(event)" width="60" restrict="-1234567890." />
+	
 	<s:SpriteVisualElement x="10" y="70" id="_space" />
 	
 	<s:Label x="20" y="620" text="N/A" id="_pos" />
@@ -403,8 +408,10 @@ import utils.Utils;
 				return _centerImage;
 			}
 			
-			for each ( var template:DraggingComplex in _templates )
+			for ( var i:int = ( _templates.length - 1 ); i >= 0; --i )
 			{
+				var template:DraggingComplex = _templates[ i ];
+				
 				if ( template._view == null )
 				{
 					continue;
@@ -419,8 +426,21 @@ import utils.Utils;
 			return null;
 		}
 		
+		private var _ignoreNextMouseUp:Boolean = false;
+		private function IgnoreMouse( e:MouseEvent ): Boolean
+		{
+			//do not create space quads when clicks are done for layer choosing drop down list:
+			return Utils.FindParentByObject( e.target as DisplayObject, _space ) == false;
+		}
 		private function onMouseDown( e:MouseEvent ): void
 		{
+			if ( IgnoreMouse( e ) )
+			{
+				_ignoreNextMouseUp = true;
+				return;
+			}
+			
+			
 			//leave this window alone when you interact with some other windows:
 			var local:Point = _space.globalToLocal( new Point( e.stageX, e.stageY ) );
 			if ( local.x < 0 || local.y < 0 || local.x > WIDTH || local.y > HEIGHT )
@@ -445,6 +465,12 @@ import utils.Utils;
 		
 		private function onMouseUp( e:MouseEvent ): void
 		{
+			if ( _ignoreNextMouseUp )
+			{
+				_ignoreNextMouseUp = false;
+				return;
+			}
+			
 			_mousePos = null;
 			
 			if ( _wasDown == false )
@@ -544,6 +570,10 @@ import utils.Utils;
 						ShowIsoDisplacements();
 					}
 				}
+				else if ( obj == _centerImage )
+				{
+					ShowCenterPos();
+				}
 			}
 		}
 		
@@ -637,6 +667,14 @@ import utils.Utils;
 				_centerImage.x = _complex._center.x - CENTER_DISP_X;
 				_centerImage.y = _complex._center.y - CENTER_DISP_Y;
 				_centerHolder.addChild( _centerImage );
+				ShowCenterPos();
+			}
+			else
+			{
+				_centerXName.visible = false;
+				_centerXInput.visible = false;
+				_centerYName.visible = false;
+				_centerYInput.visible = false;
 			}
 			
 			//elements views:
@@ -1080,6 +1118,26 @@ import utils.Utils;
 			new edit_space.ColorCollection( 0x6B4E7C, new < int >[ GROUP_GREY, GROUP_BLUE, GROUP_DARK_BLUE ] ),
 			new edit_space.ColorCollection( 0x6A4288, new < int >[ GROUP_GREY, GROUP_BLUE, GROUP_DARK_BLUE ] ),
 		];
+		
+		
+		private function ShowCenterPos(): void
+		{
+			_centerXInput.text = ( _centerImage.x + CENTER_DISP_X ).toString();
+			_centerYInput.text = ( _centerImage.y + CENTER_DISP_Y ).toString();
+		}
+		private function ApplyCenterPos(): void
+		{
+			_centerImage.x = parseFloat( _centerXInput.text ) - CENTER_DISP_X;
+			_centerImage.y = parseFloat( _centerYInput.text ) - CENTER_DISP_Y;
+		}
+		private function onCenterXChange( ... args ): void
+		{
+			ApplyCenterPos();
+		}
+		private function onCenterYChange( ... args ): void
+		{
+			ApplyCenterPos();
+		}
 		
 		]]>
 	</fx:Script>

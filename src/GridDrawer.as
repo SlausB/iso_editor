@@ -40,7 +40,7 @@ package
 			_project = project;
 		}
 		
-		override public function draw( canvas:BitmapData, mouseCanvas:BitmapData, cameraX:Number, cameraY:Number, mouseCullX:int, mouseCullY:int, mouseCullX2:int, mouseCullY2:int ) :void
+		override public function draw( canvas:BitmapData, mouseCanvas:BitmapData, cameraX:Number, cameraY:Number, mouseCullX:int, mouseCullY:int, mouseCullX2:int, mouseCullY2:int, zoom:Number ) :void
 		{
 			if ( _viewportWidth == 0 || _viewportHeight == 0 )
 			{
@@ -80,7 +80,7 @@ package
 				const TILES:int = Math.ceil( Math.ceil( _map._right / _project._data._tileSize + 3 ) * Math.ceil( _map._down / _project._data._tileSize * 2.0 + 3 ) ) * 4;
 				var tilePos:Point = new Point;
 				var boundaryRect:Rectangle = new Rectangle( -_map._right, -_map._down, _map._right * 2.0, _map._down * 2.0 );
-				var viewportRect:Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth, _viewportHeight );
+				var viewportRect:Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth / zoom, _viewportHeight / zoom );
 				var tileRect:Rectangle = new Rectangle( 0, 0, _project._data._tileSize * 2.0, _project._data._tileSize );
 				var destPoint:Point = new Point;
 				for ( var i:int = 0; i < TILES; ++i )

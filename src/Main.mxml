@@ -55,6 +55,14 @@
 					
 					<s:Label x="220" y="30" text="Units speed:" />
 					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" />
+					
+					<s:Label x="350" y="10" text="Scale:" />
+					<s:HGroup x="390" y="4" >
+						<s:RadioButton id="_scale_1" width="30" groupName="scale" label="x1" click="onScale_1(event)" />
+						<s:RadioButton id="_scale_2" width="30" groupName="scale" label="x2" click="onScale_2(event)" />
+						<s:RadioButton id="_scale_3" width="30" groupName="scale" label="x3" click="onScale_3(event)" />
+						<s:RadioButton id="_scale_4" width="30" groupName="scale" label="x4" click="onScale_4(event)" />
+					</s:HGroup>
 				</s:BorderContainer>
 			</s:Group>
 			
@@ -233,6 +241,7 @@ import view.Projection;
 		public var _chosenMap:Map = null;
 		
 		public var _ctrlDown:Boolean = false;
+		public var _qDown:Boolean = false;
 		
 		
 		public function onInit( ... args ): void
@@ -258,6 +267,48 @@ import view.Projection;
 		private function onKeyboardEvent( e:KeyboardEvent ): void
 		{
 			_ctrlDown = e.ctrlKey;
+			
+			switch ( e.keyCode )
+			{
+				//q:
+				case 81:
+					_qDown = e.type == KeyboardEvent.KEY_DOWN;
+					break;
+				
+				//del:
+				case 46:
+					var selected:IsometryObject = _isometry._selected;
+					if ( selected != null && _isometry.displaying != null )
+					{
+						//remove from displaying:
+						for ( var isometryObjectIndex:int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
+						{
+							if ( _isometry._isometryObjects[ isometryObjectIndex ] == selected )
+							{
+								_isometry._isometryObjects.splice( isometryObjectIndex, 1 );
+								break;
+							}
+						}
+						//remove from map's objects:
+						for ( var mapObjectIndex:int = 0; mapObjectIndex < _isometry.displaying._instances.length; ++mapObjectIndex )
+						{
+							if ( _isometry.displaying._instances[ mapObjectIndex ] == selected._objectInstance )
+							{
+								_isometry.displaying._instances.splice( mapObjectIndex, 1 );
+								break;
+							}
+						}
+						selected.Deselect();
+						if ( _isometry._over == selected )
+						{
+							_isometry._over.Out();
+							_isometry._over = null;
+						}
+						selected.Destroy();
+						_isometry._selected = null;
+					}
+					break;
+			}
 		}
 		
 		public function onResourceChoice( e:IndexChangeEvent ): void
@@ -375,12 +426,7 @@ import view.Projection;
 			_templatesContextMenu = Menu.createMenu( null, _templatesContextMenuData );
 			_templatesContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
 			{
-				switch ( menuEvent.item.id )
-				{
-					case "add_template":
-						AddTemplate();
-						break;
-				}
+				OnTemplateListContextMenu( menuEvent.item.id );
 			} );
 			_templatesContextMenu.show( e.stageX, e.stageY );
 		}
@@ -389,6 +435,15 @@ import view.Projection;
 		[
 			{ label:"Add template...", id:"add_template" }
 		];
+		private function OnTemplateListContextMenu( menuName:String ): void
+		{
+			switch ( menuName )
+			{
+				case "add_template":
+					AddTemplate();
+					break;
+			}
+		}
 		private function ShowSingleTemplateContextMenu( complexTemplate:ComplexTemplate, x:Number, y:Number ): void
 		{
 			var thisOne:Main = this;
@@ -399,7 +454,7 @@ import view.Projection;
 				_singleTemplateContextMenu = null;
 			}
 			
-			_singleTemplateContextMenu = Menu.createMenu( null, [ { label: "Edit...", id: "edit", template: complexTemplate } ] );
+			_singleTemplateContextMenu = Menu.createMenu( null, _templatesContextMenuData.concat( [ { label: "Edit...", id: "edit", template: complexTemplate } ] ) );
 			_singleTemplateContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleTemplateMenuEvent:MenuEvent ): void
 			{
 				switch ( singleTemplateMenuEvent.item.id )
@@ -410,6 +465,8 @@ import view.Projection;
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
 				}
+				
+				OnTemplateListContextMenu( singleTemplateMenuEvent.item.id );
 			} );
 			_singleTemplateContextMenu.show( x, y );
 		}
@@ -454,12 +511,7 @@ import view.Projection;
 			_compoundsContextMenu = Menu.createMenu( null, _compoundsContextMenuData );
 			_compoundsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
 			{
-				switch ( menuEvent.item.id )
-				{
-					case "add_compound":
-						AddCompound();
-						break;
-				}
+				OnCompoundListContextMenu( menuEvent.item.id );
 			} );
 			_compoundsContextMenu.show( e.stageX, e.stageY );
 		}
@@ -468,6 +520,15 @@ import view.Projection;
 		[
 			{ label:"Add compound...", id:"add_compound" }
 		];
+		private function OnCompoundListContextMenu( menuName:String ): void
+		{
+			switch ( menuName )
+			{
+				case "add_compound":
+					AddCompound();
+					break;
+			}
+		}
 		private function ShowSingleCompoundContextMenu( compoundTemplate:CompoundTemplate, x:Number, y:Number ): void
 		{
 			var thisOne:Main = this;
@@ -478,7 +539,7 @@ import view.Projection;
 				_singleCompoundContextMenu = null;
 			}
 			
-			_singleCompoundContextMenu = Menu.createMenu( null, [ { label: "Edit...", id: "edit", compound: compoundTemplate } ] );
+			_singleCompoundContextMenu = Menu.createMenu( null, _compoundsContextMenuData.concat( [ { label: "Edit...", id: "edit", compound: compoundTemplate } ] ) );
 			_singleCompoundContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleCompoundMenuEvent:MenuEvent ): void
 			{
 				switch ( singleCompoundMenuEvent.item.id )
@@ -489,6 +550,8 @@ import view.Projection;
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
 				}
+				
+				OnCompoundListContextMenu( singleCompoundMenuEvent.item.id );
 			} );
 			_singleCompoundContextMenu.show( x, y );
 		}
@@ -1118,6 +1181,31 @@ import view.Projection;
 		private function onResourcesPreviewHolderResize( ... args ): void
 		{
 			_resourcesPreview.Resize( _resources_preview_holder.width, _resources_preview_holder.height );
+		}
+		
+		
+		private function SetScale( value:Number ): void
+		{
+			if ( _isometry._blisc != null )
+			{
+				_isometry._blisc.zoom = value;
+			}
+		}
+		private function onScale_1( ... args ): void
+		{
+			SetScale( 1 );
+		}
+		private function onScale_2( ... args ): void
+		{
+			SetScale( 1 / 2 );
+		}
+		private function onScale_3( ... args ): void
+		{
+			SetScale( 1 / 3 );
+		}
+		private function onScale_4( ... args ): void
+		{
+			SetScale( 1 / 4 );
 		}
 		
 		]]>

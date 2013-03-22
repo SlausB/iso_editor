@@ -60,7 +60,7 @@ import view.Projection;
 		
 		public var _blisc:Blisc;
 		
-		private var _isometryObjects:Vector.< IsometryObject > = new Vector.< IsometryObject >;
+		public var _isometryObjects:Vector.< IsometryObject > = new Vector.< IsometryObject >;
 		
 		/** Dirty (but only one known) way to handle viewport size changes.*/
 		private var _previousWidth:Number;
@@ -87,6 +87,9 @@ import view.Projection;
 		private static const POINTER_Y:Number = 35;
 		private var _pointer:DisplayObject;
 		
+		/** Which object was dragged in last to position it again using "alt" key.*/
+		public var _lastPositioned:ObjectTemplate = null;
+		
 		
 		public function HideTip(): void
 		{
@@ -95,6 +98,11 @@ import view.Projection;
 				ToolTipManager.destroyToolTip( _objectTip );
 				_objectTip = null;
 			}
+		}
+		public function ShowTip( tip:IToolTip ): void
+		{
+			HideTip();
+			_objectTip = tip;
 		}
 		
 		private function onInit( ... args ): void
@@ -282,6 +290,8 @@ import view.Projection;
 		{
 			Unload();
 			
+			_main._scale_1.selected = true;
+			
 			_displaying = map;
 			
 			_main._mapPropertiesArea.enabled = true;
@@ -402,6 +412,15 @@ import view.Projection;
 			return result;
 		}
 		
+		public function ShowPointerOverMouse(): void
+		{
+			_pointer.visible = true;
+			var mouse:Point = ResolveMouseIso( displaying._clampToTiles );
+			var flatMouse:Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
+			_pointer.x = flatMouse.x - POINTER_X;
+			_pointer.y = flatMouse.y - POINTER_Y;
+		}
+		
 		public function onDragOver( event:DragEvent ): void
 		{
 			if ( _blisc != null )
@@ -410,11 +429,7 @@ import view.Projection;
 					event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
 					event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 				{
-					_pointer.visible = true;
-					var mouse:Point = ResolveMouseIso( displaying._clampToTiles );
-					var flatMouse:Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
-					_pointer.x = flatMouse.x - POINTER_X;
-					_pointer.y = flatMouse.y - POINTER_Y;
+					ShowPointerOverMouse();
 					
 					DragManager.showFeedback( DragManager.COPY );
 					return;
@@ -455,15 +470,22 @@ import view.Projection;
 			
 			if ( addingTemplate != null )
 			{
-				var addingInstance:ObjectInstance = new ObjectInstance;
-				addingInstance.Init( addingTemplate );
-				addingInstance._tileCoords.x = tileMousePos.x;
-				addingInstance._tileCoords.y = tileMousePos.y;
+				_lastPositioned = addingTemplate;
 				
-				_displaying._instances.push( addingInstance );
-				
-				AddObject( addingInstance );
+				AddTemplate( addingTemplate, tileMousePos.x, tileMousePos.y );
 			}
+		}
+		
+		public function AddTemplate( template:ObjectTemplate, x:Number, y:Number ): void
+		{
+			var addingInstance:ObjectInstance = new ObjectInstance;
+			addingInstance.Init( template );
+			addingInstance._tileCoords.x = x;
+			addingInstance._tileCoords.y = y;
+			
+			_displaying._instances.push( addingInstance );
+			
+			AddObject( addingInstance );
 		}
 		
 		public function get displaying(): project_data.Map
@@ -500,7 +522,16 @@ import view.Projection;
 			
 			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
-			if ( _main._ctrlDown )
+			if ( _main._qDown )
+			{
+				if ( _lastPositioned != null )
+				{
+					var tilePos:Point = new Point;
+					ResolveMouseIso( displaying._clampToTiles, tilePos );
+					AddTemplate( _lastPositioned, tilePos.x, tilePos.y );
+				}
+			}
+			else if ( _main._ctrlDown )
 			{
 				var newDragging:IsometryObject = GetObj( e, local );
 				if ( newDragging != null )
@@ -551,6 +582,19 @@ import view.Projection;
 			
 			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
+			if ( DragManager.isDragging == false )
+			{
+				if ( _main._qDown )
+				{
+					ShowPointerOverMouse();
+					return;
+				}
+				else
+				{
+					_pointer.visible = false;
+				}
+			}
+			
 			//displaying hovering tile coordinates:
 			var iso:Point = new Point;
 			_blisc.ScreenToIso( local.x, local.y, iso );
@@ -575,6 +619,31 @@ import view.Projection;
 			else
 			{
 				_blisc.OnMouseMove( local.x, local.y );
+				
+				var objects:Vector.< * > = _blisc.ObjectsUnderPoint( local.x + _blisc.cameraOffsetX, local.y + _blisc.cameraOffsetY );
+				var tipText:String = "";
+				for ( var i:int = 0; i < objects.length; ++i )
+				{
+					var io:IsometryObject = objects[ i ] as IsometryObject;
+					if ( io == null )
+					{
+						continue;
+					}
+					
+					if ( tipText.length > 0 )
+					{
+						tipText = tipText + "\n";
+					}
+					tipText = tipText + io._objectInstance._template._name;
+				}
+				if ( tipText.length > 0 )
+				{
+					ShowTip( ToolTipManager.createToolTip( tipText, _main.stage.mouseX - 2, _main.stage.mouseY + 20 ) );
+				}
+				else
+				{
+					HideTip();
+				}
 			}
 		}
 		

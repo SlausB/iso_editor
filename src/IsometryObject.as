@@ -78,8 +78,7 @@ package
 			
 			if ( _selected == false )
 			{
-				_main._isometry.HideTip();
-				_main._isometry._objectTip = ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY );
+				//_main._isometry.ShowTip( ToolTipManager.createToolTip( _objectInstance._template._name, _main.stage.mouseX, _main.stage.mouseY ) );
 				
 				ShowOverHighlight();
 			}
