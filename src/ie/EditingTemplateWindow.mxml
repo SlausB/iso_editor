@@ -57,6 +57,7 @@ import flash.filters.GlowFilter;
 import flash.geom.Point;
 import flash.text.TextField;
 import flash.utils.getQualifiedClassName;
+import list_items.CompoundTableItem;
 import list_items.ListItem;
 import list_items.TemplateListItem;
 import mx.controls.NumericStepper;
@@ -284,7 +285,16 @@ import utils.Utils;
 					_compound._consisting.push( adding );
 				}
 				
-				ListItem.UpdateListItem( _editing, _main._compounds_table.dataProvider, true, "Editing compound" );
+				var compoundTableItem:CompoundTableItem = ListItem.FindListItem( _compound, _main._compounds_table.dataProvider ) as CompoundTableItem;
+				if ( compoundTableItem == null )
+				{
+					Cc.error( "E: EditingTemplateWindow.onOk(): CompoundTableItem was NOT found." );
+				}
+				else
+				{
+					compoundTableItem.UpdateView( _main );
+					_main._compounds_table.dataProvider.itemUpdated( compoundTableItem );
+				}
 			}
 			
 			Destroy();

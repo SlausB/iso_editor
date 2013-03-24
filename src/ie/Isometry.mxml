@@ -29,6 +29,7 @@ import blisc.BliscDisplayObject;
 import blisc.BliscObjectTemplate;
 import blisc.BliscSprite;
 import blisc.BliscUnit;
+import com.junkbyte.console.Cc;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;
@@ -40,6 +41,8 @@ import flash.geom.Point;
 import flash.text.TextField;
 import flash.ui.Keyboard;
 import flash.utils.getTimer;
+import list_items.CompoundTableItem;
+import list_items.ListItem;
 import mx.core.IToolTip;
 import mx.core.UIComponent;
 import mx.events.DragEvent;
@@ -474,6 +477,24 @@ import view.Projection;
 				_lastPositioned = addingTemplate;
 				
 				AddTemplate( addingTemplate, tileMousePos.x, tileMousePos.y );
+				
+				if ( addingTemplate is ComplexTemplate )
+				{
+					
+				}
+				else if ( addingTemplate is CompoundTemplate )
+				{
+					var compoundTableItem:CompoundTableItem = ListItem.FindListItem( addingTemplate, _main._compounds_table.dataProvider ) as CompoundTableItem;
+					if ( compoundTableItem == null )
+					{
+						Cc.error( "E: Isometry.onDragDrop(): CompoundTableItem was NOT found." );
+					}
+					else
+					{
+						compoundTableItem.UpdateUsage( _main );
+						_main._compounds_table.dataProvider.itemUpdated( compoundTableItem );
+					}
+				}
 			}
 		}
 		

@@ -232,6 +232,7 @@ import ie.EditingProjectWindow;
 import ie.EditingTemplateWindow;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
+import list_items.ListItem;
 import list_items.MapListItem;
 import list_items.TemplateListItem;
 import list_items.UnitListItem;
@@ -313,6 +314,7 @@ import view.Projection;
 				
 				//del:
 				case 46:
+					//remove currently selected object from map:
 					var selected:IsometryObject = _isometry._selected;
 					if ( selected != null && _isometry.displaying != null )
 					{
@@ -340,6 +342,21 @@ import view.Projection;
 							_isometry._over.Out();
 							_isometry._over = null;
 						}
+						
+						if ( selected._objectInstance._template is CompoundTemplate )
+						{
+							var compoundTableItem:CompoundTableItem = ListItem.FindListItem( selected._objectInstance._template, _compounds_table.dataProvider ) as CompoundTableItem;
+							if ( compoundTableItem == null )
+							{
+								Cc.error( "E: Main.onKeyboardEvent(): del: CompoundTableItem was NOT found." );
+							}
+							else
+							{
+								compoundTableItem.UpdateUsage( this );
+								_compounds_table.dataProvider.itemUpdated( compoundTableItem );
+							}
+						}
+						
 						selected.Destroy();
 						_isometry._selected = null;
 					}
@@ -431,6 +448,16 @@ import view.Projection;
 						return looking;
 					}
 				}
+			}
+			return null;
+		}
+		
+		private function FindTableItem( e:MouseEvent ): ListItem
+		{
+			var gir:IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
+			if ( gir != null )
+			{
+				return gir.data as ListItem;
 			}
 			return null;
 		}
@@ -766,7 +793,7 @@ import view.Projection;
 		private var _downCompound:CompoundTableItem = null;
 		private function onCompoundsMouseDown( e:MouseEvent ): void
 		{
-			_downCompound = FindListItem( e, CompoundTableItem );
+			_downCompound = FindTableItem( e ) as CompoundTableItem;
 		}
 		private function onCompoundsMouseUp( e:MouseEvent ): void
 		{

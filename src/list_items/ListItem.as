@@ -29,7 +29,7 @@ package list_items
 		}
 		
 		
-		public static function UpdateListItem( data:Object, dp:IList, complain:Boolean = true, context:String = "" ): void
+		public static function FindListItem( data:Object, dp:IList ): ListItem
 		{
 			for ( var i:int = 0; i < dp.length; ++i )
 			{
@@ -41,12 +41,25 @@ package list_items
 				
 				if ( listItem.data == data )
 				{
-					dp.itemUpdated( listItem );
-					return;
+					return listItem;
 				}
 			}
-			
-			Cc.error( "E: " + context + ": ListItem.UpdateListItem(): ListItem wasn't found." );
+			return null;
+		}
+		public static function UpdateListItem( data:Object, dp:IList, complain:Boolean = true, context:String = "" ): void
+		{
+			var listItem:ListItem = FindListItem( data, dp );
+			if ( listItem == null )
+			{
+				if ( complain )
+				{
+					Cc.error( "E: " + context + ": ListItem.UpdateListItem(): ListItem wasn't found." );
+				}
+			}
+			else
+			{
+				dp.itemUpdated( listItem );
+			}
 		}
 		
 	}

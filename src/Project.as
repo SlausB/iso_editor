@@ -19,7 +19,9 @@ package
 	import list_items.ResourceListItem;
 	import list_items.TemplateListItem;
 	import list_items.UnitListItem;
+	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
+	import mx.collections.ICollectionView;
 	import mx.collections.IList;
 	import mx.rpc.soap.types.MapType;
 	import project_data.ComplexTemplate;
@@ -93,6 +95,13 @@ package
 					LoadLayers();
 					
 					LoadMaps();
+					
+					//update compounds after maps loading:
+					for each ( var compoundTableItem:CompoundTableItem in ( _main._compounds_table.dataProvider as ArrayCollection ).source )
+					{
+						compoundTableItem.UpdateUsage( _main );
+						_main._compounds_table.dataProvider.itemUpdated( compoundTableItem );
+					}
 					
 					onResult( null );
 				}

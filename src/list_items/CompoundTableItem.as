@@ -50,14 +50,10 @@ package list_items
 		}
 		public function UpdateUsage( main:Main ): void
 		{
-			var map:Map = main._isometry.displaying;
+			_used = 0;
 			
-			_used = -1;
-			
-			if ( map != null )
+			for each ( var map:Map in main._project._data._maps )
 			{
-				_used = 0;
-				
 				for each ( var objectInstance:ObjectInstance in map._instances )
 				{
 					if ( objectInstance._template == _data )
