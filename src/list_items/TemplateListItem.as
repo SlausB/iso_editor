@@ -1,6 +1,11 @@
-package list_items 
+///@cond
+package list_items
 {
 	import project_data.ComplexTemplate;
+	
+	///@endcond
+	
+	
 	public class TemplateListItem extends Object
 	{
 		private var _label:String;

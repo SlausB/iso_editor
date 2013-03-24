@@ -114,7 +114,7 @@ package
 		private function LoadTemplates(): void
 		{
 			_main._templates_list_data_provider.removeAll();
-			_main._compounds_list_data_provider.removeAll();
+			_main._compounds_table.dataProvider.removeAll();
 			
 			for ( var i:int = 0; i < _data._objects.length; ++i )
 			{
@@ -122,7 +122,7 @@ package
 				if ( complex == null )
 				{
 					var compound:CompoundTemplate = _data._objects[ i ] as CompoundTemplate;
-					_main._compounds_list_data_provider.addItem( new CompoundListItem( compound._name, compound ) );
+					_main._compounds_table.dataProvider.addItem( new CompoundListItem( compound._name, compound ) );
 				}
 				else
 				{
@@ -304,7 +304,7 @@ package
 			}
 			else
 			{
-				_main._compounds_list_data_provider.addItem( new CompoundListItem( template._name, template as CompoundTemplate ) );
+				_main._compounds_table.dataProvider.addItem( new CompoundListItem( template._name, template as CompoundTemplate ) );
 			}
 		}
 		

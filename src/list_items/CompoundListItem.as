@@ -5,13 +5,12 @@ package list_items
 	
 	///@endcond
 	
-	public class CompoundListItem extends Object
+	public class CompoundTableItem extends Object
 	{
-		private var _label:String;
 		private var _compound:CompoundTemplate;
 		
 		
-		public function CompoundListItem( label:String, compound:CompoundTemplate ) 
+		public function CompoundTableItem( compound:CompoundTemplate ) 
 		{
 			_label = label;
 			_compound = compound;

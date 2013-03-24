@@ -95,9 +95,15 @@
 			</mx:VBox>
 			
 			<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
-				<s:List id="_compounds_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onCompoundsChoice(event)" contextMenu="onCompoundsContextMenu(event)" mouseDown="onCompoundsMouseDown(event)" mouseUp="onCompoundsMouseUp(event)" mouseMove="onCompoundsMouseMove(event)" >
-					<s:ArrayList id="_compounds_list_data_provider" />
-				</s:List>
+				<s:DataGrid id="_compounds_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onCompoundsContextMenu(event)" mouseDown="onCompoundsMouseDown(event)" mouseUp="onCompoundsMouseUp(event)" mouseMove="onCompoundsMouseMove(event)" selectionChanging="onCompoundsChoice(event)" >
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="used" headerText="Used" />
+						</s:ArrayList>
+					</s:columns>
+					<s:ArrayList />
+				</s:DataGrid>
 			</mx:VBox>
 			
 			<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
@@ -226,6 +232,7 @@ import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
 import spark.components.Label;
 import spark.core.IContentLoader;
+import spark.events.GridSelectionEvent;
 import spark.events.IndexChangeEvent;
 import spark.skins.spark.DefaultItemRenderer;
 import utils.Utils;
@@ -320,7 +327,7 @@ import view.Projection;
 		{
 			trace( "template" );
 		}
-		public function onCompoundsChoice( e:IndexChangeEvent ): void
+		public function onCompoundsChoice( e:GridSelectionEvent ): void
 		{
 			trace( "compound" );
 		}

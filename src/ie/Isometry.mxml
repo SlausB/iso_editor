@@ -8,6 +8,7 @@
 			   mouseDown="onMouseDown(event)"
 			   mouseUp="onMouseUp(event)"
 			   mouseMove="onMouseMove(event)"
+			   mouseOut="onMouseOut(event)"
 			   >
 	
 	<fx:Declarations>
@@ -645,6 +646,10 @@ import view.Projection;
 					HideTip();
 				}
 			}
+		}
+		private function onMouseOut( ... args ): void
+		{
+			HideTip();
 		}
 		
 		]]>

@@ -284,7 +284,8 @@ import utils.Utils;
 					_compound._consisting.push( adding );
 				}
 				
-				//inform list view about item change:
+				//TODO:
+				/*//inform list view about item change:
 				var associatedCompoundListItem:CompoundListItem = null;
 				for each ( var compoundListItem:CompoundListItem in _main._compounds_list_data_provider.source )
 				{
@@ -302,7 +303,7 @@ import utils.Utils;
 				{
 					associatedCompoundListItem.label = _editing._name;
 					_main._compounds_list_data_provider.itemUpdated( associatedCompoundListItem );
-				}
+				}*/
 			}
 			
 			Destroy();
