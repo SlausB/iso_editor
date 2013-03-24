@@ -99,10 +99,37 @@
 					<s:columns>
 						<s:ArrayList>
 							<s:GridColumn dataField="name" headerText="Name" />
-							<s:GridColumn dataField="used" headerText="Used" />
+							<s:GridColumn dataField="used" headerText="Used" width="60" />
+							<s:GridColumn headerText="View" sortable="false" width="60" >
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer>
+											<s:SpriteVisualElement id="_view" />
+											<fx:Script>
+												<![CDATA[
+import com.junkbyte.console.Cc;
+import utils.Utils;
+													override public function prepare( hasBeenRecycled:Boolean ): void
+													{
+														if ( data != null )
+														{
+															Utils.RemoveAllChildren( _view );
+															var view:flash.display.DisplayObject = data.view;
+															Utils.CenterItself( view );
+															view.y += 13;
+															view.x += 4 + ( view.getBounds( view ).width / 2.0 );
+															_view.addChild( view );
+														}
+													}
+												]]>
+											</fx:Script>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
 						</s:ArrayList>
 					</s:columns>
-					<s:ArrayList />
+					<mx:ArrayCollection />
 				</s:DataGrid>
 			</mx:VBox>
 			
@@ -203,7 +230,7 @@ import ie.EditingLayerWindow;
 import ie.EditingMapWindow;
 import ie.EditingProjectWindow;
 import ie.EditingTemplateWindow;
-import list_items.CompoundListItem;
+import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.MapListItem;
 import list_items.TemplateListItem;
@@ -230,6 +257,8 @@ import project_data.Map;
 import project_data.Resource;
 import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
+import spark.components.gridClasses.GridItemRenderer;
+import spark.components.gridClasses.IGridItemRenderer;
 import spark.components.Label;
 import spark.core.IContentLoader;
 import spark.events.GridSelectionEvent;
@@ -479,88 +508,45 @@ import view.Projection;
 		}
 		
 		public var _compoundsContextMenu:Menu = null;
-		public var _singleCompoundContextMenu:Menu = null;
 		private function onCompoundsContextMenu( e:MouseEvent ): void
-		{
-			if ( e.target is spark.components.Label )
-			{
-				var label:spark.components.Label = e.target as spark.components.Label;
-				var dir:DefaultItemRenderer = label.parent as DefaultItemRenderer;
-				if ( dir == null )
-				{
-					Cc.error( "E: Main.onCompoundsContextMenu(): wrong expectations." );
-				}
-				else
-				{
-					var compoundListItem:CompoundListItem = dir.data as CompoundListItem;
-					if ( compoundListItem == null )
-					{
-						Cc.error( "E: Main.onCompoundsContextMenu(): wrong data." );
-					}
-					else
-					{
-						ShowSingleCompoundContextMenu( compoundListItem.compound, e.stageX, e.stageY );
-					}
-				}
-				return;
-			}
-			else if ( ( e.target is DataGroup ) == false )
-			{
-				return;
-			}
-			
-			if ( _compoundsContextMenu != null && _compoundsContextMenu.visible == true )
-			{
-				_compoundsContextMenu.x = e.stageX;
-				_compoundsContextMenu.y = e.stageY;
-				return;
-			}
-			_compoundsContextMenu = Menu.createMenu( null, _compoundsContextMenuData );
-			_compoundsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
-			{
-				OnCompoundListContextMenu( menuEvent.item.id );
-			} );
-			_compoundsContextMenu.show( e.stageX, e.stageY );
-		}
-		[Bindable]
-		public var _compoundsContextMenuData:Array =
-		[
-			{ label:"Add compound...", id:"add_compound" }
-		];
-		private function OnCompoundListContextMenu( menuName:String ): void
-		{
-			switch ( menuName )
-			{
-				case "add_compound":
-					AddCompound();
-					break;
-			}
-		}
-		private function ShowSingleCompoundContextMenu( compoundTemplate:CompoundTemplate, x:Number, y:Number ): void
 		{
 			var thisOne:Main = this;
 			
-			if ( _singleCompoundContextMenu != null )
+			if ( _compoundsContextMenu != null )
 			{
-				_singleCompoundContextMenu.hide();
-				_singleCompoundContextMenu = null;
+				_compoundsContextMenu.hide();
+				_compoundsContextMenu = null;
 			}
 			
-			_singleCompoundContextMenu = Menu.createMenu( null, _compoundsContextMenuData.concat( [ { label: "Edit...", id: "edit", compound: compoundTemplate } ] ) );
-			_singleCompoundContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleCompoundMenuEvent:MenuEvent ): void
+			var menuData:Array = [ { label:"Add compound...", id:"add_compound" } ];
+			
+			var gridItemRenderer:IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
+			if ( gridItemRenderer != null )
 			{
-				switch ( singleCompoundMenuEvent.item.id )
+				var compoundTableItem:CompoundTableItem = gridItemRenderer.data as CompoundTableItem;
+				if ( compoundTableItem != null )
 				{
+					menuData = menuData.concat( [ { label: "Edit...", id: "edit", compound: compoundTableItem.compound } ] );
+				}
+			}
+			
+			_compoundsContextMenu = Menu.createMenu( null, menuData );
+			_compoundsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_compound":
+						AddCompound();
+						break;
+					
 					case "edit":
 						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
-						editingTemplateWindow.Init( _project, compoundTemplate, thisOne );
+						editingTemplateWindow.Init( _project, menuEvent.item.compound, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
 				}
-				
-				OnCompoundListContextMenu( singleCompoundMenuEvent.item.id );
 			} );
-			_singleCompoundContextMenu.show( x, y );
+			_compoundsContextMenu.show( e.stageX, e.stageY );
 		}
 		
 		private var _mapsContextMenu:Menu = null;
@@ -777,33 +763,33 @@ import view.Projection;
 		}
 		
 		
-		private var _downCompoundListItem:CompoundListItem = null;
+		private var _downCompound:CompoundTableItem = null;
 		private function onCompoundsMouseDown( e:MouseEvent ): void
 		{
-			_downCompoundListItem = FindListItem( e, CompoundListItem );
+			_downCompound = FindListItem( e, CompoundTableItem );
 		}
 		private function onCompoundsMouseUp( e:MouseEvent ): void
 		{
-			_downCompoundListItem = null;
+			_downCompound = null;
 		}
 		private function onCompoundsMouseMove( e:MouseEvent ): void
 		{
-			if ( _downCompoundListItem == null )
+			if ( _downCompound == null )
 			{
 				return;
 			}
 			
-			if ( _downCompoundListItem.compound._consisting.length <= 0 )
+			if ( _downCompound.compound._consisting.length <= 0 )
 			{
 				PopUp( "Specify at least one complex within chosen compound first.", POP_UP_ERROR );
 			}
 			else
 			{
-				StartDrag( e, _downCompoundListItem.compound, Global.DRAG_FORMAT_COMPOUND_TEMPLATE, _downCompoundListItem.compound._consisting[ 0 ]._complex._singleResource.FindClass( _project ) );
+				StartDrag( e, _downCompound.compound, Global.DRAG_FORMAT_COMPOUND_TEMPLATE, _downCompound.compound._consisting[ 0 ]._complex._singleResource.FindClass( _project ) );
 			}
 			
 			//to ignore other mouse moves:
-			_downComplexListItem = null;
+			_downCompound = null;
 		}
 		
 		

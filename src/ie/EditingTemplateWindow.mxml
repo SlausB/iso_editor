@@ -57,7 +57,7 @@ import flash.filters.GlowFilter;
 import flash.geom.Point;
 import flash.text.TextField;
 import flash.utils.getQualifiedClassName;
-import list_items.CompoundListItem;
+import list_items.ListItem;
 import list_items.TemplateListItem;
 import mx.controls.NumericStepper;
 import mx.core.IUIComponent;
@@ -284,26 +284,7 @@ import utils.Utils;
 					_compound._consisting.push( adding );
 				}
 				
-				//TODO:
-				/*//inform list view about item change:
-				var associatedCompoundListItem:CompoundListItem = null;
-				for each ( var compoundListItem:CompoundListItem in _main._compounds_list_data_provider.source )
-				{
-					if ( compoundListItem.compound == _editing )
-					{
-						associatedCompoundListItem = compoundListItem;
-						break;
-					}
-				}
-				if ( associatedCompoundListItem == null )
-				{
-					Cc.error( "E: EditingTemplateWindow.onOk(): CompoundListItem wasn't found." );
-				}
-				else
-				{
-					associatedCompoundListItem.label = _editing._name;
-					_main._compounds_list_data_provider.itemUpdated( associatedCompoundListItem );
-				}*/
+				ListItem.UpdateListItem( _editing, _main._compounds_table.dataProvider, true, "Editing compound" );
 			}
 			
 			Destroy();

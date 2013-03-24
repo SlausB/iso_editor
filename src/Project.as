@@ -13,7 +13,7 @@ package
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
 	import flash.utils.ByteArray;
-	import list_items.CompoundListItem;
+	import list_items.CompoundTableItem;
 	import list_items.LayerListItem;
 	import list_items.MapListItem;
 	import list_items.ResourceListItem;
@@ -122,7 +122,7 @@ package
 				if ( complex == null )
 				{
 					var compound:CompoundTemplate = _data._objects[ i ] as CompoundTemplate;
-					_main._compounds_table.dataProvider.addItem( new CompoundListItem( compound._name, compound ) );
+					_main._compounds_table.dataProvider.addItem( new CompoundTableItem( compound, _main ) );
 				}
 				else
 				{
@@ -304,7 +304,7 @@ package
 			}
 			else
 			{
-				_main._compounds_table.dataProvider.addItem( new CompoundListItem( template._name, template as CompoundTemplate ) );
+				_main._compounds_table.dataProvider.addItem( new CompoundTableItem( template as CompoundTemplate, _main ) );
 			}
 		}
 		
@@ -329,6 +329,19 @@ package
 		public function get side(): Number
 		{
 			return _data._tileSize * Utils.TILE_SIDE;
+		}
+		
+		public function ResolveLayerIndex( layer:Layer ): int
+		{
+			for ( var i:int = 0; i < _data._layers.length; ++i )
+			{
+				if ( layer == _data._layers[ i ] )
+				{
+					return i;
+				}
+			}
+			Cc.error( "E: Project.ResolveLayerIndex(): wasn't found." );
+			return 0;
 		}
 		
 	}
