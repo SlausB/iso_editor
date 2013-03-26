@@ -29,10 +29,6 @@ package list_items
 			UpdateView( main );
 		}
 		
-		public function set compound( value:CompoundTemplate ): void
-		{
-			super.data = value;
-		}
 		public function get compound(): CompoundTemplate
 		{
 			return super.data as CompoundTemplate;

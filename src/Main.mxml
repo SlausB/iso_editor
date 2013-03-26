@@ -89,9 +89,42 @@
 			</mx:VBox>
 			
 			<mx:VBox label="Templates" percentWidth="100" percentHeight="100" >
-				<s:List id="_templates_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onTemplateChoice(event)" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)" >
-					<s:ArrayList id="_templates_list_data_provider" />
-				</s:List>
+				<s:DataGrid id="_templates_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)" selectionChanging="onTemplateChoice(event)" >
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="used" headerText="Used" width="60" />
+							<s:GridColumn headerText="View" sortable="false" width="60" >
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer>
+											<s:SpriteVisualElement id="_view" />
+											<fx:Script>
+												<![CDATA[
+import com.junkbyte.console.Cc;
+import utils.Utils;
+													override public function prepare( hasBeenRecycled:Boolean ): void
+													{
+														if ( data != null )
+														{
+															Utils.RemoveAllChildren( _view );
+															var view:flash.display.DisplayObject = data.view;
+															Utils.CenterItself( view );
+															view.y += 13;
+															view.x += 4 + ( view.getBounds( view ).width / 2.0 );
+															_view.addChild( view );
+														}
+													}
+												]]>
+											</fx:Script>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+						</s:ArrayList>
+					</s:columns>
+					<mx:ArrayCollection />
+				</s:DataGrid>
 			</mx:VBox>
 			
 			<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
@@ -234,7 +267,7 @@ import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
 import list_items.MapListItem;
-import list_items.TemplateListItem;
+import list_items.TemplateTableItem;
 import list_items.UnitListItem;
 import mx.collections.ArrayList;
 import mx.containers.TitleWindow;
@@ -279,6 +312,9 @@ import view.Projection;
 		
 		public var _ctrlDown:Boolean = false;
 		public var _qDown:Boolean = false;
+		
+		/** Is it need to clamp complex templates within compound editing window.*/
+		public static var _clampTemplatesToTile:Boolean = false;
 		
 		
 		public function onInit( ... args ): void
@@ -369,7 +405,7 @@ import view.Projection;
 			var resource:Resource = ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ].resource as Resource;
 			_resourcesPreview.Display( resource, _project );
 		}
-		public function onTemplateChoice( e:IndexChangeEvent ): void
+		public function onTemplateChoice( e:GridSelectionEvent ): void
 		{
 			trace( "template" );
 		}
@@ -463,75 +499,45 @@ import view.Projection;
 		}
 		
 		public var _templatesContextMenu:Menu = null;
-		public var _singleTemplateContextMenu:Menu = null;
-		public function onTemplatesContextMenu( e:MouseEvent ): void
-		{
-			if ( e.target is spark.components.Label )
-			{
-				var templateListItem:TemplateListItem = FindListItem( e, TemplateListItem ) as TemplateListItem;
-				if ( templateListItem != null )
-				{
-					ShowSingleTemplateContextMenu( templateListItem.template, e.stageX, e.stageY );
-				}
-				return;
-			}
-			else if ( ( e.target is DataGroup ) == false )
-			{
-				return;
-			}
-			
-			if ( _templatesContextMenu != null && _templatesContextMenu.visible == true )
-			{
-				_templatesContextMenu.x = e.stageX;
-				_templatesContextMenu.y = e.stageY;
-				return;
-			}
-			_templatesContextMenu = Menu.createMenu( null, _templatesContextMenuData );
-			_templatesContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
-			{
-				OnTemplateListContextMenu( menuEvent.item.id );
-			} );
-			_templatesContextMenu.show( e.stageX, e.stageY );
-		}
-		[Bindable]
-		public var _templatesContextMenuData:Array =
-		[
-			{ label:"Add template...", id:"add_template" }
-		];
-		private function OnTemplateListContextMenu( menuName:String ): void
-		{
-			switch ( menuName )
-			{
-				case "add_template":
-					AddTemplate();
-					break;
-			}
-		}
-		private function ShowSingleTemplateContextMenu( complexTemplate:ComplexTemplate, x:Number, y:Number ): void
+		private function onTemplatesContextMenu( e:MouseEvent ): void
 		{
 			var thisOne:Main = this;
 			
-			if ( _singleTemplateContextMenu != null )
+			if ( _templatesContextMenu != null )
 			{
-				_singleTemplateContextMenu.hide();
-				_singleTemplateContextMenu = null;
+				_templatesContextMenu.hide();
+				_templatesContextMenu = null;
 			}
 			
-			_singleTemplateContextMenu = Menu.createMenu( null, _templatesContextMenuData.concat( [ { label: "Edit...", id: "edit", template: complexTemplate } ] ) );
-			_singleTemplateContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( singleTemplateMenuEvent:MenuEvent ): void
+			var menuData:Array = [ { label:"Add template...", id:"add_template" } ];
+			
+			var gridItemRenderer:IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
+			if ( gridItemRenderer != null )
 			{
-				switch ( singleTemplateMenuEvent.item.id )
+				var templateTableItem:TemplateTableItem = gridItemRenderer.data as TemplateTableItem;
+				if ( templateTableItem != null )
 				{
+					menuData = menuData.concat( [ { label: "Edit...", id: "edit", template: templateTableItem.template } ] );
+				}
+			}
+			
+			_templatesContextMenu = Menu.createMenu( null, menuData );
+			_templatesContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_template":
+						AddTemplate();
+						break;
+					
 					case "edit":
 						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
-						editingTemplateWindow.Init( _project, complexTemplate, thisOne );
+						editingTemplateWindow.Init( _project, menuEvent.item.template, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
 				}
-				
-				OnTemplateListContextMenu( singleTemplateMenuEvent.item.id );
 			} );
-			_singleTemplateContextMenu.show( x, y );
+			_templatesContextMenu.show( e.stageX, e.stageY );
 		}
 		
 		public var _compoundsContextMenu:Menu = null;
@@ -752,41 +758,37 @@ import view.Projection;
 		}
 		
 		
-		private var _downComplexListItem:ComplexTemplate = null;
+		private var _downComplex:TemplateTableItem = null;
 		private function onTemplatesMouseDown( e:MouseEvent ): void
 		{
-			var templateListItem:TemplateListItem = FindListItem( e, TemplateListItem );
-			if ( templateListItem != null )
-			{
-				_downComplexListItem = templateListItem.template;
-			}
+			_downComplex = FindTableItem( e ) as TemplateTableItem
 		}
 		private function onTemplatesMouseUp( e:MouseEvent ): void
 		{
-			_downComplexListItem = null;
+			_downComplex = null;
 		}
 		private function onTemplatesMouseMove( e:MouseEvent ): void
 		{
-			if ( _downComplexListItem == null )
+			if ( _downComplex == null )
 			{
 				return;
 			}
 			
-			if ( _downComplexListItem._singleResource == null )
+			if ( _downComplex.template._singleResource == null )
 			{
 				PopUp( "Specify template's graphics first.", POP_UP_ERROR );
 			}
-			else if ( _downComplexListItem._layer == null )
+			else if ( _downComplex.template._layer == null )
 			{
 				PopUp( "Specify template's layer first.", POP_UP_ERROR );
 			}
 			else
 			{
-				StartDrag( e, _downComplexListItem, Global.DRAG_FORMAT_COMPLEX_TEMPLATE, _downComplexListItem._singleResource.FindClass( _project ) );
+				StartDrag( e, _downComplex.template, Global.DRAG_FORMAT_COMPLEX_TEMPLATE, _downComplex.template._singleResource.FindClass( _project ) );
 			}
 			
 			//to ignore other mouse moves:
-			_downComplexListItem = null;
+			_downComplex = null;
 		}
 		
 		

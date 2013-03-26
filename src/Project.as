@@ -17,7 +17,7 @@ package
 	import list_items.LayerListItem;
 	import list_items.MapListItem;
 	import list_items.ResourceListItem;
-	import list_items.TemplateListItem;
+	import list_items.TemplateTableItem;
 	import list_items.UnitListItem;
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
@@ -122,7 +122,7 @@ package
 		
 		private function LoadTemplates(): void
 		{
-			_main._templates_list_data_provider.removeAll();
+			_main._templates_table.dataProvider.removeAll();
 			_main._compounds_table.dataProvider.removeAll();
 			
 			for ( var i:int = 0; i < _data._objects.length; ++i )
@@ -135,7 +135,7 @@ package
 				}
 				else
 				{
-					_main._templates_list_data_provider.addItem( new TemplateListItem( complex._name, complex ) );
+					_main._templates_table.dataProvider.addItem( new TemplateTableItem( complex, _main ) );
 				}
 			}
 		}
@@ -309,7 +309,7 @@ package
 			//represent within view:
 			if ( template is ComplexTemplate )
 			{
-				_main._templates_list_data_provider.addItem( new TemplateListItem( template._name,  template as ComplexTemplate ) );
+				_main._compounds_table.dataProvider.addItem( new TemplateTableItem( template as ComplexTemplate, _main ) );
 			}
 			else
 			{

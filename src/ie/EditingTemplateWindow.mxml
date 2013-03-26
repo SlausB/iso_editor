@@ -21,15 +21,15 @@
 		<mx:ArrayList id="_layerList" />
 	</s:DropDownList>
 	
-	<s:Label id="_dispXName" x="250" y="14" text="Disp X:" />
-	<s:NumericStepper x="298" y="6" id="_dispXStepper" change="onDispXChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
-	<s:Label id="_dispYName" x="250" y="40" text="Disp Y:" />
-	<s:NumericStepper x="298" y="34" id="_dispYStepper" change="onDispYChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
+	<s:Label id="_dispXName" x="240" y="14" text="Disp X:" />
+	<s:NumericStepper x="288" y="6" id="_dispXStepper" change="onDispXChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
+	<s:Label id="_dispYName" x="240" y="40" text="Disp Y:" />
+	<s:NumericStepper x="288" y="34" id="_dispYStepper" change="onDispYChange(event)" minimum="-2147483648" maximum="2147483647" snapInterval="0.0001" stepSize="1" width="60" />
 	
-	<s:Label id="_tileDispXName" x="400" y="14" text="Tile X:" />
-	<s:TextInput x="450" y="6" id="_tileDispXInput" change="onTileDispXChange(event)" width="60" restrict="-1234567890." />
-	<s:Label id="_tileDispYName" x="400" y="40" text="Tile Y:" />
-	<s:TextInput x="450" y="34" id="_tileDispYInput" change="onTileDispYChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_tileDispXName" x="380" y="14" text="Tile X:" />
+	<s:TextInput x="430" y="6" id="_tileDispXInput" change="onTileDispXChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_tileDispYName" x="380" y="40" text="Tile Y:" />
+	<s:TextInput x="430" y="34" id="_tileDispYInput" change="onTileDispYChange(event)" width="60" restrict="-1234567890." />
 	
 	<s:Label id="_centerXName" x="400" y="14" text="Center X:" />
 	<s:TextInput x="454" y="6" id="_centerXInput" change="onCenterXChange(event)" width="60" restrict="-1234567890." />
@@ -39,6 +39,9 @@
 	<s:SpriteVisualElement x="10" y="70" id="_space" />
 	
 	<s:Label x="20" y="620" text="N/A" id="_pos" />
+	
+	<s:Label x="514" y="14" text="Clamp to tile:" id="_clampToTileLabel" />
+	<s:CheckBox x="592" y="8" id="_clampToTile" change="onClampToTileChange(event)" />
 	
 	<s:Button x="420" y="620" label="Ok" click="onOk()" />
 	<s:Button x="500" y="620" label="Cancel" click="onCancel()" />
@@ -54,12 +57,14 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.filters.GlowFilter;
+import flash.geom.Matrix;
 import flash.geom.Point;
+import flash.geom.Rectangle;
 import flash.text.TextField;
 import flash.utils.getQualifiedClassName;
 import list_items.CompoundTableItem;
 import list_items.ListItem;
-import list_items.TemplateListItem;
+import list_items.TemplateTableItem;
 import mx.controls.NumericStepper;
 import mx.core.IUIComponent;
 import mx.core.UIComponent;
@@ -247,24 +252,15 @@ import utils.Utils;
 				}
 				
 				
-				//inform list view about item change:
-				var associatedTemplateListItem:TemplateListItem = null;
-				for each ( var templateListItem:TemplateListItem in _main._templates_list_data_provider.source )
+				var templateTableItem:TemplateTableItem = ListItem.FindListItem( _editing, _main._templates_table.dataProvider ) as TemplateTableItem;
+				if ( templateTableItem == null )
 				{
-					if ( templateListItem.template == _editing )
-					{
-						associatedTemplateListItem = templateListItem;
-						break;
-					}
-				}
-				if ( associatedTemplateListItem == null )
-				{
-					Cc.error( "E: EditingTemplateWindow.onOk(): TemplateListItem wasn't found." );
+					Cc.error( "E: EditingTemplateWindow.onOk(): TemplateTableItem was NOT found." );
 				}
 				else
 				{
-					associatedTemplateListItem.label = _editing._name;
-					_main._templates_list_data_provider.itemUpdated( associatedTemplateListItem );
+					templateTableItem.UpdateView( _main );
+					_main._templates_table.dataProvider.itemUpdated( templateTableItem );
 				}
 			}
 			else
@@ -387,10 +383,11 @@ import utils.Utils;
 			}
 			
 			var local:Point = object.globalToLocal( new Point( e.stageX, e.stageY ) );
-			var bitmapData:BitmapData = new BitmapData( object.width, object.height, true, 0 );
-			bitmapData.draw( object );
+			var bounds:Rectangle = object.getBounds( object );
+			var bitmapData:BitmapData = new BitmapData( bounds.width, bounds.height, true, 0 );
+			bitmapData.draw( object, new Matrix( 1, 0, 0, 1, -bounds.x, -bounds.y ) );
 			
-			return ( bitmapData.getPixel( local.x, local.y ) & 0x00FFFFFF ) > 0;
+			return ( bitmapData.getPixel32( local.x - bounds.x, local.y - bounds.y ) > 0 );
 		}
 		
 		private function FindInteractive( e:MouseEvent ): DisplayObject
@@ -554,13 +551,24 @@ import utils.Utils;
 				
 				if ( obj is DraggingComplex )
 				{
-					_dispXStepper.value = obj.x;
-					_dispYStepper.value = obj.y;
-					
 					if ( _compound != null )
 					{
+						if ( _clampToTile.selected )
+						{
+							var iso:Point = Utils.ToIso( obj.x, obj.y, new Point );
+							iso.x = Math.round( iso.x / _project.side ) * _project.side;
+							iso.y = Math.round( iso.y / _project.side ) * _project.side;
+							
+							var planar:Point = Utils.FromIso( iso.x, iso.y, new Point );
+							obj.x = planar.x;
+							obj.y = planar.y;
+						}
+						
 						ShowIsoDisplacements();
 					}
+					
+					_dispXStepper.value = obj.x;
+					_dispYStepper.value = obj.y;
 				}
 				else if ( obj == _centerImage )
 				{
@@ -593,6 +601,8 @@ import utils.Utils;
 			_space.stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
 			_space.stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			_space.stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+			
+			_clampToTile.selected = Main._clampTemplatesToTile;
 		}
 		
 		private function ResolveTile( stageX:Number, stageY:Number ): Point
@@ -618,6 +628,13 @@ import utils.Utils;
 			
 			_name.text = template._name;
 			
+			
+			//clamp to tile:
+			if ( _compound == null )
+			{
+				_clampToTileLabel.visible = false;
+				_clampToTile.visible = false;
+			}
 			
 			//positions steppers:
 			if ( _compound == null )
@@ -1129,6 +1146,12 @@ import utils.Utils;
 		private function onCenterYChange( ... args ): void
 		{
 			ApplyCenterPos();
+		}
+		
+		
+		private function onClampToTileChange( ... args ): void
+		{
+			Main._clampTemplatesToTile = _clampToTile.selected;
 		}
 		
 		]]>
