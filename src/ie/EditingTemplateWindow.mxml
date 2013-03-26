@@ -215,6 +215,7 @@ import utils.Utils;
 					
 					var adding:DraggingComplex = new DraggingComplex( broughtComplex, _project, withinCompound );
 					AddDragging( adding );
+					ResortGraphics();
 					
 					//to allow modificate it's positions using TextInputs without touching object itself:
 					_lastDragged = adding;
@@ -564,6 +565,8 @@ import utils.Utils;
 							obj.y = planar.y;
 						}
 						
+						ResortGraphics();
+						
 						ShowIsoDisplacements();
 					}
 					
@@ -616,6 +619,43 @@ import utils.Utils;
 		{
 			_templates.push( dragging );
 			_graphics.addChild( dragging );
+		}
+		
+		/** Display object's graphics according it's layers and displacement.*/
+		private function ResortGraphics(): void
+		{
+			Utils.RemoveAllChildren( _graphics );
+			
+			var sorting:Array = [];
+			for each ( var dc:DraggingComplex in _templates )
+			{
+				sorting.push( { dc: dc, l: _project.ResolveLayerIndex( dc._complex._layer ), y: ( dc._complex._center.y + dc.y ) } );
+			}
+			sorting.sort( function( lesser:Object, greater:Object ): int
+			{
+				if ( lesser.l < greater.l )
+				{
+					return -1;
+				}
+				if ( lesser.l == greater.l )
+				{
+					if ( lesser.y < greater.y )
+					{
+						return -1;
+					}
+					if ( lesser.y == greater.y )
+					{
+						return 0;
+					}
+					return 1;
+				}
+				return 1;
+			} );
+			
+			for ( var sortedIndex:int = 0; sortedIndex < sorting.length; ++sortedIndex )
+			{
+				_graphics.addChild( sorting[ sortedIndex ].dc );
+			}
 		}
 		
 		public function Init( project:Project, template:ObjectTemplate, main:Main ): void
