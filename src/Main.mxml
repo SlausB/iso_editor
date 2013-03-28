@@ -79,153 +79,171 @@
 			</mx:VDividedBox>
 		</mx:VBox>
 		
-		
-		<mx:Accordion percentWidth="30" percentHeight="100" creationPolicy="all" >
+		<mx:VDividedBox percentWidth="30" percentHeight="100" >
+			<s:Group percentWidth="100" percentHeight="20" >
+				<s:Rect percentWidth="100" percentHeight="100" >
+					<s:stroke>
+						<s:SolidColorStroke color="0x000000" weight="2" />
+					</s:stroke>
+				</s:Rect>
+				
+				<ie:IsometricPreview id="_isometricPreview" />
+			</s:Group>
 			
-			<mx:VBox label="Resources" percentWidth="100" percentHeight="100" >
-				<s:List id="_resources_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onResourceChoice(event)" contextMenu="onResourcesContextMenu(event)" >
-					<s:ArrayList id="_resources_list_data_provider" />
-				</s:List>
-			</mx:VBox>
-			
-			<mx:VBox label="Templates" percentWidth="100" percentHeight="100" >
-				<s:DataGrid id="_templates_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)" selectionChanging="onTemplateChoice(event)" >
-					<s:columns>
-						<s:ArrayList>
-							<s:GridColumn dataField="name" headerText="Name" />
-							<s:GridColumn dataField="used" headerText="Used" width="60" />
-							<s:GridColumn headerText="View" sortable="false" width="60" >
-								<s:itemRenderer>
-									<fx:Component>
-										<s:GridItemRenderer>
-											<s:SpriteVisualElement id="_view" />
-											<fx:Script>
-												<![CDATA[
-import com.junkbyte.console.Cc;
-import utils.Utils;
-													override public function prepare( hasBeenRecycled:Boolean ): void
-													{
-														if ( data != null )
-														{
-															Utils.RemoveAllChildren( _view );
-															var view:flash.display.DisplayObject = data.view;
-															Utils.CenterItself( view );
-															view.y += 13;
-															view.x += 4 + ( view.getBounds( view ).width / 2.0 );
-															_view.addChild( view );
-														}
-													}
-												]]>
-											</fx:Script>
-										</s:GridItemRenderer>
-									</fx:Component>
-								</s:itemRenderer>
-							</s:GridColumn>
-						</s:ArrayList>
-					</s:columns>
-					<mx:ArrayCollection />
-				</s:DataGrid>
-			</mx:VBox>
-			
-			<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
-				<s:DataGrid id="_compounds_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onCompoundsContextMenu(event)" mouseDown="onCompoundsMouseDown(event)" mouseUp="onCompoundsMouseUp(event)" mouseMove="onCompoundsMouseMove(event)" selectionChanging="onCompoundsChoice(event)" >
-					<s:columns>
-						<s:ArrayList>
-							<s:GridColumn dataField="name" headerText="Name" />
-							<s:GridColumn dataField="used" headerText="Used" width="60" />
-							<s:GridColumn headerText="View" sortable="false" width="60" >
-								<s:itemRenderer>
-									<fx:Component>
-										<s:GridItemRenderer>
-											<s:SpriteVisualElement id="_view" />
-											<fx:Script>
-												<![CDATA[
-import com.junkbyte.console.Cc;
-import utils.Utils;
-													override public function prepare( hasBeenRecycled:Boolean ): void
-													{
-														if ( data != null )
-														{
-															Utils.RemoveAllChildren( _view );
-															var view:flash.display.DisplayObject = data.view;
-															Utils.CenterItself( view );
-															view.y += 13;
-															view.x += 4 + ( view.getBounds( view ).width / 2.0 );
-															_view.addChild( view );
-														}
-													}
-												]]>
-											</fx:Script>
-										</s:GridItemRenderer>
-									</fx:Component>
-								</s:itemRenderer>
-							</s:GridColumn>
-						</s:ArrayList>
-					</s:columns>
-					<mx:ArrayCollection />
-				</s:DataGrid>
-			</mx:VBox>
-			
-			<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
-				<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" mouseDown="onUnitsMouseDown(event)" mouseUp="onUnitsMouseUp(event)" mouseMove="onUnitsMouseMove(event)" >
-					<s:ArrayList id="_units_list_data_provider" />
-				</s:List>
-			</mx:VBox>
-			
-			<mx:VBox label="Maps" percentWidth="100" percentHeight="100" >
-				<s:List id="_maps_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onMapsChoice(event)" contextMenu="onMapsContextMenu(event)" >
-					<s:ArrayList id="_maps_list_data_provider" />
-				</s:List>
-			</mx:VBox>
-			
-			<mx:VBox label="Layers" percentWidth="100" percentHeight="100" >
-				<s:List id="_layers_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onLayersChoice(event)" contextMenu="onLayersContextMenu(event)" >
-					<s:ArrayList id="_layers_list_data_provider" />
-				</s:List>
-			</mx:VBox>
-			
-			<mx:VBox id="_instanceProperties" label="Instance properties" enabled="false" paddingTop="10" paddingLeft="10" verticalGap="20" >
-				<mx:VBox>
-					<mx:HBox>
-						<mx:Label text="Name:" />
-						<mx:Label id="_objectName" />
-					</mx:HBox>
-				</mx:VBox>
-				<mx:VBox>
-					<mx:HBox >
-						<mx:Text text="iso X:" />
-						<mx:TextInput id="_objectIsoX" width="60" restrict="-1234567890." change="onObjectIsoXChange(event)" />
-					</mx:HBox>
-					<mx:HBox>
-						<mx:Text text="iso Y:" />
-						<mx:TextInput id="_objectIsoY" width="60" restrict="-1234567890." change="onObjectIsoYChange(event)" />
-					</mx:HBox>
+			<mx:Accordion percentWidth="100" percentHeight="80" creationPolicy="all" >
+				
+				<mx:VBox label="Resources" percentWidth="100" percentHeight="100" >
+					<s:List id="_resources_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onResourceChoice(event)" contextMenu="onResourcesContextMenu(event)" >
+						<s:ArrayList id="_resources_list_data_provider" />
+					</s:List>
 				</mx:VBox>
 				
-				<mx:VBox>
-					<mx:HBox >
-						<mx:Text text="tile X:" />
-						<mx:TextInput id="_objectTileX" width="60" restrict="-1234567890." change="onObjectTileXChange(event)" />
-					</mx:HBox>
-					<mx:HBox>
-						<mx:Text text="tile Y:" />
-						<mx:TextInput id="_objectTileY" width="60" restrict="-1234567890." change="onObjectTileYChange(event)" />
-					</mx:HBox>
+				<mx:VBox label="Templates" percentWidth="100" percentHeight="100" >
+					<s:DataGrid id="_templates_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onTemplatesContextMenu(event)" mouseDown="onTemplatesMouseDown(event)" mouseUp="onTemplatesMouseUp(event)" mouseMove="onTemplatesMouseMove(event)" selectionChanging="onTemplateChoice(event)" >
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="name" headerText="Name" />
+								<s:GridColumn dataField="used" headerText="Used" width="60" />
+								<s:GridColumn headerText="View" sortable="false" width="60" >
+									<s:itemRenderer>
+										<fx:Component>
+											<s:GridItemRenderer>
+												<s:SpriteVisualElement id="_view" />
+												<fx:Script>
+													<![CDATA[
+	import com.junkbyte.console.Cc;
+	import utils.Utils;
+														override public function prepare( hasBeenRecycled:Boolean ): void
+														{
+															if ( data != null )
+															{
+																Utils.RemoveAllChildren( _view );
+																var view:flash.display.DisplayObject = data.view;
+																Utils.CenterItself( view );
+																view.y += 13;
+																view.x += 4 + ( view.getBounds( view ).width / 2.0 );
+																_view.addChild( view );
+															}
+														}
+													]]>
+												</fx:Script>
+											</s:GridItemRenderer>
+										</fx:Component>
+									</s:itemRenderer>
+								</s:GridColumn>
+							</s:ArrayList>
+						</s:columns>
+						<mx:ArrayCollection />
+					</s:DataGrid>
 				</mx:VBox>
 				
-				<mx:VBox>
-					<mx:HBox >
-						<mx:Text text="flat X:" />
-						<mx:TextInput id="_objectFlatX" width="60" restrict="-1234567890." change="onObjectFlatXChange(event)" />
-					</mx:HBox>
-					<mx:HBox>
-						<mx:Text text="flat Y:" />
-						<mx:TextInput id="_objectFlatY" width="60" restrict="-1234567890." change="onObjectFlatYChange(event)" />
-					</mx:HBox>
+				<mx:VBox label="Compounds" percentWidth="100" percentHeight="100" >
+					<s:DataGrid id="_compounds_table" percentWidth="100" percentHeight="100" borderVisible="false" contextMenu="onCompoundsContextMenu(event)" mouseDown="onCompoundsMouseDown(event)" mouseUp="onCompoundsMouseUp(event)" mouseMove="onCompoundsMouseMove(event)" selectionChanging="onCompoundsChoice(event)" >
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="name" headerText="Name" />
+								<s:GridColumn dataField="used" headerText="Used" width="60" />
+								<s:GridColumn headerText="View" sortable="false" width="60" >
+									<s:itemRenderer>
+										<fx:Component>
+											<s:GridItemRenderer>
+												<s:SpriteVisualElement id="_view" />
+												<fx:Script>
+													<![CDATA[
+	import com.junkbyte.console.Cc;
+	import utils.Utils;
+														override public function prepare( hasBeenRecycled:Boolean ): void
+														{
+															if ( data != null )
+															{
+																Utils.RemoveAllChildren( _view );
+																var view:flash.display.DisplayObject = data.view;
+																Utils.CenterItself( view );
+																view.y += 13;
+																view.x += 4 + ( view.getBounds( view ).width / 2.0 );
+																_view.addChild( view );
+															}
+														}
+													]]>
+												</fx:Script>
+											</s:GridItemRenderer>
+										</fx:Component>
+									</s:itemRenderer>
+								</s:GridColumn>
+							</s:ArrayList>
+						</s:columns>
+						<mx:ArrayCollection />
+					</s:DataGrid>
 				</mx:VBox>
-			</mx:VBox>
+				
+				<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
+					<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" mouseDown="onUnitsMouseDown(event)" mouseUp="onUnitsMouseUp(event)" mouseMove="onUnitsMouseMove(event)" >
+						<s:ArrayList id="_units_list_data_provider" />
+					</s:List>
+				</mx:VBox>
+				
+				<mx:VBox label="Maps" percentWidth="100" percentHeight="100" >
+					<s:List id="_maps_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onMapsChoice(event)" contextMenu="onMapsContextMenu(event)" >
+						<s:ArrayList id="_maps_list_data_provider" />
+					</s:List>
+				</mx:VBox>
+				
+				<mx:VBox label="Layers" percentWidth="100" percentHeight="100" >
+					<s:List id="_layers_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onLayersChoice(event)" contextMenu="onLayersContextMenu(event)" >
+						<s:ArrayList id="_layers_list_data_provider" />
+					</s:List>
+				</mx:VBox>
+				
+				<mx:VBox id="_instanceProperties" label="Instance properties" enabled="false" paddingTop="10" paddingLeft="10" verticalGap="20" >
+					<mx:VBox>
+						<mx:HBox>
+							<mx:Label text="Name:" />
+							<mx:Label id="_objectName" />
+						</mx:HBox>
+					</mx:VBox>
+					<mx:VBox>
+						<mx:HBox >
+							<mx:Text text="iso X:" />
+							<mx:TextInput id="_objectIsoX" width="60" restrict="-1234567890." change="onObjectIsoXChange(event)" />
+						</mx:HBox>
+						<mx:HBox>
+							<mx:Text text="iso Y:" />
+							<mx:TextInput id="_objectIsoY" width="60" restrict="-1234567890." change="onObjectIsoYChange(event)" />
+						</mx:HBox>
+					</mx:VBox>
+					
+					<mx:VBox>
+						<mx:HBox >
+							<mx:Text text="tile X:" />
+							<mx:TextInput id="_objectTileX" width="60" restrict="-1234567890." change="onObjectTileXChange(event)" />
+						</mx:HBox>
+						<mx:HBox>
+							<mx:Text text="tile Y:" />
+							<mx:TextInput id="_objectTileY" width="60" restrict="-1234567890." change="onObjectTileYChange(event)" />
+						</mx:HBox>
+					</mx:VBox>
+					
+					<mx:VBox>
+						<mx:HBox >
+							<mx:Text text="flat X:" />
+							<mx:TextInput id="_objectFlatX" width="60" restrict="-1234567890." change="onObjectFlatXChange(event)" />
+						</mx:HBox>
+						<mx:HBox>
+							<mx:Text text="flat Y:" />
+							<mx:TextInput id="_objectFlatY" width="60" restrict="-1234567890." change="onObjectFlatYChange(event)" />
+						</mx:HBox>
+					</mx:VBox>
+				</mx:VBox>
+				
+				<mx:VBox label="Regions" percentWidth="100" percentHeight="100" >
+					<s:List id="_regions_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onRegionChoice(event)" contextMenu="onRegionContextMenu(event)" >
+						<s:ArrayList />
+					</s:List>
+				</mx:VBox>
+				
+			</mx:Accordion>
 			
-		</mx:Accordion>
+		</mx:VDividedBox>
 		
 	</mx:HDividedBox>
 	
@@ -262,11 +280,13 @@ import flash.utils.getQualifiedClassName;
 import ie.EditingLayerWindow;
 import ie.EditingMapWindow;
 import ie.EditingProjectWindow;
+import ie.EditingRegionWindow;
 import ie.EditingTemplateWindow;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
 import list_items.MapListItem;
+import list_items.RegionListItem;
 import list_items.TemplateTableItem;
 import list_items.UnitListItem;
 import mx.collections.ArrayList;
@@ -288,6 +308,7 @@ import project_data.ComplexTemplate;
 import project_data.CompoundTemplate;
 import project_data.Layer;
 import project_data.Map;
+import project_data.Region;
 import project_data.Resource;
 import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
@@ -315,6 +336,9 @@ import view.Projection;
 		
 		/** Is it need to clamp complex templates within compound editing window.*/
 		public static var _clampTemplatesToTile:Boolean = false;
+		
+		/** Currently opened editing window if not null.*/
+		public var editingTemplateWindow:EditingTemplateWindow = null;
 		
 		
 		public function onInit( ... args ): void
@@ -350,10 +374,32 @@ import view.Projection;
 				
 				//del:
 				case 46:
-					//remove currently selected object from map:
-					var selected:IsometryObject = _isometry._selected;
-					if ( selected != null && _isometry.displaying != null )
+					//remove currently selected complex within compound editing window:
+					if ( editingTemplateWindow != null )
 					{
+						if ( editingTemplateWindow._compound != null )
+						{
+							if ( editingTemplateWindow._lastDragged != null )
+							{
+								editingTemplateWindow._lastDragged.parent.removeChild( editingTemplateWindow._lastDragged );
+								
+								for ( var i:int = 0; i < editingTemplateWindow._templates.length; ++i )
+								{
+									if ( editingTemplateWindow._templates[ i ] == editingTemplateWindow._lastDragged )
+									{
+										editingTemplateWindow._templates.splice( i, 1 );
+										break;
+									}
+								}
+								
+								editingTemplateWindow._lastDragged = null;
+							}
+						}
+					}
+					//remove currently selected object from map:
+					else if ( _isometry._selected != null && _isometry.displaying != null )
+					{
+						var selected:IsometryObject = _isometry._selected;
 						//remove from displaying:
 						for ( var isometryObjectIndex:int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
 						{
@@ -407,11 +453,13 @@ import view.Projection;
 		}
 		public function onTemplateChoice( e:GridSelectionEvent ): void
 		{
-			trace( "template" );
+			var templateTableItem:TemplateTableItem = _templates_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as TemplateTableItem;
+			_isometricPreview.Display( templateTableItem.template, _project );
 		}
 		public function onCompoundsChoice( e:GridSelectionEvent ): void
 		{
-			trace( "compound" );
+			var compoundTableItem:CompoundTableItem = _compounds_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as CompoundTableItem;
+			_isometricPreview.Display( compoundTableItem.compound, _project );
 		}
 		public function onUnitChoice( e:IndexChangeEvent ): void
 		{
@@ -531,7 +579,7 @@ import view.Projection;
 						break;
 					
 					case "edit":
-						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
 						editingTemplateWindow.Init( _project, menuEvent.item.template, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
@@ -573,7 +621,7 @@ import view.Projection;
 						break;
 					
 					case "edit":
-						var editingTemplateWindow:EditingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
 						editingTemplateWindow.Init( _project, menuEvent.item.compound, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
@@ -1056,6 +1104,13 @@ import view.Projection;
 			_isometry.Reinit();
 		}
 		
+		public function AddRegion(): void
+		{
+			var newRegion:Region = new Region;
+			_project._data._regions.push( newRegion );
+			_regions_list.dataProvider.addItem( new RegionListItem( newRegion ) );
+		}
+		
 		public function UpdateLayersList(): void
 		{
 			for each ( var destroyingListItem:LayerListItem in _layers_list_data_provider.source )
@@ -1156,6 +1211,49 @@ import view.Projection;
 		private function onObjectFlatYChange( ... args ): void
 		{
 			SetObjectPosFromFlat();
+		}
+		
+		
+		private function onRegionChoice( e:IndexChangeEvent ): void
+		{
+			trace( "region" );
+		}
+		
+		public var _regionContextMenu:Menu = null;
+		private function onRegionContextMenu( e:MouseEvent ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _regionContextMenu != null )
+			{
+				_regionContextMenu.hide();
+				_regionContextMenu = null;
+			}
+			
+			var menuData:Array = [ { label:"Add region...", id:"add_region" } ];
+			var regionListItem:RegionListItem = FindListItem( e, RegionListItem ) as RegionListItem;
+			if ( regionListItem != null )
+			{
+				menuData = menuData.concat( [ { label: "Edit...", id: "edit", region: regionListItem.region } ] );
+			}
+			
+			_regionContextMenu = Menu.createMenu( null, menuData );
+			_regionContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "add_region":
+						AddRegion();
+						break;
+					
+					case "edit":
+						var editingRegionWindow:EditingRegionWindow = PopUpManager.createPopUp( thisOne, EditingRegionWindow, false ) as EditingRegionWindow;
+						editingRegionWindow.Init( _project, menuEvent.item.region, thisOne );
+						PopUpManager.centerPopUp( editingRegionWindow );
+						break;
+				}
+			} );
+			_regionContextMenu.show( e.stageX, e.stageY );
 		}
 		
 		

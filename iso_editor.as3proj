@@ -18,7 +18,6 @@
     <class path="src" />
     <class path="..\polosa\client\code\blisc" />
     <class path="..\polosa\client\code\libs\utils" />
-    <class path="..\polosa\client\code\polosa\src" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -53,7 +52,7 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
-    <!-- example: <element path="..." /> -->
+    <element path="lib\recast.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

@@ -16,6 +16,7 @@ package
 	import list_items.CompoundTableItem;
 	import list_items.LayerListItem;
 	import list_items.MapListItem;
+	import list_items.RegionListItem;
 	import list_items.ResourceListItem;
 	import list_items.TemplateTableItem;
 	import list_items.UnitListItem;
@@ -32,6 +33,7 @@ package
 	import project_data.ObjectInstance;
 	import project_data.ObjectTemplate;
 	import project_data.ProjectData;
+	import project_data.Region;
 	import project_data.Resource;
 	import project_data.SingleResource;
 	import ru.etcs.utils.getDefinitionNames;
@@ -63,6 +65,7 @@ package
 			registerClassAlias( "project_data.ObjectTemplate", ObjectTemplate );
 			registerClassAlias( "project_data.Resource", Resource );
 			registerClassAlias( "project_data.SingleResource", SingleResource );
+			registerClassAlias( "project_data.Region", Region );
 			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;
@@ -95,6 +98,8 @@ package
 					LoadLayers();
 					
 					LoadMaps();
+					
+					LoadRegions();
 					
 					//update compounds after maps loading:
 					for each ( var compoundTableItem:CompoundTableItem in ( _main._compounds_table.dataProvider as ArrayCollection ).source )
@@ -161,6 +166,18 @@ package
 				var map:Map = _data._maps[ i ];
 				
 				_main._maps_list_data_provider.addItem( new MapListItem( map._name, map ) );
+			}
+		}
+		
+		private function LoadRegions(): void
+		{
+			_main._regions_list.dataProvider.removeAll();
+			
+			for ( var i:int = 0; i < _data._regions.length; ++i )
+			{
+				var region:Region = _data._regions[ i ];
+				
+				_main._regions_list.dataProvider.addItem( new RegionListItem( region ) );
 			}
 		}
 		
@@ -309,7 +326,7 @@ package
 			//represent within view:
 			if ( template is ComplexTemplate )
 			{
-				_main._compounds_table.dataProvider.addItem( new TemplateTableItem( template as ComplexTemplate, _main ) );
+				_main._templates_table.dataProvider.addItem( new TemplateTableItem( template as ComplexTemplate, _main ) );
 			}
 			else
 			{

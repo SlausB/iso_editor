@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SpriteVisualElement xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/halo"
+			   addedToStage="onInit()"
+			   mouseDown="onMouseDown(event)"
+			   mouseUp="onMouseUp(event)"
+			   mouseMove="onMouseMove(event)"
+			   percentWidth="100"
+			   percentHeight="100" >
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+import blisc.Blisc;
+import blisc.BliscComplexWithinCompound;
+import blisc.BliscCompound;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.geom.Point;
+import project_data.Layer;
+import project_data.ObjectTemplate;
+		
+		private var _view:Sprite = new Sprite;
+		
+		private var _blisc:Blisc = null;
+		
+		/** Dirty (but only one known) way to handle viewport size changes.*/
+		private var _previousWidth:Number;
+		private var _previousHeight:Number;
+		
+		private var _displaying:BliscCompound;
+		/** Description of displaying object.*/
+		public var _objectTemplate:ObjectTemplate = null;
+		
+		
+		private function onInit( ... args ): void
+		{
+			addChild( _view );
+			
+			_previousWidth = width;
+			_previousHeight = height;
+			
+			stage.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+		}
+		
+		private var _previousTime:int = 0;
+		private var _elapsed:Number = 0;
+		private function onEnterFrame( ... args ): void
+		{
+			if ( width != _previousWidth || height != _previousHeight )
+			{
+				_previousWidth = width;
+				_previousHeight = height;
+				
+				if ( _blisc != null )
+				{
+					_blisc.SetCameraSize( width, height );
+				}
+			}
+			
+			if ( _blisc != null )
+			{
+				var currentTime:int = getTimer();
+				var elapsedSeconds:Number = ( currentTime - _previousTime ) / 1000.0;
+				_previousTime = currentTime;
+				if ( elapsedSeconds > 0.1 )
+				{
+					elapsedSeconds = 0.1;
+				}
+				
+				_elapsed += elapsedSeconds;
+				for each ( var complexWithinCompound:BliscComplexWithinCompound in _displaying._complexes )
+				{
+					complexWithinCompound._complex._bdo.Replicate( complexWithinCompound._template._complex._view.Resolve( _elapsed ) );
+				}
+				
+				_blisc.draw();
+			}
+		}
+		
+		private function onMouseDown( e:MouseEvent ): void
+		{
+			if ( _blisc == null )
+			{
+				return;
+			}
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			_blisc.OnMouseDown( local.x, local.y );
+		}
+		private function onMouseUp( e:MouseEvent ): void
+		{
+			if ( _blisc == null )
+			{
+				return;
+			}
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			_blisc.OnMouseUp( local.x, local.y );
+		}
+		
+		private function onMouseMove( e:MouseEvent ): void
+		{
+			if ( _blisc == null )
+			{
+				return;
+			}
+			
+			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			
+			_blisc.OnMouseMove( local.x, local.y );
+		}
+		
+		public function Display( objectTemplate:ObjectTemplate, project:Project ): void
+		{
+			if ( _blisc != null )
+			{
+				_blisc.Destroy();
+				_blisc = null;
+			}
+			
+			_objectTemplate = objectTemplate;
+			
+			_previousTime = 0;
+			_elapsed = 0;
+			_blisc = new Blisc( _view, null, width, height, 10000, 10000, 0, project.side );
+			for each ( var layer:Layer in project._data._layers )
+			{
+				_blisc.AddLayer( layer._name, true );
+			}
+			
+			_displaying = IE_Utils.CreateBliscCompound( null, _blisc, objectTemplate, project );
+			_blisc.AddObject( _displaying );
+		}
+		
+		]]>
+	</fx:Script>
+	
+	
+</s:SpriteVisualElement>

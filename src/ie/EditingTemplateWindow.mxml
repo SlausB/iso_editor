@@ -111,15 +111,15 @@ import utils.Utils;
 		/** Which object disighner currently edit.*/
 		private var _editing:ObjectTemplate = null;
 		/** Already cast _editing to use it. Some of it is null.*/
-		private var _complex:ComplexTemplate = null;
-		private var _compound:CompoundTemplate = null;
+		public var _complex:ComplexTemplate = null;
+		public var _compound:CompoundTemplate = null;
 		
 		private var _main:Main = null;
 		
 		
 		/** What is currently selected or being dragged.*/
 		public var _dragging:DisplayObject = null;
-		private var _lastDragged:DraggingComplex = null;
+		public var _lastDragged:DraggingComplex = null;
 		
 		public var _templates:Vector.< DraggingComplex > = new Vector.< DraggingComplex >;
 		
@@ -137,6 +137,8 @@ import utils.Utils;
 			_space.stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
 			_space.stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			_space.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+			
+			_main.editingTemplateWindow = null;
 			
 			_project = null;
 			_editing = null;
@@ -196,11 +198,11 @@ import utils.Utils;
 			{
 				if ( _complex != null && _templates.length > 0 )
 				{
-					var draggingComplex:DraggingComplex = _templates[ 0 ];
-					draggingComplex.Aim( event.dragSource.dataForFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) as SingleResource, _project );
+					var singleResource:SingleResource = event.dragSource.dataForFormat( Global.DRAG_FORMAT_SINGLE_RESOURCE ) as SingleResource;
+					_templates[ 0 ].Aim( singleResource, _project );
 					if ( _name.text == ObjectTemplate.DEFAULT_NAME )
 					{
-						_name.text = draggingComplex._complex._name;
+						_name.text = singleResource._name;
 					}
 				}
 			}
@@ -253,6 +255,7 @@ import utils.Utils;
 				}
 				
 				
+				//update preview within table:
 				var templateTableItem:TemplateTableItem = ListItem.FindListItem( _editing, _main._templates_table.dataProvider ) as TemplateTableItem;
 				if ( templateTableItem == null )
 				{
@@ -282,6 +285,7 @@ import utils.Utils;
 					_compound._consisting.push( adding );
 				}
 				
+				//update preview within table:
 				var compoundTableItem:CompoundTableItem = ListItem.FindListItem( _compound, _main._compounds_table.dataProvider ) as CompoundTableItem;
 				if ( compoundTableItem == null )
 				{
@@ -294,7 +298,18 @@ import utils.Utils;
 				}
 			}
 			
+			UpdateIsometricPreview();
+			
 			Destroy();
+		}
+		
+		/** Update preview within small isometric window.*/
+		private function UpdateIsometricPreview(): void
+		{
+			if ( _main._isometricPreview._objectTemplate == _editing )
+			{
+				_main._isometricPreview.Display( _editing, _project );
+			}
 		}
 		
 		public function onCancel( ... args ): void

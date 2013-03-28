@@ -21,6 +21,8 @@ package project_data
 		
 		/** Where project generates AS3 files for future usage within game itself. Null if path wasn't specified yet.*/
 		public var _generationFolder:String = null;
+		
+		public var _regions:Vector.< Region > = new Vector.< Region >;
 	}
 
 }

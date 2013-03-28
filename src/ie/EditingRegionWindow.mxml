@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Edit region"
+			   minWidth="280"
+			   minHeight="180"
+			   >
+	
+	<s:Label text="Name:" x="10" y="16" />
+	<s:TextInput id="_name" x="60" y="10" width="180" />
+	
+	<s:Label text="Type:" x="30" y="48" />
+	<s:VGroup x="16" y="66" >
+		<s:RadioButton id="_surface" groupName="type" label="Surface" click="onType_1(event)" />
+		<s:RadioButton id="_space" groupName="type" label="Space" click="onType_2(event)" />
+	</s:VGroup>
+	
+	<s:Label text="Color:" x="120" y="48" />
+	<mx:ColorPicker id="_colorPicker" x="162" y="40" />
+	
+	<s:Button label="Ok" x="120" y="120" click="onOk(event)" />
+	<s:Button label="Cancel" x="200" y="120" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import list_items.RegionListItem;
+import mx.managers.PopUpManager;
+import project_data.Region;
+		
+		
+		private var _project:Project;
+		private var _region:Region;
+		private var _main:Main;
+		
+		
+		public function Init( project:Project, region:Region, main:Main ): void
+		{
+			closeButton.visible = false;
+			
+			_project = project;
+			_region = region;
+			_main = main;
+			
+			_name.text = region._name;
+			switch ( region._type )
+			{
+				case Region.TYPE_SURFACE:
+					_surface.selected = true;
+					break;
+				
+				case Region.TYPE_SPACE:
+					_space.selected = true;
+					break;
+			}
+			_colorPicker.selectedColor = region._color;
+		}
+		
+		private function onOk( ... args ): void
+		{
+			_region._name = _name.text;
+			
+			if ( _surface.selected )
+			{
+				_region._type = Region.TYPE_SURFACE;
+			}
+			else if ( _space.selected )
+			{
+				_region._type = Region.TYPE_SPACE;
+			}
+			
+			_region._color = _colorPicker.selectedColor;
+			
+			
+			//inform list about item change:
+			var associatedItem:RegionListItem = null;
+			for ( var i:int = 0; i < _main._regions_list.dataProvider.length; ++i )
+			{
+				var item:RegionListItem = _main._regions_list.dataProvider.getItemAt( i ) as RegionListItem;
+				if ( item.region == _region )
+				{
+					associatedItem = item;
+					break;
+				}
+			}
+			if ( associatedItem == null )
+			{
+				Cc.error( "E: EditingRegionWindow.onOk(): item was NOT found." );
+			}
+			else
+			{
+				_main._regions_list.dataProvider.itemUpdated( associatedItem );
+			}
+			
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			_region = null;
+			_main = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		private function onType_1( ... args ): void
+		{
+		}
+		
+		private function onType_2( ... args ): void
+		{
+		}
+		
+		
+		]]>
+	</fx:Script>
+	
+	
+</s:TitleWindow>

@@ -43,6 +43,7 @@ import flash.ui.Keyboard;
 import flash.utils.getTimer;
 import list_items.CompoundTableItem;
 import list_items.ListItem;
+import list_items.TemplateTableItem;
 import mx.core.IToolTip;
 import mx.core.UIComponent;
 import mx.events.DragEvent;
@@ -93,6 +94,13 @@ import view.Projection;
 		
 		/** Which object was dragged in last to position it again using "alt" key.*/
 		public var _lastPositioned:ObjectTemplate = null;
+		
+		/** How much pixels at the edge of isometric screen are sensitive for scrolling.*/
+		private static const SCROLL_FRAME:Number = 100;
+		/** How much pixels scroll per second.*/
+		private static const SCROLL_SPEED:Number = 400;
+		
+		
 		
 		
 		public function HideTip(): void
@@ -158,10 +166,44 @@ import view.Projection;
 					elapsedSeconds = 0.1;
 				}
 				
+				
+				//scroll isometric view using sensitive mouse:
+				if ( _main._ctrlDown || DragManager.isDragging )
+				{
+					var horisontalScrolling:Number = 0;
+					var verticalScrolling:Number = 0;
+					const scrollStep:Number = SCROLL_SPEED * elapsedSeconds;
+					
+					//scroll right:
+					if ( mouseX >= ( width - SCROLL_FRAME ) && mouseX <= width )
+					{
+						horisontalScrolling = scrollStep;
+					}
+					//scroll left:
+					else if ( mouseX >= 0 && mouseX <= SCROLL_FRAME )
+					{
+						horisontalScrolling = -scrollStep;
+					}
+					
+					//scroll up:
+					if ( mouseY >= 0 && mouseY <= SCROLL_FRAME )
+					{
+						verticalScrolling = -scrollStep;
+					}
+					else if ( mouseY >= ( height - SCROLL_FRAME ) && mouseY <= height )
+					{
+						verticalScrolling = scrollStep;
+					}
+					
+					_blisc.MoveCamera( horisontalScrolling, verticalScrolling );
+				}
+				
+				
 				for each ( var isometryObject:IsometryObject in _isometryObjects )
 				{
 					isometryObject.Update( elapsedSeconds );
 				}
+				
 				
 				_blisc.draw();
 			}
@@ -176,26 +218,6 @@ import view.Projection;
 			}
 		}
 		
-		/** TODO:
-			1: need to use it with some cashing - avoid creating animations for each similar object.
-			2: create prope animations from MovieClip's
-		*/
-		private function CreateAnimation( singleResource:SingleResource, center:Point ): BliscAnimation
-		{
-			return BliscAnimation.FromMovieClip( singleResource.Display( _project ) as MovieClip, _project.FindResource( singleResource._resourcePath )._FPS, center, singleResource._name );
-		}
-		
-		private function ComplexTemplateToBlisc( complex:ComplexTemplate ): BliscComplexTemplate
-		{
-			return new BliscComplexTemplate(
-				complex._name,
-				CreateAnimation( complex._singleResource, complex._center ),
-				complex._disp,
-				complex._center,
-				complex._layer._name,
-				complex._tiles.concat()
-			);
-		}
 		
 		private function AddUnit( unitDesc:UnitDesc ): void
 		{
@@ -225,31 +247,13 @@ import view.Projection;
 		
 		private function AddObject( objectInstance:ObjectInstance ): void
 		{
-			var bliscObjectTemplate:BliscObjectTemplate;
-			
-			if ( objectInstance._template is ComplexTemplate )
-			{
-				bliscObjectTemplate = ComplexTemplateToBlisc( objectInstance._template as ComplexTemplate );
-			}
-			else
-			{
-				var compound:CompoundTemplate = objectInstance._template as CompoundTemplate;
-				var complexes:Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >;
-				for each ( var complexWithinCompound:ComplexWithinCompound in compound._consisting )
-				{
-					complexes.push( new BliscComplexWithinCompoundTemplate(
-						ComplexTemplateToBlisc( complexWithinCompound._complex ),
-						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ),
-						Utils.FromIso( complexWithinCompound._tileDispX * _project.side, complexWithinCompound._tileDispY * _project.side, new Point )
-					) );
-				}
-				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
-			}
-			
 			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
-			var bliscCompound:BliscCompound = new BliscCompound( isometryObject, _blisc, bliscObjectTemplate );
+			
+			var bliscCompound:BliscCompound = IE_Utils.CreateBliscCompound( isometryObject, _blisc, objectInstance._template, _project );
+			
 			isometryObject._view = bliscCompound;
+			
 			bliscCompound.SetTileX( objectInstance._tileCoords.x );
 			bliscCompound.SetTileY( objectInstance._tileCoords.y );
 			_blisc.AddObject( bliscCompound );
@@ -480,7 +484,16 @@ import view.Projection;
 				
 				if ( addingTemplate is ComplexTemplate )
 				{
-					
+					var templateTableItem:TemplateTableItem = ListItem.FindListItem( addingTemplate, _main._templates_table.dataProvider ) as TemplateTableItem;
+					if ( templateTableItem == null )
+					{
+						Cc.error( "E: Isometry.onDragDrop(): TemplateTableItem was NOT found." );
+					}
+					else
+					{
+						templateTableItem.UpdateUsage( _main );
+						_main._templates_table.dataProvider.itemUpdated( templateTableItem );
+					}
 				}
 				else if ( addingTemplate is CompoundTemplate )
 				{
@@ -648,6 +661,11 @@ import view.Projection;
 				{
 					var io:IsometryObject = objects[ i ] as IsometryObject;
 					if ( io == null )
+					{
+						continue;
+					}
+					//units doesn't have that property:
+					if ( io._objectInstance == null )
 					{
 						continue;
 					}
