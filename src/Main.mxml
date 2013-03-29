@@ -340,6 +340,10 @@ import view.Projection;
 		/** Currently opened editing window if not null.*/
 		public var editingTemplateWindow:EditingTemplateWindow = null;
 		
+		/** Last chosen surface and space to prechoose it when window is displayed. Null if no such.*/
+		public var _lastSurface:Region = null;
+		public var _lastSpace:Region = null;
+		
 		
 		public function onInit( ... args ): void
 		{

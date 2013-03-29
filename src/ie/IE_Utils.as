@@ -8,12 +8,15 @@ package ie
 	import blisc.BliscCompound;
 	import blisc.BliscCompoundTemplate;
 	import blisc.BliscObjectTemplate;
+	import blisc.BliscRegion;
+	import blisc.BliscRegionWithinComplex;
 	import flash.display.MovieClip;
 	import flash.geom.Point;
 	import project_data.ComplexTemplate;
 	import project_data.ComplexWithinCompound;
 	import project_data.CompoundTemplate;
 	import project_data.ObjectTemplate;
+	import project_data.RegionWithinComplex;
 	import project_data.SingleResource;
 	import utils.Utils;
 	
@@ -33,13 +36,29 @@ package ie
 		
 		public static function ComplexTemplateToBlisc( complex:ComplexTemplate, project:Project ): BliscComplexTemplate
 		{
+			//again - use some caching here - create all regions (BliscRegion) only once:
+			var regions:Vector.< BliscRegionWithinComplex > = new Vector.< BliscRegionWithinComplex >;
+			for each ( var regionWithinComplex:RegionWithinComplex in complex._regions )
+			{
+				var bliscRegion:BliscRegion = new BliscRegion( regionWithinComplex._region._name, regionWithinComplex._region._type, regionWithinComplex._region._color );
+				
+				var bliscTiles:Vector.< Point > = new Vector.< Point >;
+				for each ( var tile:Point in regionWithinComplex._tiles )
+				{
+					bliscTiles.push( tile.clone() );
+				}
+				
+				var bliscRegionWithinComplex:BliscRegionWithinComplex = new BliscRegionWithinComplex( bliscRegion, bliscTiles );
+				regions.push( bliscRegionWithinComplex );
+			}
+			
 			return new BliscComplexTemplate(
 				complex._name,
 				CreateAnimation( complex._singleResource, complex._center, project ),
 				complex._disp,
 				complex._center,
 				complex._layer._name,
-				complex._tiles.concat()
+				regions
 			);
 		}
 		

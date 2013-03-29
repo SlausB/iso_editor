@@ -34,6 +34,7 @@ package
 	import project_data.ObjectTemplate;
 	import project_data.ProjectData;
 	import project_data.Region;
+	import project_data.RegionWithinComplex;
 	import project_data.Resource;
 	import project_data.SingleResource;
 	import ru.etcs.utils.getDefinitionNames;
@@ -66,6 +67,7 @@ package
 			registerClassAlias( "project_data.Resource", Resource );
 			registerClassAlias( "project_data.SingleResource", SingleResource );
 			registerClassAlias( "project_data.Region", Region );
+			registerClassAlias( "project_data.RegionWithinComplex", RegionWithinComplex );
 			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;

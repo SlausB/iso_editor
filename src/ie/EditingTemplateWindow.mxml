@@ -2,17 +2,13 @@
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
                xmlns:s="library://ns.adobe.com/flex/spark" 
                xmlns:mx="library://ns.adobe.com/flex/mx"
-			   minWidth="624"
+			   minWidth="800"
 			   minHeight="690"
 			   initialize="onInit()"
 			   dragEnter="onDragEnter(event)"
 			   dragOver="onDragOver(event)"
 			   dragDrop="onDragDrop(event)"
 			   >
-	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
 	
 	<s:Label x="10" y="14" text="Name: " />
 	<s:TextInput id="_name" x="60" y="7" width="160" />
@@ -31,20 +27,27 @@
 	<s:Label id="_tileDispYName" x="380" y="40" text="Tile Y:" />
 	<s:TextInput x="430" y="34" id="_tileDispYInput" change="onTileDispYChange(event)" width="60" restrict="-1234567890." />
 	
-	<s:Label id="_centerXName" x="400" y="14" text="Center X:" />
-	<s:TextInput x="454" y="6" id="_centerXInput" change="onCenterXChange(event)" width="60" restrict="-1234567890." />
-	<s:Label id="_centerYName" x="400" y="40" text="Center Y:" />
-	<s:TextInput x="454" y="34" id="_centerYInput" change="onCenterYChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_centerXName" x="370" y="14" text="Center X:" />
+	<s:TextInput x="424" y="6" id="_centerXInput" change="onCenterXChange(event)" width="60" restrict="-1234567890." />
+	<s:Label id="_centerYName" x="370" y="40" text="Center Y:" />
+	<s:TextInput x="424" y="34" id="_centerYInput" change="onCenterYChange(event)" width="60" restrict="-1234567890." />
 	
 	<s:SpriteVisualElement x="10" y="70" id="_space" />
 	
 	<s:Label x="20" y="620" text="N/A" id="_pos" />
 	
-	<s:Label x="514" y="14" text="Clamp to tile:" id="_clampToTileLabel" />
-	<s:CheckBox x="592" y="8" id="_clampToTile" change="onClampToTileChange(event)" />
+	<s:Label x="510" y="12" text="Clamp to tile:" id="_clampToTileLabel" />
+	<s:CheckBox x="588" y="6" id="_clampToTile" change="onClampToTileChange(event)" />
 	
-	<s:Button x="420" y="620" label="Ok" click="onOk()" />
-	<s:Button x="500" y="620" label="Cancel" click="onCancel()" />
+	<s:DropDownList x="510" y="10" id="_surfaceChoice" prompt="Select surface" change="onSurfaceChoice(event)" width="120" >
+		<mx:ArrayList />
+	</s:DropDownList>
+	<s:DropDownList x="640" y="10" id="_spaceChoice" prompt="Select space" change="onSpaceChoice(event)" width="120" >
+		<mx:ArrayList />
+	</s:DropDownList>
+	
+	<s:Button x="624" y="620" label="Ok" click="onOk()" />
+	<s:Button x="704" y="620" label="Cancel" click="onCancel()" />
 	
 	<fx:Script>
 		<![CDATA[
@@ -64,6 +67,7 @@ import flash.text.TextField;
 import flash.utils.getQualifiedClassName;
 import list_items.CompoundTableItem;
 import list_items.ListItem;
+import list_items.RegionListItem;
 import list_items.TemplateTableItem;
 import mx.controls.NumericStepper;
 import mx.core.IUIComponent;
@@ -76,11 +80,11 @@ import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
 import project_data.Layer;
 import project_data.ObjectTemplate;
+import project_data.Region;
+import project_data.RegionWithinComplex;
 import project_data.Resource;
 import project_data.SingleResource;
 import utils.Utils;
-		
-		public var _tiles:Vector.< Point > = new Vector.< Point >;
 		
 		/** Where tiles, coordinate scale and object itself are drawn.*/
 		private var _content:Sprite = new Sprite;
@@ -89,15 +93,17 @@ import utils.Utils;
 		private var _axis:Sprite = new Sprite;
 		/** Object's graphics.*/
 		private var _graphics:Sprite = new Sprite;
+		/** Set of surface tiles marked as a part of editing object.*/
+		private var _surfaceRegionSprite:Sprite = new Sprite;
 		/** Set of tiles marked as occupied by editing object.*/
-		private var _occupiying:Sprite = new Sprite;
+		private var _spaceRegionSprite:Sprite = new Sprite;
 		/** Selecting tile highlight.*/
 		private var _cursor:Sprite = new Sprite;
 		/** Geometrical object's center holder if it is Complex.*/
 		private var _centerHolder:Sprite = new Sprite;
 		
-		/** 0;0 coordinates of the editing space.*/
-		private const WIDTH:Number = 600;
+		/** Dimensions of the editing space itself.*/
+		private const WIDTH:Number = 778;
 		private const HEIGHT:Number = 540;
 		
 		private var _mousePos:Point = null;
@@ -131,10 +137,15 @@ import utils.Utils;
 		
 		private var _chosenLayer:Layer = null;
 		
+		private var _regions:Vector.< RegionWithinComplex > = new Vector.< RegionWithinComplex >;
+		private var _editingSurface:RegionWithinComplex = null;
+		private var _editingSpace:RegionWithinComplex = null;
+		
 		
 		private function Destroy(): void
 		{
 			_space.stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
+			_space.stage.removeEventListener( MouseEvent.RIGHT_MOUSE_DOWN, onRightMouseDown );
 			_space.stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			_space.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
 			
@@ -243,7 +254,8 @@ import utils.Utils;
 				
 				_complex._name = _name.text;
 				
-				_complex._tiles = _tiles;
+				//previously we was carefully copying all fields from complex but now we can freely just assign any editing values because this window will be destroyed:
+				_complex._regions = _regions;
 				
 				if ( _templates.length > 0 )
 				{
@@ -468,6 +480,43 @@ import utils.Utils;
 			_wasDown = true;
 		}
 		
+		private function onRightMouseDown( e:MouseEvent ): void
+		{
+			if ( _complex != null )
+			{
+				EditRegion( e, Region.TYPE_SPACE );
+			}
+		}
+		
+		private function EditRegion( e:MouseEvent, type:int ): void
+		{
+			var region:RegionWithinComplex = type == Region.TYPE_SURFACE ? _editingSurface : _editingSpace;
+			if ( region == null )
+			{
+				Cc.error( "E: EditingTemplateWindow.EditRegion(): need something to edit." );
+				return;
+			}
+			
+			var tile:Point = ResolveTile( e.stageX, e.stageY );
+			var duplicate:Boolean = false;
+			for ( var i:int = 0; i < region._tiles.length; ++i )
+			{
+				var occupied:Point = region._tiles[ i ];
+				if ( tile.x == occupied.x && tile.y == occupied.y )
+				{
+					duplicate = true;
+					region._tiles.splice( i, 1 );
+					break;
+				}
+			}
+			if ( duplicate == false )
+			{
+				region._tiles.push( tile );
+			}
+			
+			type == Region.TYPE_SURFACE ? DrawSurfaceTiles() : DrawSpaceTiles();
+		}
+		
 		private function onMouseUp( e:MouseEvent ): void
 		{
 			if ( _ignoreNextMouseUp )
@@ -487,23 +536,7 @@ import utils.Utils;
 			//add another occupying tile:
 			if ( _wasMoving == false && _complex != null )
 			{
-				var tile:Point = ResolveTile( e.stageX, e.stageY );
-				var duplicate:Boolean = false;
-				for ( var i:int = 0; i < _tiles.length; ++i )
-				{
-					var occupied:Point = _tiles[ i ];
-					if ( tile.x == occupied.x && tile.y == occupied.y )
-					{
-						duplicate = true;
-						_tiles.splice( i, 1 );
-						break;
-					}
-				}
-				if ( duplicate == false )
-				{
-					_tiles.push( tile );
-				}
-				DrawOccupiedTiles();
+				EditRegion( e, Region.TYPE_SURFACE );
 			}
 		}
 		
@@ -605,7 +638,8 @@ import utils.Utils;
 			_content.addChild( _axis );
 			_axis.cacheAsBitmap = true;
 			_content.addChild( _graphics );
-			_content.addChild( _occupiying );
+			_content.addChild( _surfaceRegionSprite );
+			_content.addChild( _spaceRegionSprite );
 			_content.addChild( _cursor );
 			_content.addChild( _centerHolder );
 			
@@ -617,6 +651,7 @@ import utils.Utils;
 			_space.mask = mask;
 			
 			_space.stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown );
+			_space.stage.addEventListener( MouseEvent.RIGHT_MOUSE_DOWN, onRightMouseDown );
 			_space.stage.addEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			_space.stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
 			
@@ -673,6 +708,68 @@ import utils.Utils;
 			}
 		}
 		
+		private function SurfaceChosen(): void
+		{
+			var regionListItem:RegionChoiceListItem = _surfaceChoice.selectedItem as RegionChoiceListItem;
+			if ( regionListItem == null )
+			{
+				Cc.error( "E: EditingTemplateWindow.SurfaceChosen(): wrong expectations." );
+				return;
+			}
+			
+			_editingSurface = null;
+			for each ( var region:RegionWithinComplex in _regions )
+			{
+				if ( region._region == regionListItem.region )
+				{
+					_editingSurface = region;
+					break;
+				}
+			}
+			//chosen surface is being edited for the first time - create it within complex template:
+			if ( _editingSurface == null )
+			{
+				var newRegion:RegionWithinComplex = new RegionWithinComplex;
+				newRegion.Init( regionListItem.region );
+				_regions.push( newRegion );
+				
+				_editingSurface = newRegion;
+			}
+			
+			DrawSurfaceTiles();
+		}
+		
+		private function SpaceChosen(): void
+		{
+			var regionListItem:RegionChoiceListItem = _spaceChoice.selectedItem as RegionChoiceListItem;
+			if ( regionListItem == null )
+			{
+				Cc.error( "E: EditingTemplateWindow.SpaceChosen(): wrong expectations." );
+				return;
+			}
+			
+			_editingSpace = null;
+			for each ( var region:RegionWithinComplex in _regions )
+			{
+				if ( region._region == regionListItem.region )
+				{
+					_editingSpace = region;
+					break;
+				}
+			}
+			//chosen space is being edited for the first time - create it within complex template:
+			if ( _editingSpace == null )
+			{
+				var newRegion:RegionWithinComplex = new RegionWithinComplex;
+				newRegion.Init( regionListItem.region );
+				_regions.push( newRegion );
+				
+				_editingSpace = newRegion;
+			}
+			
+			DrawSpaceTiles();
+		}
+		
 		public function Init( project:Project, template:ObjectTemplate, main:Main ): void
 		{
 			_project = project;
@@ -683,6 +780,46 @@ import utils.Utils;
 			
 			_name.text = template._name;
 			
+			
+			//regions:
+			if ( _complex == null )
+			{
+				_surfaceChoice.visible = false;
+				_spaceChoice.visible = false;
+			}
+			else
+			{
+				for each ( var region:Region in _project._data._regions )
+				{
+					switch ( region._type )
+					{
+						case Region.TYPE_SURFACE:
+							_surfaceChoice.dataProvider.addItem( new RegionChoiceListItem( region ) );
+							break;
+						
+						case Region.TYPE_SPACE:
+							_spaceChoice.dataProvider.addItem( new RegionChoiceListItem( region ) );
+							break;
+					}
+				}
+				
+				//clone (not assign, because we'll edit it and designer may press "cancel" button) region for later changes:
+				for each ( var regionWithinComplex:RegionWithinComplex in _complex._regions )
+				{
+					_regions.push( regionWithinComplex.Clone() );
+				}
+				
+				if ( _main._lastSurface != null )
+				{
+					_surfaceChoice.selectedItem = ListItem.FindListItem( _main._lastSurface, _surfaceChoice.dataProvider );
+					SurfaceChosen();
+				}
+				if ( _main._lastSpace != null )
+				{
+					_spaceChoice.selectedItem = ListItem.FindListItem( _main._lastSpace, _spaceChoice.dataProvider );
+					SpaceChosen();
+				}
+			}
 			
 			//clamp to tile:
 			if ( _compound == null )
@@ -796,16 +933,6 @@ import utils.Utils;
 			_content.y = HEIGHT / 2.0;
 			
 			
-			if ( _complex != null )
-			{
-				for each ( var tile:Point in _complex._tiles )
-				{
-					_tiles.push( new Point( tile.x, tile.y ) );
-				}
-				DrawOccupiedTiles();
-			}
-			
-			
 			
 			///DRAW BACKGROUND CONSISTING FROM TILES:
 			
@@ -881,37 +1008,71 @@ import utils.Utils;
 			_axis.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
 		}
 		
-		private function DrawOccupiedTiles(): void
+		private function DrawSurfaceTiles(): void
 		{
-			_occupiying.graphics.clear();
-			_occupiying.graphics.lineStyle( 4, 0xBC6609 );
+			_surfaceRegionSprite.graphics.clear();
 			
-			for each ( var tile:Point in _tiles )
+			if ( _editingSurface == null )
+			{
+				return;
+			}
+			
+			_surfaceRegionSprite.graphics.lineStyle( 4, _editingSurface._region._color );
+			
+			var pos:Point = new Point;
+			
+			for each ( var tile:Point in _editingSurface._tiles )
 			{
 				//north:
 				var origin:Point = Utils.FromIso( tile.x * _project.side, tile.y * _project.side, new Point );
-				_occupiying.graphics.moveTo( origin.x, origin.y );
+				//space properties introduced, so draw only 
+				/*_surfaceRegionSprite.graphics.moveTo( origin.x, origin.y );
 				//east:
-				var pos:Point = Utils.FromIso( _project.side, 0, new Point );
-				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				Utils.FromIso( _project.side, 0, pos );
+				_surfaceRegionSprite.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//south:
 				Utils.FromIso( _project.side, _project.side, pos );
-				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				_surfaceRegionSprite.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//west:
 				Utils.FromIso( 0, _project.side, pos );
-				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				_surfaceRegionSprite.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				//back to north:
-				_occupiying.graphics.lineTo( origin.x, origin.y );
+				_surfaceRegionSprite.graphics.lineTo( origin.x, origin.y );*/
 				//inner crossing:
+				_surfaceRegionSprite.graphics.moveTo( origin.x, origin.y );
 				Utils.FromIso( _project.side, _project.side, pos );
-				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				_surfaceRegionSprite.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 				Utils.FromIso( _project.side, 0, pos );
-				_occupiying.graphics.moveTo( origin.x + pos.x, origin.y + pos.y );
+				_surfaceRegionSprite.graphics.moveTo( origin.x + pos.x, origin.y + pos.y );
 				Utils.FromIso( 0, _project.side, pos );
-				_occupiying.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
+				_surfaceRegionSprite.graphics.lineTo( origin.x + pos.x, origin.y + pos.y );
 			}
 			
-			_occupiying.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
+			_surfaceRegionSprite.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
+		}
+		
+		private function DrawSpaceTiles(): void
+		{
+			_spaceRegionSprite.graphics.clear();
+			
+			if ( _editingSpace == null )
+			{
+				return;
+			}
+			
+			const tileSize:Number = _project._data._tileSize;
+			const abater:Number = tileSize / 4;
+			
+			_spaceRegionSprite.graphics.lineStyle( 4, _editingSpace._region._color );
+			
+			for each ( var tile:Point in _editingSpace._tiles )
+			{
+				var north:Point = Utils.FromIso( tile.x * _project.side, tile.y * _project.side, new Point );
+				
+				_spaceRegionSprite.graphics.drawEllipse( north.x - tileSize + abater, north.y + ( abater / 2 ), ( tileSize * 2 ) - ( abater * 2 ), tileSize - abater );
+			}
+			
+			_spaceRegionSprite.filters = [ new GlowFilter( 0xFFFFFF, 1, 3, 4, 8 ) ];
 		}
 		
 		private function GoldenRatioHSVColorProvider( data:Object, index:int, x:int, y:int, recursive:int = 0 ): uint
@@ -1207,6 +1368,33 @@ import utils.Utils;
 		private function onClampToTileChange( ... args ): void
 		{
 			Main._clampTemplatesToTile = _clampToTile.selected;
+		}
+		
+		
+		private function onSurfaceChoice( ... args ): void
+		{
+			var surfaceListItem:RegionChoiceListItem = _surfaceChoice.selectedItem as RegionChoiceListItem;
+			if ( surfaceListItem == null )
+			{
+				Cc.error( "E: EditingTemplateWindow.onSurfaceChoice(): wrong expectations." );
+				return;
+			}
+			_main._lastSurface = surfaceListItem.region;
+			
+			SurfaceChosen();
+		}
+		
+		private function onSpaceChoice( ... args ): void
+		{
+			var spaceListItem:RegionChoiceListItem = _spaceChoice.selectedItem as RegionChoiceListItem;
+			if ( spaceListItem == null )
+			{
+				Cc.error( "E: EditingTemplateWindow.onSpaceChoice(): wrong expectations." );
+				return;
+			}
+			_main._lastSpace = spaceListItem.region;
+			
+			SpaceChosen();
 		}
 		
 		]]>

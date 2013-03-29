@@ -15,14 +15,17 @@ package project_data
 		/** Planar displacement coordinates for it's graphical representation.*/
 		public var _disp:Point = new Point;
 		
-		/** Relative tile coordinates of occupying tiles.*/
-		public var _tiles:Vector.< Point > = new Vector.< Point >;
+		/** Regions specified for this template - not necessarely all existing regions. Order is irrelevant.*/
+		public var _regions:Vector.< RegionWithinComplex > = new Vector.< RegionWithinComplex >;
 		
 		/** Within which layers this object must be displayed. Null if wasn't specified yet.*/
 		public var _layer:Layer = null;
 		
 		/** Physical object's center to properly sort this object while drawing (planar coordinates).*/
 		public var _center:Point = new Point;
+		
+		/** Archaic field to avoid project loading errors/warnings - not used anymore.*/
+		public var _tiles:Vector.< Point >;
 	}
 
 }
