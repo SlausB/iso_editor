@@ -27,6 +27,8 @@ import blisc.BliscCompound;
 import blisc.BliscCompoundTemplate;
 import blisc.BliscDisplayObject;
 import blisc.BliscObjectTemplate;
+import blisc.BliscRegion;
+import blisc.BliscRegionWithinComplex;
 import blisc.BliscSprite;
 import blisc.BliscUnit;
 import com.junkbyte.console.Cc;
@@ -99,7 +101,6 @@ import view.Projection;
 		private static const SCROLL_FRAME:Number = 100;
 		/** How much pixels scroll per second.*/
 		private static const SCROLL_SPEED:Number = 400;
-		
 		
 		
 		
@@ -319,7 +320,7 @@ import view.Projection;
 				new Point,
 				new Point,
 				GRID_DRAWER_LAYER_NAME,
-				new Vector.< Point >
+				new Vector.< BliscRegionWithinComplex >
 			);
 			var drawerCompound:BliscCompound = new BliscCompound( null, _blisc, drawerComplexTemplate );
 			_gridDrawer = new GridDrawer( map, width, height, _project );
@@ -655,8 +656,23 @@ import view.Projection;
 			{
 				_blisc.OnMouseMove( local.x, local.y );
 				
-				var objects:Vector.< * > = _blisc.ObjectsUnderPoint( local.x + _blisc.cameraOffsetX, local.y + _blisc.cameraOffsetY );
-				var tipText:String = "";
+				UpdateHoverTip( local );
+			}
+		}
+		private function onMouseOut( ... args ): void
+		{
+			HideTip();
+		}
+		
+		private function UpdateHoverTip( local:Point ): void
+		{
+			var tipText:String = "";
+			const globalX:Number = local.x + _blisc.cameraOffsetX;
+			const globalY:Number = local.y + _blisc.cameraOffsetY;
+			
+			if ( _main._tipGraphics.selected )
+			{
+				var objects:Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY );
 				for ( var i:int = 0; i < objects.length; ++i )
 				{
 					var io:IsometryObject = objects[ i ] as IsometryObject;
@@ -676,19 +692,89 @@ import view.Projection;
 					}
 					tipText = tipText + io._objectInstance._template._name;
 				}
-				if ( tipText.length > 0 )
+			}
+			else
+			{
+				//TODO:
+				var iso:Point = Utils.ToIso( globalX, globalY, new Point );
+				
+				for each ( var isometryObject:IsometryObject in _isometryObjects )
 				{
-					ShowTip( ToolTipManager.createToolTip( tipText, _main.stage.mouseX - 2, _main.stage.mouseY + 20 ) );
-				}
-				else
-				{
-					HideTip();
+					//unit:
+					var bliscCompound:BliscCompound = isometryObject._view as BliscCompound;
+					if ( bliscCompound == null )
+					{
+						continue;
+					}
+					
+					var intersects:Boolean = false;
+					
+					for each ( var bcwc:BliscComplexWithinCompound in bliscCompound._complexes )
+					{
+						const x:Number = bcwc._complex._bdo.GetIsoX();
+						const y:Number = bcwc._complex._bdo.GetIsoY();
+						
+						for each ( var region:BliscRegionWithinComplex in bcwc._complex._template._regions )
+						{
+							//we need only space:
+							if ( region._region._type != BliscRegion.TYPE_SPACE )
+							{
+								continue;
+							}
+							
+							for each ( var tile:Point in region._tiles )
+							{
+								//left:
+								if ( iso.x >= ( x + tile.x * _project.side ) )
+								{
+									//right:
+									if ( iso.x <= ( x + tile.x * _project.side + _project.side ) )
+									{
+										//up:
+										if ( iso.y >= ( y + tile.y * _project.side ) )
+										{
+											//down:
+											if ( iso.y <= ( y + tile.y * _project.side + _project.side ) )
+											{
+												intersects = true;
+												break;
+											}
+										}
+									}
+								}
+							}
+							
+							if ( intersects )
+							{
+								break;
+							}
+						}
+						
+						if ( intersects )
+						{
+							break;
+						}
+					}
+					
+					if ( intersects )
+					{
+						if ( tipText.length > 0 )
+						{
+							tipText = tipText + "\n";
+						}
+						tipText = tipText + bliscCompound._template._name;
+					}
 				}
 			}
-		}
-		private function onMouseOut( ... args ): void
-		{
-			HideTip();
+			
+			if ( tipText.length > 0 )
+			{
+				ShowTip( ToolTipManager.createToolTip( tipText, _main.stage.mouseX - 2, _main.stage.mouseY + 20 ) );
+			}
+			else
+			{
+				HideTip();
+			}
 		}
 		
 		]]>

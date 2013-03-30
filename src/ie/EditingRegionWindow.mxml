@@ -94,6 +94,8 @@ import project_data.Region;
 			}
 			
 			
+			_main._reloadMapButton.enabled = true;
+			
 			Destroy();
 		}
 		

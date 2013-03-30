@@ -310,6 +310,8 @@ import utils.Utils;
 				}
 			}
 			
+			_main._reloadMapButton.enabled = true;
+			
 			UpdateIsometricPreview();
 			
 			Destroy();

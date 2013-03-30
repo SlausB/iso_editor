@@ -63,6 +63,13 @@
 						<s:RadioButton id="_scale_3" width="30" groupName="scale" label="x3" click="onScale_3(event)" />
 						<s:RadioButton id="_scale_4" width="30" groupName="scale" label="x4" click="onScale_4(event)" />
 					</s:HGroup>
+					
+					<s:VGroup x="550" y="4" >
+						<s:RadioButton id="_tipGraphics" groupName="tip" label="Graphics" selected="true" />
+						<s:RadioButton id="_tipSpace" groupName="tip" label="Space" />
+					</s:VGroup>
+					
+					<s:Button id="_reloadMapButton" x="640" y="4" label="Reload" toolTip="Recreate isometric objects accordingly last changes within templates and compounds" click="onReloadMap(event)" enabled="false" />
 				</s:BorderContainer>
 			</s:Group>
 			
@@ -1331,6 +1338,14 @@ import view.Projection;
 		{
 			SetScale( 1 / 4 );
 		}
+		
+		
+		private function onReloadMap( ... args ): void
+		{
+			_isometry.Reinit();
+			_reloadMapButton.enabled = false;
+		}
+		
 		
 		]]>
 	</fx:Script>
