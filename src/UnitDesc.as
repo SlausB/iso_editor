@@ -37,13 +37,15 @@ package
 			var closestDistance:Number = Number.MAX_VALUE;
 			for each ( var unitView:UnitView in _views )
 			{
+				const distance:Number = Math.abs( unitView._radians - radians );
+				
 				if ( closest == null )
 				{
 					closest = unitView;
+					closestDistance = distance;
 					continue;
 				}
 				
-				const distance:Number = Math.abs( unitView._radians - radians );
 				if ( distance < closestDistance )
 				{
 					closest = unitView;
@@ -52,14 +54,10 @@ package
 				else if ( distance == closestDistance )
 				{
 					//we stated that clockwise orientation must be chosen (if unit goes north but there are no "N" orientation, then "NE" must be chosen instead of "NW"):
-					if ( distance <= Math.PI )
+					if ( unitView._radians > radians )
 					{
-						if ( unitView._radians > radians )
-						{
-							closest = unitView;
-							closestDistance = distance;
-						}
-						//otherwise just let already the chosen to be the one...
+						closest = unitView;
+						closestDistance = distance;
 					}
 				}
 			}

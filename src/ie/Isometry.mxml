@@ -421,10 +421,10 @@ import view.Projection;
 			return result;
 		}
 		
-		public function ShowPointerOverMouse(): void
+		public function ShowPointerOverMouse( clampToTiles:Boolean ): void
 		{
 			_pointer.visible = true;
-			var mouse:Point = ResolveMouseIso( displaying._clampToTiles );
+			var mouse:Point = ResolveMouseIso( clampToTiles );
 			var flatMouse:Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
 			_pointer.x = flatMouse.x - POINTER_X;
 			_pointer.y = flatMouse.y - POINTER_Y;
@@ -438,7 +438,7 @@ import view.Projection;
 					event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPOUND_TEMPLATE ) ||
 					event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 				{
-					ShowPointerOverMouse();
+					ShowPointerOverMouse( displaying._clampToTiles );
 					
 					DragManager.showFeedback( DragManager.COPY );
 					return;
@@ -551,6 +551,8 @@ import view.Projection;
 		}
 		private function onMouseDown( e:MouseEvent ): void
 		{
+			_wasDrag = false;
+			
 			if ( _blisc == null )
 			{
 				return;
@@ -574,7 +576,6 @@ import view.Projection;
 				{
 					_isDragging = new Point( local.x - newDragging._view.GetX(), local.y - newDragging._view.GetY() );
 					_dragging = newDragging;
-					_wasDrag = false;
 					
 					if ( _selected != null )
 					{
@@ -606,11 +607,23 @@ import view.Projection;
 			}
 			else
 			{
+				if ( _wasDrag == false )
+				{
+					//send currently selected unit to specified position:
+					if ( _selected is Unit )
+					{
+						var sendingUnitPos:Point = ResolveMouseIso();
+						( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y );
+					}
+				}
+				
 				_blisc.OnMouseUp( local.x, local.y );
 			}
 		}
 		private function onMouseMove( e:MouseEvent ): void
 		{
+			_wasDrag = true;
+			
 			if ( _blisc == null )
 			{
 				return;
@@ -622,8 +635,13 @@ import view.Projection;
 			{
 				if ( _main._qDown )
 				{
-					ShowPointerOverMouse();
+					ShowPointerOverMouse( displaying._clampToTiles );
 					return;
+				}
+				//try sending currently selected unit to hovering position:
+				else if ( _selected is Unit )
+				{
+					ShowPointerOverMouse( false );
 				}
 				else
 				{

@@ -1156,7 +1156,7 @@ import view.Projection;
 		
 		public function ShowObjectProperties(): void
 		{
-			if ( _isometry._selected == null )
+			if ( _isometry._selected == null || _isometry._selected is Unit )
 			{
 				_instanceProperties.enabled = false;
 				return;
