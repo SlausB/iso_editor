@@ -37,6 +37,7 @@ package
 	import project_data.RegionWithinComplex;
 	import project_data.Resource;
 	import project_data.SingleResource;
+	import project_data.UnitProperties;
 	import ru.etcs.utils.getDefinitionNames;
 	import utils.Utils;
 	
@@ -68,6 +69,7 @@ package
 			registerClassAlias( "project_data.SingleResource", SingleResource );
 			registerClassAlias( "project_data.Region", Region );
 			registerClassAlias( "project_data.RegionWithinComplex", RegionWithinComplex );
+			registerClassAlias( "project_data.UnitProperties", UnitProperties );
 			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;
@@ -370,6 +372,20 @@ package
 			}
 			Cc.error( "E: Project.ResolveLayerIndex(): wasn't found." );
 			return 0;
+		}
+		
+		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.*/
+		public function FindUnitProperties( unitDesc:UnitDesc ): UnitProperties
+		{
+			for each ( var unitProperties:UnitProperties in _data._unitProperties )
+			{
+				if ( unitProperties._unit == unitDesc._name )
+				{
+					return unitProperties;
+				}
+			}
+			
+			return null;
 		}
 		
 	}

@@ -53,8 +53,8 @@
 					<s:Label x="220" y="10" text="Clamp to tile:" />
 					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" />
 					
-					<s:Label x="220" y="30" text="Units speed:" />
-					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" />
+					<s:Label x="221" y="31" text="Units speed:" />
+					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" width="90" />
 					
 					<s:Label x="350" y="10" text="Scale:" />
 					<s:HGroup x="390" y="4" >
@@ -70,6 +70,9 @@
 					</s:VGroup>
 					
 					<s:Button id="_reloadMapButton" x="640" y="4" label="Reload" toolTip="Recreate isometric objects accordingly last changes within templates and compounds" click="onReloadMap(event)" enabled="false" />
+					
+					<s:Label text="Scrict move:" x="640" y="35" />
+					<s:CheckBox id="_strictMove" x="714" y="31" toolTip="Move units from tile to tile instead of ghost-like hovering if default surface was specified for that unit" />
 				</s:BorderContainer>
 			</s:Group>
 			
@@ -184,7 +187,7 @@
 				</mx:VBox>
 				
 				<mx:VBox label="Units" percentWidth="100" percentHeight="100" >
-					<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" mouseDown="onUnitsMouseDown(event)" mouseUp="onUnitsMouseUp(event)" mouseMove="onUnitsMouseMove(event)" >
+					<s:List id="_units_list" percentWidth="100" percentHeight="100" borderVisible="false" changing="onUnitChoice(event)" mouseDown="onUnitsMouseDown(event)" mouseUp="onUnitsMouseUp(event)" mouseMove="onUnitsMouseMove(event)" contextMenu="onUnitsContextMenu(event)">
 						<s:ArrayList id="_units_list_data_provider" />
 					</s:List>
 				</mx:VBox>
@@ -289,6 +292,7 @@ import ie.EditingMapWindow;
 import ie.EditingProjectWindow;
 import ie.EditingRegionWindow;
 import ie.EditingTemplateWindow;
+import ie.EditingUnitWindow;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
@@ -905,6 +909,41 @@ import view.Projection;
 			
 			//to ignore other mouse moves:
 			_downUnitListItem = null;
+		}
+		
+		
+		public var _unitsContextMenu:Menu = null;
+		private function onUnitsContextMenu( e:MouseEvent ): void
+		{
+			var thisOne:Main = this;
+			
+			if ( _unitsContextMenu != null )
+			{
+				_unitsContextMenu.hide();
+				_unitsContextMenu = null;
+			}
+			
+			var unitListItem:UnitListItem = FindListItem( e, UnitListItem ) as UnitListItem;
+			if ( unitListItem == null )
+			{
+				return;
+			}
+			
+			var menuData:Array =[ { label: "Edit...", id: "edit", unit: unitListItem.unit } ];
+			
+			_unitsContextMenu = Menu.createMenu( null, menuData );
+			_unitsContextMenu.addEventListener( MenuEvent.ITEM_CLICK, function( menuEvent:MenuEvent ): void
+			{
+				switch ( menuEvent.item.id )
+				{
+					case "edit":
+						var editingUnitWindow:EditingUnitWindow = PopUpManager.createPopUp( thisOne, EditingUnitWindow, false ) as EditingUnitWindow;
+						editingUnitWindow.Init( _project, menuEvent.item.unit, thisOne );
+						PopUpManager.centerPopUp( editingUnitWindow );
+						break;
+				}
+			} );
+			_unitsContextMenu.show( e.stageX, e.stageY );
 		}
 		
 		

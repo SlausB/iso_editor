@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Adjust unit"
+			   minWidth="280"
+			   minHeight="180"
+			   >
+	
+	<s:Label text="Name:" x="12" y="12" />
+	<s:TextArea id="_name" editable="false" x="54" y="6" height="22" />
+	
+	<s:Label text="Default surface:" x="12" y="44" />
+	<s:DropDownList id="_surface_list" x="12" y="62" prompt="Select surface" width="130" >
+		<mx:ArrayList />
+	</s:DropDownList>
+	
+	<s:Button label="Ok" x="120" y="120" click="onOk(event)" />
+	<s:Button label="Cancel" x="200" y="120" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import list_items.ListItem;
+import mx.collections.IList;
+import mx.managers.PopUpManager;
+import project_data.Region;
+import project_data.UnitProperties;
+		
+		
+		private var _project:Project;
+		private var _unit:UnitDesc;
+		private var _main:Main;
+		
+		private var _unitProperties:UnitProperties = null;
+		
+		
+		public function Init( project:Project, unit:UnitDesc, main:Main ): void
+		{
+			closeButton.visible = false;
+			
+			_project = project;
+			_unit = unit;
+			_main = main;
+			
+			_name.text = unit._name;
+			
+			_unitProperties = project.FindUnitProperties( unit );
+			if ( _unitProperties == null )
+			{
+				_unitProperties = new UnitProperties;
+				_unitProperties.Init( unit._name );
+				
+				project._data._unitProperties.push( _unitProperties );
+			}
+			
+			for each ( var region:Region in project._data._regions )
+			{
+				if ( region._type != Region.TYPE_SURFACE )
+				{
+					continue;
+				}
+				
+				_surface_list.dataProvider.addItem( new RegionChoiceListItem( region ) );
+			}
+			
+			if ( _unitProperties._region != null )
+			{
+				_surface_list.selectedItem = ListItem.FindListItem( _unitProperties._region, _surface_list.dataProvider );
+			}
+		}
+		
+		private function onOk( ... args ): void
+		{
+			var selected:RegionChoiceListItem = _surface_list.selectedItem as RegionChoiceListItem;
+			if ( selected == null )
+			{
+				_unitProperties._region = null;
+			}
+			else
+			{
+				_unitProperties._region = selected.region;
+			}
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			_unit = null;
+			_main = null;
+			
+			_unitProperties = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		
+		]]>
+	</fx:Script>
+	
+	
+</s:TitleWindow>

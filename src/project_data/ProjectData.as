@@ -23,6 +23,9 @@ package project_data
 		public var _generationFolder:String = null;
 		
 		public var _regions:Vector.< Region > = new Vector.< Region >;
+		
+		/** Not exactly for any existing unit - only that was specified.*/
+		public var _unitProperties:Vector.< UnitProperties > = new Vector.< UnitProperties >;
 	}
 
 }
