@@ -45,16 +45,16 @@
 					<s:Label x="60" y="30" id="_isoTileY" text="N/A" />
 					
 					<s:Label x="100" y="10" text="Draw border:" />
-					<s:CheckBox x="180" y="5" id="_drawBorder" change="onDrawBorderFlagChange(event)" />
+					<s:CheckBox x="180" y="5" id="_drawBorder" change="onDrawBorderFlagChange(event)" toolTip="Blue border at map bounds" />
 					
 					<s:Label x="100" y="30" text="Draw grid:" />
-					<s:CheckBox x="162" y="25" id="_drawGrid" change="onDrawGridFlagChange(event)" />
+					<s:CheckBox x="162" y="25" id="_drawGrid" change="onDrawGridFlagChange(event)" toolTip="Is it need to draw very slow tile grid mesh" />
 					
 					<s:Label x="220" y="10" text="Clamp to tile:" />
-					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" />
+					<s:CheckBox x="300" y="5" id="_clampToTile" change="onClampToTileFlagChange(event)" toolTip="Glue isometric objects to tiles while dragging" />
 					
 					<s:Label x="221" y="31" text="Units speed:" />
-					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" width="90" />
+					<s:TextInput x="300" y="25" text="N/A" id="_unitsSpeed" restrict="-1234567890." change="onUnitsSpeedChange(event)" width="90" toolTip="Pixels per second units must move" />
 					
 					<s:Label x="350" y="10" text="Scale:" />
 					<s:HGroup x="390" y="4" >
@@ -65,8 +65,8 @@
 					</s:HGroup>
 					
 					<s:VGroup x="550" y="4" >
-						<s:RadioButton id="_tipGraphics" groupName="tip" label="Graphics" selected="true" />
-						<s:RadioButton id="_tipSpace" groupName="tip" label="Space" />
+						<s:RadioButton id="_tipGraphics" groupName="tip" label="Graphics" selected="true" toolTip="Show objects selection tooltip using their graphics" />
+						<s:RadioButton id="_tipSpace" groupName="tip" label="Space" toolTip="Show objects selection using their any space regions" />
 					</s:VGroup>
 					
 					<s:Button id="_reloadMapButton" x="640" y="4" label="Reload" toolTip="Recreate isometric objects accordingly last changes within templates and compounds" click="onReloadMap(event)" enabled="false" />
