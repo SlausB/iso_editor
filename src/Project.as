@@ -13,6 +13,7 @@ package
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
 	import flash.utils.ByteArray;
+	import ie.ResourceMissingWindow;
 	import list_items.CompoundTableItem;
 	import list_items.LayerListItem;
 	import list_items.MapListItem;
@@ -24,6 +25,7 @@ package
 	import mx.collections.ArrayList;
 	import mx.collections.ICollectionView;
 	import mx.collections.IList;
+	import mx.managers.PopUpManager;
 	import mx.rpc.soap.types.MapType;
 	import project_data.ComplexTemplate;
 	import project_data.ComplexWithinCompound;
@@ -97,6 +99,8 @@ package
 			{
 				if ( errorText == null )
 				{
+					ValidateResourceAbsence();
+					
 					LoadTemplates();
 					
 					LoadLayers();
@@ -119,6 +123,90 @@ package
 					onResult( errorText );
 				}
 			} );
+		}
+		
+		private function ValidateResourceAbsence(): void
+		{
+			var missingResource : Vector.< String > = new Vector.< String >;
+			var removedTemplates : Vector.< String > = new Vector.< String >;
+			var affectedCompounds : Vector.< String > = new Vector.< String >;
+			var affectedMaps : Vector.< String > = new Vector.< String >;
+			var objects : int = 0;
+			
+			for ( var objectIndex : int = 0; objectIndex < _data._objects.length; ++objectIndex )
+			{
+				var template : ComplexTemplate = _data._objects[ objectIndex ] as ComplexTemplate;
+				if ( template == null )
+				{
+					continue;
+				}
+				
+				//if resource even wasn't specified earlier at all:
+				if ( template._singleResource == null )
+				{
+					continue;
+				}
+				
+				var resource : Resource = FindResource( template._singleResource._resourcePath );
+				if ( resource != null && resource._names.indexOf( template._singleResource._name ) >= 0 )
+				{
+					continue;
+				}
+				
+				//missing:
+				
+				missingResource.push( template._singleResource._resourcePath + " -> " + template._singleResource._name );
+				
+				removedTemplates.push( template._name );
+				
+				var templatesDependence : TemplatesDependence = ResolveTemplatesDependence( template );
+				
+				_main.RemoveTemplate( templatesDependence );
+				//to check next object which was moved closer:
+				--objectIndex;
+				
+				for each ( var compound : CompoundTemplate in templatesDependence._compounds )
+				{
+					affectedCompounds.push( compound._name );
+				}
+				
+				for each ( var map : TemplatesMapDependence in templatesDependence._maps )
+				{
+					affectedMaps.push( map._map._name );
+				}
+				
+				objects += templatesDependence._instances;
+			}
+			
+			if ( missingResource.length > 0 )
+			{
+				UnifyStrings( missingResource );
+				UnifyStrings( removedTemplates );
+				UnifyStrings( affectedCompounds );
+				UnifyStrings( affectedMaps );
+				
+				var resourceMissingWindow : ResourceMissingWindow = PopUpManager.createPopUp( _main, ResourceMissingWindow ) as ResourceMissingWindow;
+				resourceMissingWindow.Init( missingResource, removedTemplates, affectedCompounds, affectedMaps, objects );
+				PopUpManager.centerPopUp( resourceMissingWindow );
+			}
+		}
+		
+		private function UnifyStrings( what : Vector.< String > ): void
+		{
+			for ( var i1:int = 0; i1 < what.length; ++i1 )
+			{
+				//looking for copy:
+				for ( var i2:int = i1 + 1; i2 < what.length; ++i2 )
+				{
+					if ( what[ i1 ] == what[ i2 ] )
+					{
+						what.splice( i1, 1 );
+						//to check moved element too:
+						i1--;
+						break;
+					}
+				}
+			}
 		}
 		
 		private function Clear( list:IList ): void
@@ -317,7 +405,7 @@ package
 		{
 			_main._resources_list_data_provider.addItem( new ResourceListItem( resource._path, resource ) );
 			
-			for each ( var unitDesc:UnitDesc in resource._units)
+			for each ( var unitDesc:UnitDesc in resource._units )
 			{
 				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc._name, unitDesc ) );
 			}
@@ -386,6 +474,88 @@ package
 			}
 			
 			return null;
+		}
+		
+		public function ResolveTemplatesDependence( template : ComplexTemplate ): TemplatesDependence
+		{
+			var result : TemplatesDependence = new TemplatesDependence( template );
+			
+			for each ( var objectTemplate : ObjectTemplate in _data._objects )
+			{
+				var compoundTemplate : CompoundTemplate = objectTemplate as CompoundTemplate;
+				if ( compoundTemplate == null )
+				{
+					continue;
+				}
+				
+				for each ( var complexWithinCompound : ComplexWithinCompound in compoundTemplate._consisting )
+				{
+					if ( complexWithinCompound._complex == template )
+					{
+						result._compounds.push( compoundTemplate );
+						break;
+					}
+				}
+			}
+			
+			for each ( var map : Map in _data._maps )
+			{
+				var withinThisMap : TemplatesMapDependence = null;
+				
+				for each ( var objectInstance : ObjectInstance in map._instances )
+				{
+					if ( objectInstance._template == template )
+					{
+						if ( withinThisMap == null )
+						{
+							withinThisMap = new TemplatesMapDependence( map );
+						}
+						
+						withinThisMap._instances.push ( objectInstance );
+						
+						result._instances++;
+					}
+				}
+				
+				if ( withinThisMap != null )
+				{
+					result._maps.push( withinThisMap );
+				}
+			}
+			
+			return result;
+		}
+		
+		public function ResolveCompoundsDependence( compound : CompoundTemplate ): CompoundsDependence
+		{
+			var result : CompoundsDependence = new CompoundsDependence( compound );
+			
+			for each ( var map : Map in _data._maps )
+			{
+				var withinThisMap : CompoundsMapDependence = null;
+				
+				for each ( var objectInstance : ObjectInstance in map._instances )
+				{
+					if ( objectInstance._template == compound )
+					{
+						if ( withinThisMap == null )
+						{
+							withinThisMap = new CompoundsMapDependence( map );
+						}
+						
+						withinThisMap._instances.push ( objectInstance );
+						
+						result._instances++;
+					}
+				}
+				
+				if ( withinThisMap != null )
+				{
+					result._maps.push( withinThisMap );
+				}
+			}
+			
+			return result;
 		}
 		
 	}

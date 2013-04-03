@@ -7,7 +7,7 @@ package project_data
 	///@endcond
 	
 	/** Concrete object specified within some location.*/
-	public class ObjectInstance 
+	public class ObjectInstance
 	{
 		public var _template:ObjectTemplate;
 		

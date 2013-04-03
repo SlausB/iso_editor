@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Resource missing"
+			   minWidth="400"
+			   minHeight="600"
+			   >
+	
+	<s:Label text="Following resources wasn't found within loaded SWFs (SWF -> class):" x="10" y="12" width="380" />
+	<s:List x="10" y="42" width="300" height="90" >
+		<mx:ArrayCollection id="_missed_resources_data_provider" />
+	</s:List>
+	
+	<s:Label x="10" y="150" text="Following changes performed to keep project valid:" />
+	
+	<s:Label text="Removed templates:" x="10" y="182" />
+	<s:List x="10" y="198" width="300" height="90" >
+		<mx:ArrayCollection id="_removed_templates_data_provider" />
+	</s:List>
+	
+	<s:Label text="Affected compounds:" x="10" y="310" />
+	<s:List x="10" y="326" width="300" height="90" >
+		<mx:ArrayCollection id="_affected_compounds_data_provider" />
+	</s:List>
+	
+	<s:Label id="_text" textAlign="center" x="10" y="430" width="380" height="100" verticalAlign="middle" />
+	
+	
+	<s:Button label="Ok" x="314" y="536" click="onOk(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import mx.managers.PopUpManager;
+		
+		
+		public function Init( resources : Vector.< String >, templates : Vector.< String >, compounds : Vector.< String >, maps : Vector.< String >, objects : int ): void
+		{
+			closeButton.visible = false;
+			
+			for each ( var resource : String in resources )
+			{
+				_missed_resources_data_provider.addItem( resource );
+			}
+			
+			for each ( var template : String in templates )
+			{
+				_removed_templates_data_provider.addItem( template );
+			}
+			
+			for each ( var compound : String in compounds )
+			{
+				_affected_compounds_data_provider.addItem( compound );
+			}
+			
+			_text.text = "Removed " + objects.toString() + " objects from " + maps.length.toString() + " maps.\nThose changes wasn't saved: if you do not accept performed changes so recreate specified graphical classes within resource SWFs and reload the project.";
+		}
+		
+		private function onOk( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			PopUpManager.removePopUp( this );
+		}
+		
+		
+		]]>
+	</fx:Script>
+	
+	
+</s:TitleWindow>

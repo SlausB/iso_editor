@@ -71,7 +71,7 @@
 					
 					<s:Button id="_reloadMapButton" x="640" y="4" label="Reload" toolTip="Recreate isometric objects accordingly last changes within templates and compounds" click="onReloadMap(event)" enabled="false" />
 					
-					<s:Label text="Scrict move:" x="640" y="35" />
+					<s:Label text="Strict move:" x="640" y="35" />
 					<s:CheckBox id="_strictMove" x="714" y="31" toolTip="Move units from tile to tile instead of ghost-like hovering if default surface was specified for that unit" />
 				</s:BorderContainer>
 			</s:Group>
@@ -143,7 +143,7 @@
 								</s:GridColumn>
 							</s:ArrayList>
 						</s:columns>
-						<mx:ArrayCollection />
+						<mx:ArrayCollection id="_templates_table_data_provider" />
 					</s:DataGrid>
 				</mx:VBox>
 				
@@ -182,7 +182,7 @@
 								</s:GridColumn>
 							</s:ArrayList>
 						</s:columns>
-						<mx:ArrayCollection />
+						<mx:ArrayCollection id="_compounds_table_data_provider" />
 					</s:DataGrid>
 				</mx:VBox>
 				
@@ -268,6 +268,7 @@ import flash.display.DisplayObjectContainer;
 import flash.display.InteractiveObject;
 import flash.display.Loader;
 import flash.display.LoaderInfo;
+import flash.display.Sprite;
 import flash.errors.IOError;
 import flash.events.ContextMenuEvent;
 import flash.events.Event;
@@ -287,6 +288,7 @@ import flash.system.ApplicationDomain;
 import flash.ui.ContextMenu;
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
+import ie.ConfirmationWindow;
 import ie.EditingLayerWindow;
 import ie.EditingMapWindow;
 import ie.EditingProjectWindow;
@@ -300,6 +302,7 @@ import list_items.MapListItem;
 import list_items.RegionListItem;
 import list_items.TemplateTableItem;
 import list_items.UnitListItem;
+import mx.collections.ArrayCollection;
 import mx.collections.ArrayList;
 import mx.containers.TitleWindow;
 import mx.controls.Alert;
@@ -313,12 +316,13 @@ import mx.events.IndexChangedEvent;
 import mx.events.MenuEvent;
 import mx.managers.DragManager;
 import mx.managers.PopUpManager;
-import org.bytearray.explorer.SWFExplorer;
 import org.osmf.media.LoadableElementBase;
 import project_data.ComplexTemplate;
 import project_data.CompoundTemplate;
 import project_data.Layer;
 import project_data.Map;
+import project_data.ObjectInstance;
+import project_data.ObjectTemplate;
 import project_data.Region;
 import project_data.Resource;
 import ru.etcs.utils.getDefinitionNames;
@@ -382,6 +386,15 @@ import view.Projection;
 			
 			switch ( e.keyCode )
 			{
+				//ctrl+f to simulate program crash to check if editor is run in debug mode:
+				case 70:
+					if ( _ctrlDown )
+					{
+						var falling : Sprite = null;
+						falling.addChild( null );
+					}
+					break;
+				
 				//q:
 				case 81:
 					_qDown = e.type == KeyboardEvent.KEY_DOWN;
@@ -414,50 +427,82 @@ import view.Projection;
 					//remove currently selected object from map:
 					else if ( _isometry._selected != null && _isometry.displaying != null )
 					{
-						var selected:IsometryObject = _isometry._selected;
-						//remove from displaying:
-						for ( var isometryObjectIndex:int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
-						{
-							if ( _isometry._isometryObjects[ isometryObjectIndex ] == selected )
-							{
-								_isometry._isometryObjects.splice( isometryObjectIndex, 1 );
-								break;
-							}
-						}
-						//remove from map's objects:
-						for ( var mapObjectIndex:int = 0; mapObjectIndex < _isometry.displaying._instances.length; ++mapObjectIndex )
-						{
-							if ( _isometry.displaying._instances[ mapObjectIndex ] == selected._objectInstance )
-							{
-								_isometry.displaying._instances.splice( mapObjectIndex, 1 );
-								break;
-							}
-						}
-						selected.Deselect();
-						if ( _isometry._over == selected )
-						{
-							_isometry._over.Out();
-							_isometry._over = null;
-						}
-						
-						if ( selected._objectInstance._template is CompoundTemplate )
-						{
-							var compoundTableItem:CompoundTableItem = ListItem.FindListItem( selected._objectInstance._template, _compounds_table.dataProvider ) as CompoundTableItem;
-							if ( compoundTableItem == null )
-							{
-								Cc.error( "E: Main.onKeyboardEvent(): del: CompoundTableItem was NOT found." );
-							}
-							else
-							{
-								compoundTableItem.UpdateUsage( this );
-								_compounds_table.dataProvider.itemUpdated( compoundTableItem );
-							}
-						}
-						
-						selected.Destroy();
-						_isometry._selected = null;
+						RemoveObjectFromMap( _isometry._selected._objectInstance, _isometry.displaying );
 					}
 					break;
+			}
+		}
+		
+		public function RemoveObjectFromMap( objectInstance : ObjectInstance, map : Map, updateUsage : Boolean = true ): void
+		{
+			//if removing object from currently selected map:
+			if ( _isometry.displaying == map )
+			{
+				var selected:IsometryObject = _isometry._selected;
+				
+				if ( selected != null && selected._objectInstance == objectInstance )
+				{
+					selected.Deselect();
+					_isometry._selected = null;
+				}
+				
+				if ( _isometry._over != null && _isometry._over._objectInstance == objectInstance )
+				{
+					_isometry._over.Out();
+					_isometry._over = null;
+				}
+				
+				//remove from displaying:
+				for ( var isometryObjectIndex:int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
+				{
+					var isometryObject : IsometryObject = _isometry._isometryObjects[ isometryObjectIndex ];
+					if ( isometryObject._objectInstance == objectInstance )
+					{
+						_isometry._isometryObjects.splice( isometryObjectIndex, 1 );
+						isometryObject.Destroy();
+						break;
+					}
+				}
+			}
+			
+			//remove from map's objects:
+			for ( var mapObjectIndex:int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
+			{
+				if ( map._instances[ mapObjectIndex ] == objectInstance )
+				{
+					map._instances.splice( mapObjectIndex, 1 );
+					break;
+				}
+			}
+			
+			if ( updateUsage )
+			{
+				if ( objectInstance is ComplexTemplate )
+				{
+					var templateTableItem : TemplateTableItem = ListItem.FindListItem( objectInstance._template, _templates_table.dataProvider ) as TemplateTableItem;
+					if ( templateTableItem == null )
+					{
+						Cc.error( "E: Main.RemoveObjectFromMap(): TemplateTableItem was NOT found." );
+					}
+					else
+					{
+						templateTableItem.UpdateUsage( this );
+						_templates_table.dataProvider.itemUpdated( templateTableItem );
+					}
+				}
+				else if ( objectInstance is CompoundTemplate )
+				{
+					var compoundTableItem:CompoundTableItem = ListItem.FindListItem( objectInstance._template, _compounds_table.dataProvider ) as CompoundTableItem;
+					if ( compoundTableItem == null )
+					{
+						Cc.error( "E: Main.RemoveObjectFromMap(): CompoundTableItem was NOT found." );
+					}
+					else
+					{
+						compoundTableItem.UpdateUsage( this );
+						_compounds_table.dataProvider.itemUpdated( compoundTableItem );
+					}
+				}
 			}
 		}
 		
@@ -580,7 +625,10 @@ import view.Projection;
 				var templateTableItem:TemplateTableItem = gridItemRenderer.data as TemplateTableItem;
 				if ( templateTableItem != null )
 				{
-					menuData = menuData.concat( [ { label: "Edit...", id: "edit", template: templateTableItem.template } ] );
+					menuData = menuData.concat(
+						[ { label: "Edit...", id: "edit", template: templateTableItem.template } ],
+						[ { label: "Delete", id: "delete", template: templateTableItem.template } ]
+					);
 				}
 			}
 			
@@ -598,9 +646,82 @@ import view.Projection;
 						editingTemplateWindow.Init( _project, menuEvent.item.template, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
+					
+					case "delete":
+						var templatesDependence : TemplatesDependence = _project.ResolveTemplatesDependence( menuEvent.item.template );
+						if ( templatesDependence._compounds.length > 0 || templatesDependence._maps.length > 0 )
+						{
+							var confirmationWindow : ConfirmationWindow = PopUpManager.createPopUp( thisOne, ConfirmationWindow, true ) as ConfirmationWindow;
+							confirmationWindow.Init(
+								_project,
+								thisOne,
+								"Removing template \"" + menuEvent.item.template._name + "\" will cause " + templatesDependence._instances.toString() + " map objects to remove from " + templatesDependence._maps.length + " maps and " + templatesDependence._compounds.length.toString() + " compound templates to change. Are you sure?",
+								function(): void
+								{
+									RemoveTemplate( templatesDependence );
+								} );
+							PopUpManager.centerPopUp( confirmationWindow );
+						}
+						//otherwise nobody cares - just remove it and forget about it:
+						else
+						{
+							RemoveTemplate( templatesDependence );
+						}
+						break;
 				}
 			} );
 			_templatesContextMenu.show( e.stageX, e.stageY );
+		}
+		
+		public function RemoveTemplate( templatesDependence : TemplatesDependence ): void
+		{
+			//from the representating list:
+			var templateTableItem : TemplateTableItem = ListItem.FindListItem( templatesDependence._template, _templates_table.dataProvider ) as TemplateTableItem;
+			if ( templateTableItem != null )
+			{
+				_templates_table_data_provider.removeItemAt( _templates_table_data_provider.getItemIndex( templateTableItem ) );
+			}
+			
+			//from project's array:
+			for ( var i : int = 0; i < _project._data._objects.length; ++i )
+			{
+				if ( _project._data._objects[ i ] == templatesDependence._template )
+				{
+					_project._data._objects.splice( i, 1 );
+					break;
+				}
+			}
+			
+			//all objects from all maps:
+			for each ( var map : TemplatesMapDependence in templatesDependence._maps )
+			{
+				for each ( var objectInstance : ObjectInstance in map._instances )
+				{
+					RemoveObjectFromMap( objectInstance, map._map, false );
+				}
+			}
+			
+			//all instances from all compounds:
+			for each ( var compound : CompoundTemplate in templatesDependence._compounds )
+			{
+				for ( var ti : int = 0; ti < compound._consisting.length; ++ti )
+				{
+					if ( compound._consisting[ ti ]._complex == templatesDependence._template )
+					{
+						compound._consisting.splice( ti, 1 );
+						--ti;
+					}
+				}
+				
+				var compoundTableItem : CompoundTableItem = ListItem.FindListItem( compound, _compounds_table.dataProvider ) as CompoundTableItem;
+				if ( compoundTableItem != null )
+				{
+					compoundTableItem.UpdateView( this );
+					_compounds_table.dataProvider.itemUpdated( compoundTableItem );
+				}
+			}
+			
+			_reloadMapButton.enabled = true;
 		}
 		
 		public var _compoundsContextMenu:Menu = null;
@@ -622,7 +743,10 @@ import view.Projection;
 				var compoundTableItem:CompoundTableItem = gridItemRenderer.data as CompoundTableItem;
 				if ( compoundTableItem != null )
 				{
-					menuData = menuData.concat( [ { label: "Edit...", id: "edit", compound: compoundTableItem.compound } ] );
+					menuData = menuData.concat(
+						[ { label: "Edit...", id: "edit", compound: compoundTableItem.compound } ],
+						[ { label: "Delete", id: "delete", compound: compoundTableItem.compound } ]
+					);
 				}
 			}
 			
@@ -640,9 +764,60 @@ import view.Projection;
 						editingTemplateWindow.Init( _project, menuEvent.item.compound, thisOne );
 						PopUpManager.centerPopUp( editingTemplateWindow );
 						break;
+					
+					case "delete":
+						var compoundsDependence : CompoundsDependence = _project.ResolveCompoundsDependence( menuEvent.item.compound );
+						if ( compoundsDependence._instances > 0 )
+						{
+							var confirmationWindow : ConfirmationWindow = PopUpManager.createPopUp( thisOne, ConfirmationWindow, true ) as ConfirmationWindow;
+							confirmationWindow.Init(
+								_project,
+								thisOne,
+								"Removing compound template \"" + menuEvent.item.compound._name + "\" will cause " + compoundsDependence._instances.toString() + " map objects to remove from " + compoundsDependence._maps.length + " maps. Are you sure?",
+								function(): void
+								{
+									RemoveCompound( compoundsDependence );
+								} );
+							PopUpManager.centerPopUp( confirmationWindow );
+						}
+						//otherwise nobody cares - just remove it and forget about it:
+						else
+						{
+							RemoveCompound( compoundsDependence );
+						}
+						break;
 				}
 			} );
 			_compoundsContextMenu.show( e.stageX, e.stageY );
+		}
+		
+		private function RemoveCompound( compoundsDependence : CompoundsDependence ): void
+		{
+			//from the representating list:
+			var compoundTableItem : CompoundTableItem = ListItem.FindListItem( compoundsDependence._compound, _compounds_table.dataProvider ) as CompoundTableItem;
+			if ( compoundTableItem != null )
+			{
+				_compounds_table_data_provider.removeItemAt( _compounds_table_data_provider.getItemIndex( compoundTableItem ) );
+			}
+			
+			//from project's array:
+			for ( var i : int = 0; i < _project._data._objects.length; ++i )
+			{
+				if ( _project._data._objects[ i ] == compoundsDependence._compound )
+				{
+					_project._data._objects.splice( i, 1 );
+					break;
+				}
+			}
+			
+			//all objects from all maps:
+			for each ( var map : CompoundsMapDependence in compoundsDependence._maps )
+			{
+				for each ( var objectInstance : ObjectInstance in map._instances )
+				{
+					RemoveObjectFromMap( objectInstance, map._map, false );
+				}
+			}
 		}
 		
 		private var _mapsContextMenu:Menu = null;
