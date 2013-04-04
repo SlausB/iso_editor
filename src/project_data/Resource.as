@@ -3,6 +3,8 @@ package project_data
 {
 	import blisc.BliscAnimation;
 	import blisc.BliscSprite;
+	import blisc.templates.BliscUnitTemplate;
+	import blisc.templates.BliscUnitView;
 	import flash.display.FrameLabel;
 	import flash.display.MovieClip;
 	import flash.geom.Point;
@@ -78,9 +80,12 @@ package project_data
 					continue;
 				}
 				
+				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( name );
+				
 				var unitsSingleResource:SingleResource = new SingleResource;
 				unitsSingleResource.Init( _path, name );
-				var unitDesc:UnitDesc = new UnitDesc( name, unitsSingleResource );
+				
+				var unitDesc:UnitDesc = new UnitDesc( bliscUnitTemplate, unitsSingleResource );
 				_units.push( unitDesc );
 				
 				for ( var currentLabelIndex:int = 0; currentLabelIndex < currentLabels.length; ++currentLabelIndex )
@@ -93,7 +98,7 @@ package project_data
 						endingFrame = currentLabels[ currentLabelIndex + 1 ].frame;
 					}
 					var bliscAnimation:BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, new Point, name, frameLabel.frame, endingFrame );
-					unitDesc._views.push( new UnitView( orientation, bliscAnimation ) );
+					unitDesc._template._views.push( new BliscUnitView( orientation, bliscAnimation ) );
 				}
 			}
 		}

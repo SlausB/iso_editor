@@ -407,7 +407,7 @@ package
 			
 			for each ( var unitDesc:UnitDesc in resource._units )
 			{
-				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc._name, unitDesc ) );
+				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc._template._name, unitDesc ) );
 			}
 		}
 		
@@ -462,15 +462,27 @@ package
 			return 0;
 		}
 		
-		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.*/
-		public function FindUnitProperties( unitDesc:UnitDesc ): UnitProperties
+		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.
+		\param create True if need to create and add new one if wasn't found.
+		*/
+		public function FindUnitProperties( unitDesc:UnitDesc, create : Boolean ): UnitProperties
 		{
 			for each ( var unitProperties:UnitProperties in _data._unitProperties )
 			{
-				if ( unitProperties._unit == unitDesc._name )
+				if ( unitProperties._unit == unitDesc._template._name )
 				{
 					return unitProperties;
 				}
+			}
+			
+			if ( create )
+			{
+				var creating : UnitProperties = new UnitProperties;
+				creating.Init( unitDesc._template._name );
+				
+				_data._unitProperties.push( creating );
+				
+				return creating;
 			}
 			
 			return null;

@@ -43,16 +43,9 @@ import project_data.UnitProperties;
 			_unit = unit;
 			_main = main;
 			
-			_name.text = unit._name;
+			_name.text = unit._template._name;
 			
-			_unitProperties = project.FindUnitProperties( unit );
-			if ( _unitProperties == null )
-			{
-				_unitProperties = new UnitProperties;
-				_unitProperties.Init( unit._name );
-				
-				project._data._unitProperties.push( _unitProperties );
-			}
+			_unitProperties = project.FindUnitProperties( unit, true );
 			
 			for each ( var region:Region in project._data._regions )
 			{

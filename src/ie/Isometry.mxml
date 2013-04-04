@@ -30,7 +30,10 @@ import blisc.BliscObjectTemplate;
 import blisc.BliscRegion;
 import blisc.BliscRegionWithinComplex;
 import blisc.BliscSprite;
+import blisc.BliscTemplate;
 import blisc.BliscUnit;
+import blisc.pathfinding.AStar;
+import blisc.templates.BliscUnitTemplate;
 import com.junkbyte.console.Cc;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -58,7 +61,9 @@ import project_data.Layer;
 import project_data.Map;
 import project_data.ObjectInstance;
 import project_data.ObjectTemplate;
+import project_data.Region;
 import project_data.SingleResource;
+import project_data.UnitProperties;
 import utils.Utils;
 import view.Projection;
 		
@@ -241,8 +246,16 @@ import view.Projection;
 			var unit:Unit = new Unit( _main, unitDesc );
 			_isometryObjects.push( unit );
 			
-			var bliscUnit:BliscUnit = new BliscUnit( unit, _blisc, foundLayer );
-			unit._view = bliscUnit;
+			//initing surfaces:
+			unitDesc._template._surfaces.length = 0;
+			var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
+			for each ( var surface : Region in unitProperties._surfaces )
+			{
+				unitDesc._template._surfaces.push( new BliscRegion( surface._name, surface._type, surface._color ) );
+			}
+			
+			var bliscUnit:BliscUnit = new BliscUnit( unitDesc._template, unit, _blisc, foundLayer );
+			unit.Init( bliscUnit );
 			_blisc.AddObject( bliscUnit );
 		}
 		
@@ -310,7 +323,8 @@ import view.Projection;
 			_main._clampToTile.selected = _displaying._clampToTiles;
 			_main._unitsSpeed.text = _displaying._unitsSpeed.toString();
 			
-			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side );
+			var aStar : AStar = new AStar( map._right, map._down, _project._data._tileSize, _project.side );
+			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side, aStar );
 			
 			//adding an ability to draw map's grid:
 			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
@@ -613,7 +627,7 @@ import view.Projection;
 					if ( _selected is Unit )
 					{
 						var sendingUnitPos:Point = ResolveMouseIso();
-						( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y );
+						( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y, _main._strictMove.selected );
 					}
 				}
 				

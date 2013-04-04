@@ -2,7 +2,12 @@
 package
 {
 	import blisc.BliscCompound;
+	import blisc.BliscIsometric;
+	import blisc.BliscUnit;
+	import blisc.pathfinding.AStarNode;
+	import blisc.templates.BliscUnitTemplate;
 	import blisc.unit_actions.MoveDirectly;
+	import blisc.unit_actions.MoveTiled;
 	import blisc.unit_actions.UnitAction;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
@@ -28,6 +33,11 @@ package
 			super( null, main );
 			
 			_unitDesc = unitDesc;
+		}
+		
+		public function Init( view : BliscIsometric ) : void
+		{
+			_view = view;
 			
 			MoveRandomly();
 		}
@@ -69,7 +79,7 @@ package
 			}
 			
 			Utils.ToIso( Utils.RandomInt( -map._right, map._right ), Utils.RandomInt( -map._down, map._down ), _isoDest );
-			_currentAction = new MoveDirectly( this, map, startX, startY, _isoDest.x, _isoDest.y );
+			_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), startX, startY, _isoDest.x, _isoDest.y );
 		}
 		
 		override public function Highlight( glowFilter:GlowFilter ): void
@@ -87,17 +97,45 @@ package
 			if ( _currentAction != null )
 			{
 				_currentAction.Destroy();
+				_currentAction = null;
 			}
 			
 			_isoDest.setTo( isoX, isoY );
 			
+			var moveDirectly : Boolean = false;
+			
 			if ( tiled )
 			{
-				//TODO...
+				//units stay on tile's center:
+				const startX : Number = _view.GetIsoX() - _view._blisc.tileSide / 2;
+				const startY : Number = _view.GetIsoY() - _view._blisc.tileSide / 2;
+				var start : AStarNode = _view._blisc._aStar.grid.GetTile( Math.round( startX / _view._blisc.tileSide ), Math.round( startY / _view._blisc.tileSide ) );
+				var end : AStarNode = _view._blisc._aStar.grid.GetTile( Math.round( isoX / _view._blisc.tileSide ), Math.round( isoY / _view._blisc.tileSide ) );
+				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end );
+				if ( path == null )
+				{
+					trace( "path not found" );
+					moveDirectly = true;
+				}
+				else
+				{
+					trace( "found path consisting from " + path.length.toString() + " tiles:" );
+					for ( var i : int = 0; i < path.length; ++i )
+					{
+						trace( "	" + path[ i ].tileX.toString() + " | " + path[ i ].tileY.toString() );
+					}
+					
+					_currentAction = new MoveTiled( _view as BliscUnit, path, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+				}
 			}
 			else
 			{
-				_currentAction = new MoveDirectly( this, _main._isometry.displaying, _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+				moveDirectly = true;
+			}
+			
+			if ( moveDirectly )
+			{
+				_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
 			}
 		}
 		

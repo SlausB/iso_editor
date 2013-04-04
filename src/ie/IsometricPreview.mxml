@@ -18,6 +18,7 @@
 import blisc.Blisc;
 import blisc.BliscComplexWithinCompound;
 import blisc.BliscCompound;
+import blisc.pathfinding.AStar;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -136,7 +137,8 @@ import project_data.ObjectTemplate;
 			
 			_previousTime = 0;
 			_elapsed = 0;
-			_blisc = new Blisc( _view, null, width, height, 10000, 10000, 0, project.side );
+			var aStar : AStar = new AStar( 1, 1, 1, 1 );
+			_blisc = new Blisc( _view, null, width, height, 10000, 10000, 0, project.side, aStar );
 			for each ( var layer:Layer in project._data._layers )
 			{
 				_blisc.AddLayer( layer._name, true );
