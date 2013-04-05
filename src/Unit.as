@@ -39,7 +39,9 @@ package
 		{
 			_view = view;
 			
-			MoveRandomly();
+			//MoveRandomly();
+			_view.bdo.SetIsoXY( 0, 0 );
+			_view.bdo.Replicate( _unitDesc._template.GetAnimation( 0 ).Resolve( 0 ) );
 		}
 		
 		public function get unitDesc(): UnitDesc
@@ -54,7 +56,7 @@ package
 				return;
 			}
 			
-			const left:Number = elapsedSeconds - _currentAction.Proceed( elapsedSeconds );
+			const left : Number = elapsedSeconds - _currentAction.Proceed( elapsedSeconds );
 			//ended:
 			if ( left > 0 )
 			{
@@ -62,6 +64,11 @@ package
 				{
 					MoveRandomly( _isoDest.x, _isoDest.y );
 					_currentAction.Proceed( left );
+				}
+				else if ( _currentAction is MoveTiled )
+				{
+					_currentAction.Destroy();
+					_currentAction = null;
 				}
 			}
 		}
@@ -92,7 +99,7 @@ package
 			_view.bdo.Unhighlight();
 		}
 		
-		public function MoveTo( isoX:Number, isoY:Number, tiled:Boolean = false ): void
+		public function MoveTo( isoX : Number, isoY : Number, tiled:Boolean = false ): void
 		{
 			if ( _currentAction != null )
 			{
@@ -109,8 +116,12 @@ package
 				//units stay on tile's center:
 				const startX : Number = _view.GetIsoX() - _view._blisc.tileSide / 2;
 				const startY : Number = _view.GetIsoY() - _view._blisc.tileSide / 2;
-				var start : AStarNode = _view._blisc._aStar.grid.GetTile( Math.round( startX / _view._blisc.tileSide ), Math.round( startY / _view._blisc.tileSide ) );
-				var end : AStarNode = _view._blisc._aStar.grid.GetTile( Math.round( isoX / _view._blisc.tileSide ), Math.round( isoY / _view._blisc.tileSide ) );
+				var start : AStarNode = _view._blisc._aStar.grid.GetTile(
+					Math.round( startX / _view._blisc.tileSide ),
+					Math.round( startY / _view._blisc.tileSide ) );
+				var end : AStarNode = _view._blisc._aStar.grid.GetTile(
+					Math.round( isoX / _view._blisc.tileSide ),
+					Math.round( isoY / _view._blisc.tileSide ) );
 				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end );
 				if ( path == null )
 				{
@@ -125,7 +136,14 @@ package
 						trace( "	" + path[ i ].tileX.toString() + " | " + path[ i ].tileY.toString() );
 					}
 					
-					_currentAction = new MoveTiled( _view as BliscUnit, path, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+					_currentAction = new MoveTiled(
+						_view as BliscUnit,
+						path,
+						parseFloat( _main._unitsSpeed.text ),
+						_view.bdo.GetIsoX(),
+						_view.bdo.GetIsoY(),
+						isoX,
+						isoY );
 				}
 			}
 			else
@@ -135,7 +153,7 @@ package
 			
 			if ( moveDirectly )
 			{
-				_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+				//_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
 			}
 		}
 		

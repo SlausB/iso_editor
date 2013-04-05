@@ -3,17 +3,20 @@
                xmlns:s="library://ns.adobe.com/flex/spark" 
                xmlns:mx="library://ns.adobe.com/flex/mx"
 			   title="Adjust unit"
-			   minWidth="280"
-			   minHeight="180"
+			   minWidth="400"
+			   minHeight="600"
 			   >
 	
 	<s:Label text="Name:" x="12" y="12" />
 	<s:TextArea id="_name" editable="false" x="54" y="6" height="22" />
 	
-	<s:Label text="Default surface:" x="12" y="44" />
-	<s:DropDownList id="_surface_list" x="12" y="62" prompt="Select surface" width="130" >
-		<mx:ArrayList />
-	</s:DropDownList>
+	<s:List x="10" y="100" dragEnabled="true" dropEnabled="true" >
+		<mx:ArrayCollection id="_available_surfaces_list_data_provider" />
+	</s:List>
+	
+	<s:List x="200" y="100" dragEnabled="true" dropEnabled="true" >
+		<mx:ArrayCollection id="_chosen_surfaces_list_data_provider" />
+	</s:List>
 	
 	<s:Button label="Ok" x="120" y="120" click="onOk(event)" />
 	<s:Button label="Cancel" x="200" y="120" click="onCancel(event)" />
@@ -35,7 +38,7 @@ import project_data.UnitProperties;
 		private var _unitProperties:UnitProperties = null;
 		
 		
-		public function Init( project:Project, unit:UnitDesc, main:Main ): void
+		public function Init( project : Project, unit : UnitDesc, main:Main ): void
 		{
 			closeButton.visible = false;
 			
@@ -47,7 +50,7 @@ import project_data.UnitProperties;
 			
 			_unitProperties = project.FindUnitProperties( unit, true );
 			
-			for each ( var region:Region in project._data._regions )
+			/*for each ( var region:Region in project._data._regions )
 			{
 				if ( region._type != Region.TYPE_SURFACE )
 				{
@@ -60,6 +63,14 @@ import project_data.UnitProperties;
 			if ( _unitProperties._region != null )
 			{
 				_surface_list.selectedItem = ListItem.FindListItem( _unitProperties._region, _surface_list.dataProvider );
+			}*/
+			
+			for each ( var region : Region in _project._data._regions )
+			{
+				if ( region._type != Region.TYPE_SURFACE )
+				{
+					
+				}
 			}
 		}
 		
