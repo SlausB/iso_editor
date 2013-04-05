@@ -10,22 +10,22 @@ package ie
 	/** Region within EditingTemplateWindow's drop down list.*/
 	public class RegionChoiceListItem extends ListItem
 	{
-		public function RegionChoiceListItem( region:Region )
+		public function RegionChoiceListItem( region : Region )
 		{
 			super( region );
 		}
 		
-		public function get region(): Region
+		public function get region() : Region
 		{
 			return _data as Region;
 		}
 		
-		public function get label(): String
+		public function get label() : String
 		{
 			return region._name;
 		}
 		
-		public function get name(): String
+		public function get name() : String
 		{
 			return region._name;
 		}

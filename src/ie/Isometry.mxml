@@ -107,6 +107,8 @@ import view.Projection;
 		/** How much pixels scroll per second.*/
 		private static const SCROLL_SPEED:Number = 400;
 		
+		private var _regionsCache : Vector.< BliscRegion > = new Vector.< BliscRegion >;
+		
 		
 		
 		public function HideTip(): void
@@ -251,12 +253,27 @@ import view.Projection;
 			var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
 			for each ( var surface : Region in unitProperties._surfaces )
 			{
-				unitDesc._template._surfaces.push( new BliscRegion( surface._name, surface._type, surface._color ) );
+				unitDesc._template._surfaces.push( ObtainBliscRegion( surface, _regionsCache ) );
 			}
 			
-			var bliscUnit:BliscUnit = new BliscUnit( unitDesc._template, unit, _blisc, foundLayer );
+			var bliscUnit : BliscUnit = new BliscUnit( unitDesc._template, unit, _blisc, foundLayer );
 			unit.Init( bliscUnit );
 			_blisc.AddObject( bliscUnit );
+		}
+		
+		public static function ObtainBliscRegion( region : Region, cache : Vector.< BliscRegion > ) : BliscRegion
+		{
+			for each ( var bliscRegion : BliscRegion in cache )
+			{
+				if ( bliscRegion._name == region._name && bliscRegion._color == region._color && bliscRegion._type == region._type )
+				{
+					return bliscRegion;
+				}
+			}
+			
+			var newBliscRegion : BliscRegion = new BliscRegion( region._name, region._type, region._color );
+			cache.push( newBliscRegion );
+			return newBliscRegion;
 		}
 		
 		private function AddObject( objectInstance:ObjectInstance ): void
@@ -264,7 +281,7 @@ import view.Projection;
 			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
 			
-			var bliscCompound:BliscCompound = IE_Utils.CreateBliscCompound( isometryObject, _blisc, objectInstance._template, _project );
+			var bliscCompound:BliscCompound = IE_Utils.CreateBliscCompound( _regionsCache, isometryObject, _blisc, objectInstance._template, _project );
 			
 			isometryObject._view = bliscCompound;
 			
@@ -392,6 +409,8 @@ import view.Projection;
 			
 			_dragging = null;
 			_isDragging = null;
+			
+			_regionsCache.length = 0;
 		}
 		
 		public function onDragEnter( event:DragEvent ): void

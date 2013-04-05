@@ -18,6 +18,7 @@
 import blisc.Blisc;
 import blisc.BliscComplexWithinCompound;
 import blisc.BliscCompound;
+import blisc.BliscRegion;
 import blisc.pathfinding.AStar;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -38,6 +39,8 @@ import project_data.ObjectTemplate;
 		private var _displaying:BliscCompound;
 		/** Description of displaying object.*/
 		public var _objectTemplate:ObjectTemplate = null;
+		
+		private var _regionsCache : Vector.< BliscRegion > = new Vector.< BliscRegion >;
 		
 		
 		private function onInit( ... args ): void
@@ -144,7 +147,7 @@ import project_data.ObjectTemplate;
 				_blisc.AddLayer( layer._name, true );
 			}
 			
-			_displaying = IE_Utils.CreateBliscCompound( null, _blisc, objectTemplate, project );
+			_displaying = IE_Utils.CreateBliscCompound( _regionsCache, null, _blisc, objectTemplate, project );
 			_blisc.AddObject( _displaying );
 		}
 		

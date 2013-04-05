@@ -34,13 +34,13 @@ package ie
 			return BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, center, singleResource._name );
 		}
 		
-		public static function ComplexTemplateToBlisc( complex:ComplexTemplate, project:Project ): BliscComplexTemplate
+		public static function ComplexTemplateToBlisc( regionsCache : Vector.< BliscRegion >, complex:ComplexTemplate, project:Project ): BliscComplexTemplate
 		{
 			//again - use some caching here - create all regions (BliscRegion) only once:
 			var regions:Vector.< BliscRegionWithinComplex > = new Vector.< BliscRegionWithinComplex >;
 			for each ( var regionWithinComplex:RegionWithinComplex in complex._regions )
 			{
-				var bliscRegion:BliscRegion = new BliscRegion( regionWithinComplex._region._name, regionWithinComplex._region._type, regionWithinComplex._region._color );
+				var bliscRegion:BliscRegion = Isometry.ObtainBliscRegion( regionWithinComplex._region, regionsCache );
 				
 				var bliscTiles:Vector.< Point > = new Vector.< Point >;
 				for each ( var tile:Point in regionWithinComplex._tiles )
@@ -62,13 +62,13 @@ package ie
 			);
 		}
 		
-		public static function CreateBliscCompound( opaqueData:*, blisc:Blisc, objectTemplate:ObjectTemplate, project:Project ): BliscCompound
+		public static function CreateBliscCompound( regionsCache : Vector.< BliscRegion >, opaqueData:*, blisc:Blisc, objectTemplate:ObjectTemplate, project:Project ): BliscCompound
 		{
 			var bliscObjectTemplate:BliscObjectTemplate;
 			
 			if ( objectTemplate is ComplexTemplate )
 			{
-				bliscObjectTemplate = ComplexTemplateToBlisc( objectTemplate as ComplexTemplate, project );
+				bliscObjectTemplate = ComplexTemplateToBlisc( regionsCache, objectTemplate as ComplexTemplate, project );
 			}
 			else
 			{
@@ -77,7 +77,7 @@ package ie
 				for each ( var complexWithinCompound:ComplexWithinCompound in compound._consisting )
 				{
 					complexes.push( new BliscComplexWithinCompoundTemplate(
-						ComplexTemplateToBlisc( complexWithinCompound._complex, project ),
+						ComplexTemplateToBlisc( regionsCache, complexWithinCompound._complex, project ),
 						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ),
 						Utils.FromIso( complexWithinCompound._tileDispX * project.side, complexWithinCompound._tileDispY * project.side, new Point )
 					) );
