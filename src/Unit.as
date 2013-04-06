@@ -35,13 +35,12 @@ package
 			_unitDesc = unitDesc;
 		}
 		
-		public function Init( view : BliscIsometric ) : void
+		public function Init( view : BliscIsometric, tileX : Number, tileY : Number ) : void
 		{
 			_view = view;
 			
-			//MoveRandomly();
-			_view.bdo.SetIsoXY( 0, 0 );
-			_view.bdo.Replicate( _unitDesc._template.GetAnimation( 0 ).Resolve( 0 ) );
+			_view.SetTileXY( tileX, tileY );
+			MoveRandomly();
 		}
 		
 		public function get unitDesc(): UnitDesc
@@ -60,15 +59,24 @@ package
 			//ended:
 			if ( left > 0 )
 			{
+				_currentAction.Destroy();
+				_currentAction = null;
+				
 				if ( _currentAction is MoveDirectly )
 				{
-					MoveRandomly( _isoDest.x, _isoDest.y );
-					_currentAction.Proceed( left );
+					if ( _main._stroll.selected )
+					{
+						MoveRandomly();
+						_currentAction.Proceed( left );
+					}
 				}
 				else if ( _currentAction is MoveTiled )
 				{
-					_currentAction.Destroy();
-					_currentAction = null;
+					if ( _main._stroll.selected )
+					{
+						MoveRandomly();
+						_currentAction.Proceed( left );
+					}
 				}
 			}
 		}
@@ -78,15 +86,16 @@ package
 			return _main._isometry.displaying;
 		}
 		
-		private function MoveRandomly( startX:Number = 0, startY:Number = 0 ): void
+		private function MoveRandomly() : void
 		{
 			if ( _currentAction != null )
 			{
 				_currentAction.Destroy();
+				_currentAction = null;
 			}
 			
 			Utils.ToIso( Utils.RandomInt( -map._right, map._right ), Utils.RandomInt( -map._down, map._down ), _isoDest );
-			_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), startX, startY, _isoDest.x, _isoDest.y );
+			MoveTo( _isoDest.x, _isoDest.y, _main._strictMove.selected );
 		}
 		
 		override public function Highlight( glowFilter:GlowFilter ): void
@@ -122,11 +131,12 @@ package
 				var end : AStarNode = _view._blisc._aStar.grid.GetTile(
 					Math.round( isoX / _view._blisc.tileSide ),
 					Math.round( isoY / _view._blisc.tileSide ) );
-				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end );
+				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end, _main._project._data._slippingValue );
 				if ( path == null )
 				{
 					trace( "path not found" );
-					moveDirectly = true;
+					//keep unit standing or doing what he was doing:
+					//moveDirectly = true;
 				}
 				else
 				{
@@ -153,7 +163,7 @@ package
 			
 			if ( moveDirectly )
 			{
-				//_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+				_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
 			}
 		}
 		

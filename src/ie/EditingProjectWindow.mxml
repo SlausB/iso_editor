@@ -24,6 +24,13 @@
 	<s:Label text="Sample:" x="280" y="66" />
 	<s:SpriteVisualElement id="_sampleHolder" x="304" y="90" percentWidth="100" percentHeight="100" />
 	
+	<s:Label text="Slipping value:" x="10" y="180" toolTip="Maximum amoung of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west)." />
+	<s:VGroup x="10" y="198" >
+		<s:RadioButton id="_slipping_0" groupName="slippingValue" label="0" toolTip="Can slip even through 2 neighbours adjacent by corners. Pretty unnatural." />
+		<s:RadioButton id="_slipping_1" groupName="slippingValue" label="1" toolTip="Can slip only if at least one of adjacent corners is free. A little overlapping is possible." />
+		<s:RadioButton id="_slipping_2" groupName="slippingValue" label="2" toolTip="Can slip only if both of adjacent corners are empty. Realistic hardcore." />
+	</s:VGroup>
+	
 	
 	<s:Button x="220" y="330" label="Ok" click="onOk(event)" />
 	<s:Button x="310" y="330" label="Cancel" click="onCancel(event)" />
@@ -61,11 +68,24 @@ import utils.Utils;
 			_sampleHolder.addChild( _sample );
 		}
 		
-		public function Init( project:Project ): void
+		public function Init( project : Project ): void
 		{
 			_project = project;
 			
 			_tileSize = _project._data._tileSize;
+			
+			if ( project._data._slippingValue < 1 )
+			{
+				_slipping_0.selected = true;
+			}
+			else if ( project._data._slippingValue == 1 )
+			{
+				_slipping_1.selected = true;
+			}
+			else
+			{
+				_slipping_2.selected = true;
+			}
 			
 			Update();
 		}
@@ -167,6 +187,19 @@ import utils.Utils;
 		private function onOk( ... args ): void
 		{
 			_project._data._tileSize = _tileSize;
+			
+			if ( _slipping_0.selected )
+			{
+				_project._data._slippingValue = 0;
+			}
+			else if ( _slipping_1.selected )
+			{
+				_project._data._slippingValue = 1;
+			}
+			else
+			{
+				_project._data._slippingValue = 2;
+			}
 			
 			Destroy();
 		}

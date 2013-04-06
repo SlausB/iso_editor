@@ -72,7 +72,10 @@
 					<s:Button id="_reloadMapButton" x="640" y="4" label="Reload" toolTip="Recreate isometric objects accordingly last changes within templates and compounds" click="onReloadMap(event)" enabled="false" />
 					
 					<s:Label text="Strict move:" x="640" y="35" />
-					<s:CheckBox id="_strictMove" x="714" y="31" toolTip="Move units from tile to tile instead of ghost-like hovering if default surface was specified for that unit" />
+					<s:CheckBox id="_strictMove" x="714" y="31" toolTip="Move units from tile to tile passing around restricted surfaces nstead of ghost-like hovering." />
+					
+					<s:Label text="Stroll:" x="724" y="10" />
+					<s:CheckBox id="_stroll" x="763" y="6" toolTip="Allow units randomly walking around." selected="true" />
 				</s:BorderContainer>
 			</s:Group>
 			
@@ -1517,6 +1520,8 @@ import view.Projection;
 			{
 				return;
 			}
+			
+			_reloadMapButton.enabled = true;
 			
 			_isometry.displaying._unitsSpeed = parseFloat( _unitsSpeed.text );
 		}

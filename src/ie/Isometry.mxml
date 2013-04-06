@@ -227,7 +227,7 @@ import view.Projection;
 		}
 		
 		
-		private function AddUnit( unitDesc:UnitDesc ): void
+		private function AddUnit( unitDesc:UnitDesc, tileX : Number, tileY : Number ): void
 		{
 			var foundLayer:String = null;
 			for each ( var layer:Layer in _project._data._layers )
@@ -257,7 +257,7 @@ import view.Projection;
 			}
 			
 			var bliscUnit : BliscUnit = new BliscUnit( unitDesc._template, unit, _blisc, foundLayer );
-			unit.Init( bliscUnit );
+			unit.Init( bliscUnit, tileX, tileY );
 			_blisc.AddObject( bliscUnit );
 		}
 		
@@ -319,7 +319,7 @@ import view.Projection;
 				
 				for each ( var unitDesc:UnitDesc in units )
 				{
-					AddUnit( unitDesc );
+					AddUnit( unitDesc, 0, 0 );
 				}
 			}
 		}
@@ -495,7 +495,7 @@ import view.Projection;
 			
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 			{
-				AddUnit( event.dragSource.dataForFormat( Global.DRAG_FORMAG_UNIT_DESC ) as UnitDesc );
+				AddUnit( event.dragSource.dataForFormat( Global.DRAG_FORMAG_UNIT_DESC ) as UnitDesc, tileMousePos.x, tileMousePos.y );
 				return;
 			}
 			
@@ -746,24 +746,23 @@ import view.Projection;
 			}
 			else
 			{
-				//TODO:
-				var iso:Point = Utils.ToIso( globalX, globalY, new Point );
+				var iso : Point = Utils.ToIso( globalX, globalY, new Point );
 				
-				for each ( var isometryObject:IsometryObject in _isometryObjects )
+				for each ( var isometryObject : IsometryObject in _isometryObjects )
 				{
 					//unit:
-					var bliscCompound:BliscCompound = isometryObject._view as BliscCompound;
+					var bliscCompound : BliscCompound = isometryObject._view as BliscCompound;
 					if ( bliscCompound == null )
 					{
 						continue;
 					}
 					
-					var intersects:Boolean = false;
+					var intersects : Boolean = false;
 					
-					for each ( var bcwc:BliscComplexWithinCompound in bliscCompound._complexes )
+					for each ( var bcwc : BliscComplexWithinCompound in bliscCompound._complexes )
 					{
-						const x:Number = bcwc._complex._bdo.GetIsoX();
-						const y:Number = bcwc._complex._bdo.GetIsoY();
+						const x : Number = bcwc._complex._bdo.GetIsoX();
+						const y : Number = bcwc._complex._bdo.GetIsoY();
 						
 						for each ( var region:BliscRegionWithinComplex in bcwc._complex._template._regions )
 						{
@@ -773,7 +772,7 @@ import view.Projection;
 								continue;
 							}
 							
-							for each ( var tile:Point in region._tiles )
+							for each ( var tile : Point in region._tiles )
 							{
 								//left:
 								if ( iso.x >= ( x + tile.x * _project.side ) )
