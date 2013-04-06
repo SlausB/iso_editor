@@ -1,10 +1,9 @@
 ///@cond
 package  
 {
-	import blisc.BliscDisplayObject;
+	import blisc.core.BliscDisplayObject;
 	import flash.display.BitmapData;
 	import flash.display.BlendMode;
-	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;

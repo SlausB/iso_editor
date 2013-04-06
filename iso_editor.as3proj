@@ -16,8 +16,8 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="..\polosa\client\code\blisc" />
-    <class path="..\polosa\client\code\libs\utils" />
+    <class path="..\flash_libs\utils" />
+    <class path="..\blisc" />
   </classpaths>
   <!-- Build options -->
   <build>

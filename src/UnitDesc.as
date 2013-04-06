@@ -1,11 +1,8 @@
 ///@cond
 package  
 {
-	import blisc.BliscAnimation;
 	import blisc.templates.BliscUnitTemplate;
-	import iso.orient.Orientation;
 	import project_data.SingleResource;
-	import utils.Utils;
 	
 	///@endcond
 	

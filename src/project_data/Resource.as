@@ -1,8 +1,7 @@
 ///@cond
 package project_data
 {
-	import blisc.BliscAnimation;
-	import blisc.BliscSprite;
+	import blisc.core.BliscAnimation;
 	import blisc.templates.BliscUnitTemplate;
 	import blisc.templates.BliscUnitView;
 	import flash.display.FrameLabel;
@@ -10,28 +9,27 @@ package project_data
 	import flash.geom.Point;
 	import flash.system.ApplicationDomain;
 	import iso.orient.Orientation;
-	import org.osmf.layout.AnchorLayoutMetadata;
 	///@endcond
 	
 	/** SWF file with graphical resources.*/
 	public class Resource 
 	{
-		public var _path:String;
+		public var _path : String;
 		
-		public var _applicationDomain:ApplicationDomain;
+		public var _applicationDomain : ApplicationDomain;
 		
 		/** [ String ].*/
-		public var _names:Array;
+		public var _names : Array;
 		
 		/** The nominal frame rate, in frames per second, of the loaded SWF file. This
 		 * number is often an integer, but need not be.*/
-		public var _FPS:Number;
+		public var _FPS : Number;
 		
 		/** Recognized units' specifications.*/
-		public var _units:Vector.< UnitDesc > = new Vector.< UnitDesc >;
+		public var _units : Vector.< UnitDesc > = new Vector.< UnitDesc >;
 		
 		
-		public function Init( applicationDomain:ApplicationDomain, names:Array, FPS:Number, main:Main ): void
+		public function Init( applicationDomain : ApplicationDomain, names : Array, FPS : Number, main : Main ) : void
 		{
 			//dunno why but it's null while loading:
 			if ( _units == null )
@@ -97,7 +95,7 @@ package project_data
 					{
 						endingFrame = currentLabels[ currentLabelIndex + 1 ].frame;
 					}
-					var bliscAnimation:BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, new Point, name, frameLabel.frame, endingFrame );
+					var bliscAnimation : BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, new Point, name, frameLabel.frame, endingFrame );
 					unitDesc._template._views.push( new BliscUnitView( orientation, bliscAnimation ) );
 				}
 			}

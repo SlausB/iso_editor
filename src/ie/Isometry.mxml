@@ -17,22 +17,15 @@
 	
 	<fx:Script>
 		<![CDATA[
-import blisc.Blisc;
-import blisc.BliscAnimation;
-import blisc.BliscComplex;
-import blisc.BliscComplexTemplate;
-import blisc.BliscComplexWithinCompound;
-import blisc.BliscComplexWithinCompoundTemplate;
-import blisc.BliscCompound;
-import blisc.BliscCompoundTemplate;
-import blisc.BliscDisplayObject;
-import blisc.BliscObjectTemplate;
-import blisc.BliscRegion;
-import blisc.BliscRegionWithinComplex;
-import blisc.BliscSprite;
-import blisc.BliscTemplate;
-import blisc.BliscUnit;
+import blisc.core.Blisc;
+import blisc.instances.BliscComplex;
+import blisc.instances.BliscComplexWithinCompound;
+import blisc.instances.BliscCompound;
+import blisc.instances.BliscUnit;
 import blisc.pathfinding.AStar;
+import blisc.templates.BliscComplexTemplate;
+import blisc.templates.BliscRegion;
+import blisc.templates.BliscRegionWithinComplex;
 import blisc.templates.BliscUnitTemplate;
 import com.junkbyte.console.Cc;
 import flash.display.Bitmap;
@@ -68,50 +61,50 @@ import utils.Utils;
 import view.Projection;
 		
 		/** We can draw only on child objects - not upon SpriteVisualElement itself :( .*/
-		private var _bliscViewport:Sprite = new Sprite;
+		private var _bliscViewport : Sprite = new Sprite;
 		
-		public var _blisc:Blisc;
+		public var _blisc : Blisc;
 		
-		public var _isometryObjects:Vector.< IsometryObject > = new Vector.< IsometryObject >;
+		public var _isometryObjects : Vector.< IsometryObject > = new Vector.< IsometryObject >;
 		
 		/** Dirty (but only one known) way to handle viewport size changes.*/
-		private var _previousWidth:Number;
-		private var _previousHeight:Number;
+		private var _previousWidth : Number;
+		private var _previousHeight : Number;
 		
 		/** What is currently displayed.*/
-		private var _displaying:Map = null;
+		private var _displaying : Map = null;
 		
-		private var _project:Project;
-		private var _main:Main;
+		private var _project : Project;
+		private var _main : Main;
 		
-		private var _gridDrawer:GridDrawer = null;
+		private var _gridDrawer : GridDrawer = null;
 		
-		public var _objectTip:IToolTip = null;
+		public var _objectTip : IToolTip = null;
 		/** Object which is currently can be edited using "Instance properties" window.*/
-		public var _selected:IsometryObject = null;
+		public var _selected : IsometryObject = null;
 		/** Object which is currently under mouse (if isometry was in selecting mode).*/
-		public var _over:IsometryObject = null;
+		public var _over : IsometryObject = null;
 		
 		/** Arrow which must point to object adding position.*/
 		[ Embed( source = "../arrow-down-blue.png" ) ]
-		private var _pointerClass:Class;
-		private static const POINTER_X:Number = 18;
-		private static const POINTER_Y:Number = 35;
-		private var _pointer:DisplayObject;
+		private var _pointerClass : Class;
+		private static const POINTER_X : Number = 18;
+		private static const POINTER_Y : Number = 35;
+		private var _pointer : DisplayObject;
 		
 		/** Which object was dragged in last to position it again using "alt" key.*/
-		public var _lastPositioned:ObjectTemplate = null;
+		public var _lastPositioned : ObjectTemplate = null;
 		
 		/** How much pixels at the edge of isometric screen are sensitive for scrolling.*/
-		private static const SCROLL_FRAME:Number = 100;
+		private static const SCROLL_FRAME : Number = 100;
 		/** How much pixels scroll per second.*/
-		private static const SCROLL_SPEED:Number = 400;
+		private static const SCROLL_SPEED : Number = 400;
 		
 		private var _regionsCache : Vector.< BliscRegion > = new Vector.< BliscRegion >;
 		
 		
 		
-		public function HideTip(): void
+		public function HideTip() : void
 		{
 			if ( _objectTip != null )
 			{
@@ -119,13 +112,13 @@ import view.Projection;
 				_objectTip = null;
 			}
 		}
-		public function ShowTip( tip:IToolTip ): void
+		public function ShowTip( tip:IToolTip ) : void
 		{
 			HideTip();
 			_objectTip = tip;
 		}
 		
-		private function onInit( ... args ): void
+		private function onInit( ... args ) : void
 		{
 			addChild( _bliscViewport );
 			
@@ -281,7 +274,7 @@ import view.Projection;
 			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
 			
-			var bliscCompound:BliscCompound = IE_Utils.CreateBliscCompound( _regionsCache, isometryObject, _blisc, objectInstance._template, _project );
+			var bliscCompound : BliscCompound = IE_Utils.CreateBliscCompound( _regionsCache, isometryObject, _blisc, objectInstance._template, _project );
 			
 			isometryObject._view = bliscCompound;
 			
@@ -345,7 +338,7 @@ import view.Projection;
 			
 			//adding an ability to draw map's grid:
 			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
-			var drawerComplexTemplate:BliscComplexTemplate = new BliscComplexTemplate(
+			var drawerComplexTemplate : BliscComplexTemplate = new BliscComplexTemplate(
 				"grid_drawer",
 				null,
 				new Point,
@@ -358,7 +351,7 @@ import view.Projection;
 			_gridDrawer._layerId = GRID_DRAWER_LAYER_NAME;
 			drawerCompound._complexes[ 0 ]._complex = new BliscComplex( drawerComplexTemplate, _gridDrawer );
 			
-			for each ( var layer:Layer in _project._data._layers )
+			for each ( var layer : Layer in _project._data._layers )
 			{
 				_blisc.AddLayer( layer._name, layer._visible );
 				
@@ -370,14 +363,14 @@ import view.Projection;
 			
 			_blisc.AddObject( drawerCompound );
 			
-			for each ( var objectInstance:ObjectInstance in map._instances )
+			for each ( var objectInstance : ObjectInstance in map._instances )
 			{
 				AddObject( objectInstance );
 			}
 		}
 		
 		/** Remove currently displaying map (if there is such) and abandon it.*/
-		public function Unload(): void
+		public function Unload() : void
 		{
 			_main._mapPropertiesArea.enabled = false;
 			_main._isoTileX.text = _main._isoTileY.text = "N/A";

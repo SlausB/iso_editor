@@ -1,13 +1,11 @@
 ///@cond
 package  
 {
-	import blisc.BliscComplexWithinCompound;
-	import blisc.BliscCompound;
-	import blisc.BliscDisplayObject;
-	import blisc.BliscIsometric;
+	import blisc.core.BliscDisplayObject;
+	import blisc.instances.BliscComplexWithinCompound;
+	import blisc.instances.BliscCompound;
+	import blisc.instances.BliscIsometric;
 	import flash.filters.GlowFilter;
-	import ie.Isometry;
-	import mx.managers.ToolTipManager;
 	import project_data.ObjectInstance;
 	import view.View;
 	
@@ -26,7 +24,7 @@ package
 		private var _over:Boolean = false;
 		
 		
-		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view:BliscIsometric = null )
+		public function IsometryObject( objectInstance:ObjectInstance, main:Main, view : BliscIsometric = null )
 		{
 			_objectInstance = objectInstance;
 			_main = main;
@@ -153,7 +151,7 @@ package
 			}
 		}
 		
-		private function get bdo(): BliscDisplayObject
+		private function get bdo() : BliscDisplayObject
 		{
 			return _view.bdo;
 		}
@@ -162,9 +160,9 @@ package
 		{
 			_elapsed += elapsedSeconds;
 			
-			var compound:BliscCompound = _view as BliscCompound;
+			var compound : BliscCompound = _view as BliscCompound;
 			
-			for each ( var complexWithinCompound:BliscComplexWithinCompound in compound._complexes )
+			for each ( var complexWithinCompound : BliscComplexWithinCompound in compound._complexes )
 			{
 				complexWithinCompound._complex._bdo.Replicate( complexWithinCompound._template._complex._view.Resolve( _elapsed ) );
 			}

@@ -264,7 +264,6 @@
 	<fx:Script>
 		<![CDATA[
 import adobe.utils.CustomActions;
-import blisc.Blisc;
 import com.junkbyte.console.Cc;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
@@ -292,12 +291,7 @@ import flash.ui.ContextMenu;
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
 import ie.ConfirmationWindow;
-import ie.EditingLayerWindow;
 import ie.EditingMapWindow;
-import ie.EditingProjectWindow;
-import ie.EditingRegionWindow;
-import ie.EditingTemplateWindow;
-import ie.EditingUnitWindow;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
@@ -338,6 +332,11 @@ import spark.events.GridSelectionEvent;
 import spark.events.IndexChangeEvent;
 import spark.skins.spark.DefaultItemRenderer;
 import utils.Utils;
+import ie.EditingTemplateWindow;
+import ie.EditingLayerWindow;
+import ie.EditingProjectWindow;
+import ie.EditingUnitWindow;
+import ie.EditingRegionWindow;
 import view.Projection;
 
 		public var _projectPath:String = null;
@@ -356,7 +355,7 @@ import view.Projection;
 		public static var _clampTemplatesToTile:Boolean = false;
 		
 		/** Currently opened editing window if not null.*/
-		public var editingTemplateWindow:EditingTemplateWindow = null;
+		public var editingTemplateWindow : EditingTemplateWindow = null;
 		
 		/** Last chosen surface and space to prechoose it when window is displayed. Null if no such.*/
 		public var _lastSurface:Region = null;
@@ -971,7 +970,7 @@ import view.Projection;
 				switch ( singleLayerMenuEvent.item.id )
 				{
 					case "edit":
-						var editingLayerWindow:EditingLayerWindow = PopUpManager.createPopUp( thisOne, EditingLayerWindow, false ) as EditingLayerWindow;
+						var editingLayerWindow : EditingLayerWindow = PopUpManager.createPopUp( thisOne, EditingLayerWindow, false ) as EditingLayerWindow;
 						editingLayerWindow.Init( _project, layerListItem_withinMenu.layer, thisOne );
 						PopUpManager.centerPopUp( editingLayerWindow );
 						break;

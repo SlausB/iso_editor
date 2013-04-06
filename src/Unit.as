@@ -1,18 +1,15 @@
 ///@cond
 package
 {
-	import blisc.BliscCompound;
-	import blisc.BliscIsometric;
-	import blisc.BliscUnit;
+	import blisc.instances.BliscIsometric;
+	import blisc.instances.BliscUnit;
 	import blisc.pathfinding.AStarNode;
-	import blisc.templates.BliscUnitTemplate;
 	import blisc.unit_actions.MoveDirectly;
 	import blisc.unit_actions.MoveTiled;
 	import blisc.unit_actions.UnitAction;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import project_data.Map;
-	import project_data.ObjectInstance;
 	import utils.Utils;
 	
 	///@endcond
@@ -21,11 +18,11 @@ package
 	/** Random walking unit within isometry.*/
 	public class Unit extends IsometryObject
 	{
-		public var _unitDesc:UnitDesc;
+		public var _unitDesc : UnitDesc;
 		
-		private var _currentAction:UnitAction = null;
+		private var _currentAction : UnitAction = null;
 		
-		private var _isoDest:Point = new Point;
+		private var _isoDest : Point = new Point;
 		
 		
 		public function Unit( main:Main, unitDesc:UnitDesc )
