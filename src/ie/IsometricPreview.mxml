@@ -142,7 +142,7 @@ import project_data.ObjectTemplate;
 			_elapsed = 0;
 			var aStar : AStar = new AStar( 1, 1, 1, 1 );
 			_blisc = new Blisc( _view, null, width, height, 10000, 10000, 0, project.side, aStar );
-			for each ( var layer:Layer in project._data._layers )
+			for each ( var layer : Layer in project._data._layers )
 			{
 				_blisc.AddLayer( layer._name, true );
 			}

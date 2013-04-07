@@ -31,6 +31,9 @@
 		<s:RadioButton id="_slipping_2" groupName="slippingValue" label="2" toolTip="Can slip only if both of adjacent corners are empty. Realistic hardcore." />
 	</s:VGroup>
 	
+	<s:Label text="Sources generation directory:" x="180" y="180" toolTip="Directory where one or more source files will be generated for future usage within game." />
+	<s:TextInput x="180" y="198" id="_sourcesDirectory" width="200" />
+	
 	
 	<s:Button x="220" y="330" label="Ok" click="onOk(event)" />
 	<s:Button x="310" y="330" label="Cancel" click="onCancel(event)" />
@@ -86,6 +89,8 @@ import utils.Utils;
 			{
 				_slipping_2.selected = true;
 			}
+			
+			_sourcesDirectory.text = project._data._sourcesDirectory;
 			
 			Update();
 		}
@@ -200,6 +205,8 @@ import utils.Utils;
 			{
 				_project._data._slippingValue = 2;
 			}
+			
+			_project._data._sourcesDirectory = _sourcesDirectory.text;
 			
 			Destroy();
 		}

@@ -10,18 +10,18 @@ package project_data
 	public class RegionWithinComplex
 	{
 		/** Describing region.*/
-		public var _region:Region;
+		public var _region : Region;
 		
 		/** Relative tile coordinates of region's tiles.*/
-		public var _tiles:Vector.< Point > = new Vector.< Point >;
+		public var _tiles : Vector.< Point > = new Vector.< Point >;
 		
 		
-		public function Init( region:Region ): void
+		public function Init( region : Region ) : void
 		{
 			_region = region;
 		}
 		
-		public function Clone(): RegionWithinComplex
+		public function Clone() : RegionWithinComplex
 		{
 			var result:RegionWithinComplex = new RegionWithinComplex;
 			

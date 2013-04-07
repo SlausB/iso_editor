@@ -449,7 +449,7 @@ package
 			return _data._tileSize * Utils.TILE_SIDE;
 		}
 		
-		public function ResolveLayerIndex( layer:Layer ): int
+		public function ResolveLayerIndex( layer : Layer ): int
 		{
 			for ( var i:int = 0; i < _data._layers.length; ++i )
 			{

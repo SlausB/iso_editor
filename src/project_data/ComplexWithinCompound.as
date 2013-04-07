@@ -7,14 +7,14 @@ package project_data
 	/** Complex instance within compound object specification.*/
 	public class ComplexWithinCompound
 	{
-		public var _complex:ComplexTemplate;
+		public var _complex : ComplexTemplate;
 		
 		/** Tile (not physical) isometric displacement relative to compound coordinates.*/
-		public var _tileDispX:Number;
-		public var _tileDispY:Number;
+		public var _tileDispX : Number;
+		public var _tileDispY : Number;
 		
 		
-		public function Init( complex:ComplexTemplate, tileDispX:Number, tileDispY:Number ): void
+		public function Init( complex : ComplexTemplate, tileDispX : Number, tileDispY : Number ) : void
 		{
 			_complex = complex;
 			
@@ -22,7 +22,7 @@ package project_data
 			_tileDispY = tileDispY;
 		}
 		
-		public function Destroy(): void
+		public function Destroy() : void
 		{
 			_complex = null;
 		}

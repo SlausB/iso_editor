@@ -135,7 +135,7 @@ import utils.Utils;
 		private static const CENTER_DISP_X:Number = 10;
 		private static const CENTER_DISP_Y:Number = 31;
 		
-		private var _chosenLayer:Layer = null;
+		private var _chosenLayer : Layer = null;
 		
 		private var _regions:Vector.< RegionWithinComplex > = new Vector.< RegionWithinComplex >;
 		private var _editingSurface:RegionWithinComplex = null;

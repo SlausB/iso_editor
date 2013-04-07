@@ -19,6 +19,7 @@
 				<menuitem label="Open project..." id="open_project" />
 				<menuitem label="Save project" id="save_project" enabled="false" />
 				<menuitem label="Save project as..." id="save_project_as" />
+				<menuitem label="Generate sources" id="generate_sources" />
 			</menuitem>
 			
 			<menuitem label="Project" >
@@ -315,12 +316,14 @@ import mx.managers.DragManager;
 import mx.managers.PopUpManager;
 import org.osmf.media.LoadableElementBase;
 import project_data.ComplexTemplate;
+import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
 import project_data.Layer;
 import project_data.Map;
 import project_data.ObjectInstance;
 import project_data.ObjectTemplate;
 import project_data.Region;
+import project_data.RegionWithinComplex;
 import project_data.Resource;
 import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
@@ -1263,6 +1266,10 @@ import view.Projection;
 					savingAsFile.browse();
 					break;
 				
+				case "generate_sources":
+					GenerateSources();
+					break;
+				
 				
 				///PROJECT:
 				
@@ -1279,6 +1286,287 @@ import view.Projection;
 					PopUp( "Isometric editor as part of \"Blisc\" engine. If you have any suggestions or issues please contact SlavMFM@gmail.com", POP_UP_INFO );
 					break;
 			}
+		}
+		
+		private function GenerateSources() : void
+		{
+			if ( _project._data._sourcesDirectory.length <= 0 )
+			{
+				PopUp( "Specify sources folder within project editing window first.", POP_UP_ERROR );
+				return;
+			}
+			
+			//only this way (creating new File object from applicationDirectory.nativePath) allows to navigate from application directory somewhere (otherwise call to createDirectory() thrown SecurityError exception):
+			var directory : File = new File ( File.applicationDirectory.nativePath );
+			directory = directory.resolvePath( _project._data._sourcesDirectory );
+			directory.createDirectory();
+			
+			var resourcesFile : File = directory.resolvePath( "Resources.as" );
+			var rs : FileStream = new FileStream;
+			rs.open( resourcesFile, FileMode.WRITE );
+			
+			rs.writeUTFBytes( "///@cond\n" );
+			rs.writeUTFBytes( "package\n" );
+			rs.writeUTFBytes( "{\n" );
+			rs.writeUTFBytes( "	import flash.display.Loader;\n" );
+			rs.writeUTFBytes( "	import flash.display.LoaderInfo;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscLayerTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscRegion;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscObjectTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscMapTemplate;\n" );
+			rs.writeUTFBytes( "	import flash.geom.Point;\n" );
+			rs.writeUTFBytes( "	import flash.display.MovieClip;\n" );
+			rs.writeUTFBytes( "	import blisc.core.BliscAnimation;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscComplexTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscRegionWithinComplex;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscCompoundTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscComplexWithinCompoundTemplate;\n" );
+			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscObjectInstanceTemplate;\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	///@endcond\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	public class Resources\n" );
+			rs.writeUTFBytes( "	{\n" );
+			//layers:
+			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
+			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//regions:
+			rs.writeUTFBytes( "		public var _regions : Vector.< BliscRegion > = new Vector.< BliscRegion >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//complexes and compounds:
+			rs.writeUTFBytes( "		public var _objects : Vector.< BliscObjectTemplate > = new Vector.< BliscObjectTemplate >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//maps:
+			rs.writeUTFBytes( "		public var _maps : Vector.< BliscMapTemplate > = new Vector.< BliscMapTemplate >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//embedding resources:
+			for ( var declaringIndex : int = 0; declaringIndex < _project._data._resources.length; ++declaringIndex )
+			{
+				var declaringResource : Resource = _project._data._resources[ declaringIndex ];
+				var declaringResourceFile : File = new File( File.applicationDirectory.nativePath );
+				declaringResourceFile = declaringResourceFile.resolvePath( declaringResource._path );
+				
+				var embeddingPath : String = directory.getRelativePath( declaringResourceFile, true );
+				rs.writeUTFBytes( "		[ Embed( source = \"" + embeddingPath + "\" ) ]\n" );
+				rs.writeUTFBytes( "		private var _" + declaringIndex.toString() + " : Class;\n" );
+				rs.writeUTFBytes( "		\n" );
+			}
+			rs.writeUTFBytes( "		\n" );
+			//array holding all embedded resources:
+			rs.writeUTFBytes( "		private var _allEmbeddedResources : Vector.< EmbeddedResource > = new Vector.< EmbeddedResource >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//loaded resources counter:
+			rs.writeUTFBytes( "		private var _leftResources : int = " + _project._data._resources.length.toString() + ";\n" );
+			rs.writeUTFBytes( "		\n" );
+			rs.writeUTFBytes( "		\n" );
+			//constructor:
+			rs.writeUTFBytes( "		/** .\n" );
+			rs.writeUTFBytes( "		\param onReady function() : void Called when all resources are loaded.\n" );
+			rs.writeUTFBytes( "		*/\n" );
+			rs.writeUTFBytes( "		public function Resources( onReady : Function )\n" );
+			rs.writeUTFBytes( "		{\n" );
+			//resource loading function:
+			rs.writeUTFBytes( "			function OnResourceLoaded() : void\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				--_leftResources;\n" );
+			rs.writeUTFBytes( "				if ( _leftResources <= 0 )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					InitTemplates( onReady );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			for ( var instantiatingIndex : int = 0; instantiatingIndex < _project._data._resources.length; ++instantiatingIndex )
+			{
+				rs.writeUTFBytes( "			_allEmbeddedResources.push( new EmbeddedResource( \"" + _project._data._resources[ instantiatingIndex ]._path + "\", _" + instantiatingIndex.toString() + ", OnResourceLoaded ) );\n" );
+			}
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//graphics resolving function:
+			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String, center : Point ) : BliscAnimation\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				if ( embeddedResource._editorsPath == editorsPath )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					var found : MovieClip;\n" );
+			rs.writeUTFBytes( "					try\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						found = new ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as MovieClip;\n" );
+			rs.writeUTFBytes( "					}\n" )
+			rs.writeUTFBytes( "					catch( e : Error )\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + editorsPath + \"\\\". Returning null.\" );\n" );
+			rs.writeUTFBytes( "						return null;\n" );
+			rs.writeUTFBytes( "					}\n" );
+			rs.writeUTFBytes( "					\n" );
+			rs.writeUTFBytes( "					if ( found == null )\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + editorsPath + \"\\\" is NOT of type MovieClip. Returning null.\" );\n" );
+			rs.writeUTFBytes( "						return null;\n" );
+			rs.writeUTFBytes( "					}\n" );
+			rs.writeUTFBytes( "					\n" );
+			rs.writeUTFBytes( "					return BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, center, name );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			return null;\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//templates initing function:
+			rs.writeUTFBytes( "		private function InitTemplates( onReady : Function ) : void\n" );
+			rs.writeUTFBytes( "		{\n" );
+			//layers:
+			for ( var layerIndex : int = 0; layerIndex < _project._data._layers.length; ++layerIndex )
+			{
+				rs.writeUTFBytes( "			_layers.push( new BliscLayerTemplate( \"" + _project._data._layers[ layerIndex ]._name + "\", " + _project._data._layers[ layerIndex ]._units.toString() + " ) );\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			//regions:
+			for ( var regionIndex : int = 0; regionIndex < _project._data._regions.length; ++regionIndex )
+			{
+				rs.writeUTFBytes( "			_regions.push( new BliscRegion( \"" + _project._data._regions[ regionIndex ]._name + "\", " + _project._data._regions[ regionIndex ]._type.toString() + ", 0x" + _project._data._regions[ regionIndex ]._color.toString( 16 ) + " ) )\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			//complexes:
+			for ( var complexIndex : int = 0; complexIndex < _project._data._objects.length; ++complexIndex )
+			{
+				var complex : ComplexTemplate = _project._data._objects[ complexIndex ] as ComplexTemplate;
+				if ( complex == null )
+				{
+					//will be added later as compound:
+					rs.writeUTFBytes( "			_objects.push( null );\n" );
+					continue;
+				}
+				
+				var regionsString : String = "new < BliscRegionWithinComplex >[ ";
+				for ( var regionWithinComplexIndex : int = 0; regionWithinComplexIndex < complex._regions.length; ++regionWithinComplexIndex )
+				{
+					var regionWithinComplex : RegionWithinComplex = complex._regions[ regionWithinComplexIndex ];
+					
+					if ( regionWithinComplexIndex > 0 )
+					{
+						regionsString = regionsString + ", ";
+					}
+					
+					var tilesString : String = "new < Point >[ ";
+					for ( var tileWithinRegionIndex : int = 0; tileWithinRegionIndex < regionWithinComplex._tiles.length; ++tileWithinRegionIndex )
+					{
+						if ( tileWithinRegionIndex > 0 )
+						{
+							tilesString = tilesString + ", ";
+						}
+						
+						tilesString = tilesString + "new Point( " + regionWithinComplex._tiles[ tileWithinRegionIndex ].x.toString() + ", " + regionWithinComplex._tiles[ tileWithinRegionIndex ].y.toString() + " )";
+					}
+					tilesString = tilesString + " ]";
+					
+					regionsString = regionsString + "new BliscRegionWithinComplex( _regions[ " + _project._data._regions.indexOf( regionWithinComplex._region ).toString() + " ], " + tilesString + " )";
+				}
+				regionsString = regionsString + " ]";
+				
+				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\", new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ) ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + " ) );\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			//compounds:
+			for ( var compoundIndex : int = 0; compoundIndex < _project._data._objects.length; ++compoundIndex )
+			{
+				var compound : CompoundTemplate = _project._data._objects[ compoundIndex ] as CompoundTemplate;
+				if ( compound == null )
+				{
+					continue;
+				}
+				
+				var compoundConsistingString : String = "new < BliscComplexWithinCompoundTemplate >[ ";
+				for ( var compoundConsistingIndex : int = 0; compoundConsistingIndex < compound._consisting.length; ++compoundConsistingIndex )
+				{
+					var compoundConsisting : ComplexWithinCompound = compound._consisting[ compoundConsistingIndex ];
+					
+					if ( compoundConsistingIndex > 0 )
+					{
+						compoundConsistingString = compoundConsistingString + ", ";
+					}
+					
+					compoundConsistingString = compoundConsistingString + "new BliscComplexWithinCompoundTemplate( _objects[ " + _project._data._objects.indexOf( compoundConsisting._complex ).toString() + " ] as BliscComplexTemplate, new Point( " + compoundConsisting._tileDispX.toString() + ", " + compoundConsisting._tileDispY.toString() + " ) )";
+				}
+				compoundConsistingString = compoundConsistingString + " ]";
+				
+				rs.writeUTFBytes( "			_objects[ " + compoundIndex.toString() + " ] = new BliscCompoundTemplate( \"" + compound._name + "\", " + compoundConsistingString + " );\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			//maps:
+			for ( var mapIndex : int = 0; mapIndex < _project._data._maps.length; ++mapIndex )
+			{
+				var map : Map = _project._data._maps[ mapIndex ];
+				
+				var mapObjectsString : String = "new < BliscObjectInstanceTemplate >[ ";
+				for ( var mapObjectIndex : int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
+				{
+					var mapObjectInstance : ObjectInstance = map._instances[ mapObjectIndex ];
+					
+					if ( mapObjectIndex > 0 )
+					{
+						mapObjectsString = mapObjectsString + ", ";
+					}
+					
+					mapObjectsString = mapObjectsString + "new BliscObjectInstanceTemplate( _objects[ " + _project._data._objects.indexOf( mapObjectInstance._template ).toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) )";
+				}
+				mapObjectsString = mapObjectsString + " ]";
+				
+				rs.writeUTFBytes( "			_maps.push( new BliscMapTemplate( \"" + map._name + "\", " + map._right.toString() + ", " + map._down.toString() + ", " + mapObjectsString + " ) );\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			
+			rs.writeUTFBytes( "			onReady();\n" );
+			
+			rs.writeUTFBytes( "		}\n" );
+			
+			rs.writeUTFBytes( "	}\n" );
+			
+			rs.writeUTFBytes( "}\n" );
+			
+			//EmbeddedResource:
+			rs.writeUTFBytes( "\n" );
+			rs.writeUTFBytes( "import mx.core.MovieClipAsset;\n" );
+			rs.writeUTFBytes( "import flash.system.ApplicationDomain;\n" );
+			rs.writeUTFBytes( "import flash.events.Event;\n" );
+			rs.writeUTFBytes( "import flash.display.LoaderInfo;\n" );
+			rs.writeUTFBytes( "import flash.display.Loader;\n" );
+			rs.writeUTFBytes( "\n" );
+			rs.writeUTFBytes( "class EmbeddedResource\n" );
+			rs.writeUTFBytes( "{\n" );
+			rs.writeUTFBytes( "	public var _editorsPath : String;\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	public var _applicationDomain : ApplicationDomain;\n" );
+			rs.writeUTFBytes( "	public var _frameRate : Number;\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	public function EmbeddedResource( editorsPath : String, swf : Class, onLoaded : Function )\n" );
+			rs.writeUTFBytes( "	{\n" );
+			rs.writeUTFBytes( "		_editorsPath = editorsPath;\n" );
+			rs.writeUTFBytes( "		\n" );
+			rs.writeUTFBytes( "		var mca : MovieClipAsset = new swf;\n" );
+			rs.writeUTFBytes( "		var loader : Loader = Loader( mca.getChildAt( 0 ) );\n" );
+			rs.writeUTFBytes( "		loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function( event : Event ) : void\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			var info : LoaderInfo = LoaderInfo( event.target );\n" );
+			rs.writeUTFBytes( "			_applicationDomain = info.applicationDomain;\n" );
+			rs.writeUTFBytes( "			_frameRate = info.frameRate;\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			onLoaded();\n" );
+			rs.writeUTFBytes( "		} );\n" );
+			rs.writeUTFBytes( "	}\n" );
+			rs.writeUTFBytes( "}\n" );
+			rs.writeUTFBytes( "\n" );
+			rs.writeUTFBytes( "\n" );
+			
+			rs.close();
+			
+			
+			PopUp( "Resources successfully generated.", POP_UP_INFO );
 		}
 		
 		private function set projectPath( value:String ): void
@@ -1349,7 +1637,7 @@ import view.Projection;
 			
 			for ( var i:int = 0; i < _project._data._layers.length; ++i )
 			{
-				var layer:Layer = _project._data._layers[ i ];
+				var layer : Layer = _project._data._layers[ i ];
 				_layers_list_data_provider.addItem( new LayerListItem( layer._name, layer, i ) );
 			}
 		}

@@ -220,10 +220,10 @@ import view.Projection;
 		}
 		
 		
-		private function AddUnit( unitDesc:UnitDesc, tileX : Number, tileY : Number ): void
+		private function AddUnit( unitDesc : UnitDesc, tileX : Number, tileY : Number ): void
 		{
-			var foundLayer:String = null;
-			for each ( var layer:Layer in _project._data._layers )
+			var foundLayer : String = null;
+			for each ( var layer : Layer in _project._data._layers )
 			{
 				if ( layer._units )
 				{

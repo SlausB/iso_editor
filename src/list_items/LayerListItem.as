@@ -13,7 +13,7 @@ package list_items
 		private var _index:int;
 		
 		
-		public function LayerListItem( label:String, layer:Layer, index:int ) 
+		public function LayerListItem( label : String, layer : Layer, index : int ) 
 		{
 			_label = label;
 			_layer = layer;

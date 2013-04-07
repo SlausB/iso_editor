@@ -29,12 +29,12 @@ import list_items.LayerListItem;
 import mx.managers.PopUpManager;
 import project_data.Layer;
 		
-		private var _project:Project;
-		private var _layer:Layer;
-		private var _main:Main;
+		private var _project : Project;
+		private var _main : Main;
+		private var _layer : Layer;
 		
 		
-		public function Init( project:Project, layer:Layer, main:Main ): void
+		public function Init( project : Project, layer : Layer, main : Main ): void
 		{
 			closeButton.visible = false;
 			

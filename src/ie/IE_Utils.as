@@ -78,9 +78,8 @@ package ie
 				{
 					complexes.push( new BliscComplexWithinCompoundTemplate(
 						ComplexTemplateToBlisc( regionsCache, complexWithinCompound._complex, project ),
-						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ),
-						Utils.FromIso( complexWithinCompound._tileDispX * project.side, complexWithinCompound._tileDispY * project.side, new Point )
-					) );
+						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ) )
+					);
 				}
 				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
 			}

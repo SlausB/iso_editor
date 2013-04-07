@@ -7,7 +7,7 @@ package project_data
 	/** Consisting of multiple complexes.*/
 	public class CompoundTemplate extends ObjectTemplate
 	{
-		public var _consisting:Vector.< ComplexWithinCompound > = new Vector.< ComplexWithinCompound >;
+		public var _consisting : Vector.< ComplexWithinCompound > = new Vector.< ComplexWithinCompound >;
 	}
 
 }
