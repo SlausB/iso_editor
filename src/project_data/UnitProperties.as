@@ -9,16 +9,16 @@ package project_data
 	public class UnitProperties
 	{
 		/** Unit's resource name. Yes - multiple units can have similar name - designer's drawback.*/
-		public var _unit:String;
+		public var _unit : String;
 		
 		/** Archaic field to avoid AMF loading errors/warning. Used to store chosen default region. Null if wasn't yet.*/
-		public var _region:Region = null;
+		public var _region : Region = null;
 		
 		/** Surfaces designer managed to choose for this unit - where he is walking on.*/
 		public var _surfaces : Vector.< Region > = new Vector.< Region >;
 		
 		
-		public function Init( unit:String ): void
+		public function Init( unit : String ) : void
 		{
 			_unit = unit;
 		}

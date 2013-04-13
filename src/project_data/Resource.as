@@ -44,7 +44,7 @@ package project_data
 			_FPS = FPS;
 			
 			//recognizing units:
-			for each ( var name:String in _names )
+			for each ( var name : String in _names )
 			{
 				var parts:Array = name.split( "_" );
 				//units must start with "unit_" and be like "unit_move_name":
@@ -53,17 +53,17 @@ package project_data
 					continue;
 				}
 				
-				var unitGraphics:MovieClip = ( new ( _applicationDomain.getDefinition( name ) as Class ) ) as MovieClip;
+				var unitGraphics : MovieClip = ( new ( _applicationDomain.getDefinition( name ) as Class ) ) as MovieClip;
 				if ( unitGraphics == null )
 				{
 					continue;
 				}
 				
 				
-				var currentLabels:Array = unitGraphics.currentLabels;
+				var currentLabels : Array = unitGraphics.currentLabels;
 				
 				//remove all labels which doesn't display any orientation:
-				for ( var splicingLabelIndex:int = 0; splicingLabelIndex < currentLabels.length; ++splicingLabelIndex )
+				for ( var splicingLabelIndex : int = 0; splicingLabelIndex < currentLabels.length; ++splicingLabelIndex )
 				{
 					if ( Orientation.ToInt( currentLabels[ splicingLabelIndex ].name ) == Orientation.U )
 					{
@@ -80,21 +80,24 @@ package project_data
 				
 				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( name );
 				
-				var unitsSingleResource:SingleResource = new SingleResource;
+				var unitsSingleResource : SingleResource = new SingleResource;
 				unitsSingleResource.Init( _path, name );
 				
-				var unitDesc:UnitDesc = new UnitDesc( bliscUnitTemplate, unitsSingleResource );
+				var unitDesc : UnitDesc = new UnitDesc( bliscUnitTemplate, unitsSingleResource );
 				_units.push( unitDesc );
 				
-				for ( var currentLabelIndex:int = 0; currentLabelIndex < currentLabels.length; ++currentLabelIndex )
+				for ( var currentLabelIndex : int = 0; currentLabelIndex < currentLabels.length; ++currentLabelIndex )
 				{
-					var frameLabel:FrameLabel = currentLabels[ currentLabelIndex ] as FrameLabel;
-					var orientation:int = Orientation.ToInt( frameLabel.name );
-					var endingFrame:int = int.MAX_VALUE;
+					var frameLabel : FrameLabel = currentLabels[ currentLabelIndex ] as FrameLabel;
+					var orientation : int = Orientation.ToInt( frameLabel.name );
+					var endingFrame : int = int.MAX_VALUE;
 					if ( ( currentLabelIndex + 1 ) < currentLabels.length )
 					{
 						endingFrame = currentLabels[ currentLabelIndex + 1 ].frame;
 					}
+					
+					unitDesc._orientations.push( new UnitOrientation( frameLabel.frame, endingFrame, orientation ) );
+					
 					var bliscAnimation : BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, new Point, name, frameLabel.frame, endingFrame );
 					unitDesc._template._views.push( new BliscUnitView( orientation, bliscAnimation ) );
 				}

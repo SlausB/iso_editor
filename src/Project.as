@@ -465,9 +465,9 @@ package
 		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.
 		\param create True if need to create and add new one if wasn't found.
 		*/
-		public function FindUnitProperties( unitDesc:UnitDesc, create : Boolean ): UnitProperties
+		public function FindUnitProperties( unitDesc : UnitDesc, create : Boolean ): UnitProperties
 		{
-			for each ( var unitProperties:UnitProperties in _data._unitProperties )
+			for each ( var unitProperties : UnitProperties in _data._unitProperties )
 			{
 				if ( unitProperties._unit == unitDesc._template._name )
 				{

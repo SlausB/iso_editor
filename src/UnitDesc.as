@@ -11,8 +11,11 @@ package
 	{
 		public var _template : BliscUnitTemplate;
 		
-		/** Just to represent it somehow while dragging from list view to isometry.*/
-		public var _singleResource:SingleResource;
+		/** To represent it somehow while dragging from list view to isometry and generate Resources file.*/
+		public var _singleResource : SingleResource;
+		
+		/** In the same order how views was specified within _template.*/
+		public var _orientations : Vector.< UnitOrientation > = new Vector.< UnitOrientation >;
 		
 		
 		public function UnitDesc( template : BliscUnitTemplate, singleResource : SingleResource )

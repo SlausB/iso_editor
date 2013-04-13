@@ -265,6 +265,8 @@
 	<fx:Script>
 		<![CDATA[
 import adobe.utils.CustomActions;
+import blisc.templates.BliscRegion;
+import blisc.templates.BliscUnitView;
 import com.junkbyte.console.Cc;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
@@ -325,6 +327,7 @@ import project_data.ObjectTemplate;
 import project_data.Region;
 import project_data.RegionWithinComplex;
 import project_data.Resource;
+import project_data.UnitProperties;
 import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
 import spark.components.gridClasses.GridItemRenderer;
@@ -1321,6 +1324,7 @@ import view.Projection;
 			rs.writeUTFBytes( "	import blisc.templates.BliscRegionWithinComplex;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscCompoundTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscComplexWithinCompoundTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscUnitTemplate;\n" );
 			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscObjectInstanceTemplate;\n" );
 			rs.writeUTFBytes( "	\n" );
@@ -1328,6 +1332,12 @@ import view.Projection;
 			rs.writeUTFBytes( "	\n" );
 			rs.writeUTFBytes( "	public class Resources\n" );
 			rs.writeUTFBytes( "	{\n" );
+			//global properties:
+			rs.writeUTFBytes( "		/** Distance from tile's center to east side.*/\n" );
+			rs.writeUTFBytes( "		public static const TILE_SIZE : Number = " + _project._data._tileSize.toString() + ";\n" );
+			rs.writeUTFBytes( "		/** Distance from tile's north side to east.*/\n" );
+			rs.writeUTFBytes( "		public static const TILE_SIDE : Number = " + _project.side.toString() + ";\n" );
+			rs.writeUTFBytes( "		\n" );
 			//layers:
 			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
 			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
@@ -1337,6 +1347,9 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			//complexes and compounds:
 			rs.writeUTFBytes( "		public var _objects : Vector.< BliscObjectTemplate > = new Vector.< BliscObjectTemplate >;\n" );
+			rs.writeUTFBytes( "		\n" );
+			//units:
+			rs.writeUTFBytes( "		public var _units : Vector.< BliscUnitTemplate > = new Vector.< BliscUnitTemplate >;\n" );
 			rs.writeUTFBytes( "		\n" );
 			//maps:
 			rs.writeUTFBytes( "		public var _maps : Vector.< BliscMapTemplate > = new Vector.< BliscMapTemplate >;\n" );
@@ -1385,7 +1398,7 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			
 			//graphics resolving function:
-			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String, center : Point ) : BliscAnimation\n" );
+			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String, center : Point, startingFrame : int = 0, endingFrame : int = int.MAX_VALUE ) : BliscAnimation\n" );
 			rs.writeUTFBytes( "		{\n" );
 			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
 			rs.writeUTFBytes( "			{\n" );
@@ -1408,7 +1421,7 @@ import view.Projection;
 			rs.writeUTFBytes( "						return null;\n" );
 			rs.writeUTFBytes( "					}\n" );
 			rs.writeUTFBytes( "					\n" );
-			rs.writeUTFBytes( "					return BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, center, name );\n" );
+			rs.writeUTFBytes( "					return BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, center, name, startingFrame, endingFrame );\n" );
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			\n" );
@@ -1495,6 +1508,47 @@ import view.Projection;
 				compoundConsistingString = compoundConsistingString + " ]";
 				
 				rs.writeUTFBytes( "			_objects[ " + compoundIndex.toString() + " ] = new BliscCompoundTemplate( \"" + compound._name + "\", " + compoundConsistingString + " );\n" );
+			}
+			rs.writeUTFBytes( "			\n" );
+			//units:
+			for each ( var resourceWithUnits : Resource in _project._data._resources )
+			{
+				for ( var unitDesc : UnitDesc in resourceWithUnits._units )
+				{
+					var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
+					
+					var unitSurfacesString : String = "new < BliscRegion >[ ";
+					for ( var surfaceWithinUnitIndex : int = 0; surfaceWithinUnitIndex < unitProperties._surfaces.length; ++surfaceWithinUnitIndex )
+					{
+						var surfaceWithinUnit : Region = unitProperties._surfaces[ regionWithinComplexIndex ];
+						
+						if ( surfaceWithinUnitIndex > 0 )
+						{
+							unitSurfacesString = unitSurfacesString + ", ";
+						}
+						
+						//regions must be written in the same order as they are presented:
+						unitSurfacesString = unitSurfacesString + "_regions[ " + _project._data._regions.indexOf( surfaceWithinUnit ).toString() + " ]";
+					}
+					unitSurfacesString = unitSurfacesString + " ]";
+					
+					var unitViewsString : String = "new < BliscUnitView >[ ";
+					for ( var unitViewIndex : int = 0; unitViewIndex < unitDesc._template._views.length; ++unitViewIndex )
+					{
+						var unitView : BliscUnitView = unitDesc._template._views[ unitViewIndex ];
+						var unitViewOrientation : UnitOrientation = unitDesc._orientations[ unitViewIndex ];
+						
+						if ( unitViewIndex > 0 )
+						{
+							unitViewsString = unitViewsString + ", ";
+						}
+						
+						unitViewsString = unitViewsString + "new BliscUnitView( " + unitViewOrientation._orientation.toString() + ", ResolveGraphics( \"" + unitDesc._singleResource._name + "\", \"" + unitDesc._singleResource._resourcePath + "\", new Point, " + unitViewOrientation._startingFrame.toString() + ", " + unitViewOrientation._endingFrame.toString() + " ) )";
+					}
+					unitViewsString = unitViewsString + " ]";
+					
+					rs.writeUTFBytes( "			_units.push( new BliscUnitTemplate( \"" + unitDesc._template._name + "\", \"" + unitDesc._template._animation + "\", " + unitSurfacesString + ", " + unitViewsString + " ) );\n" );
+				}
 			}
 			rs.writeUTFBytes( "			\n" );
 			//maps:
