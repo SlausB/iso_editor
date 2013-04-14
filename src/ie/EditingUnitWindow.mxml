@@ -47,7 +47,7 @@ import project_data.UnitProperties;
 			_unit = unit;
 			_main = main;
 			
-			_name.text = unit._template._name;
+			_name.text = unit._singleResource._name;
 			
 			_unitProperties = project.FindUnitProperties( unit, true );
 			

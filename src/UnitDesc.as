@@ -1,5 +1,5 @@
 ///@cond
-package  
+package
 {
 	import blisc.templates.BliscUnitTemplate;
 	import project_data.SingleResource;
@@ -7,7 +7,7 @@ package
 	///@endcond
 	
 	/** Formed description of identified unit.*/
-	public class UnitDesc 
+	public class UnitDesc
 	{
 		public var _template : BliscUnitTemplate;
 		

@@ -1327,6 +1327,7 @@ import view.Projection;
 			rs.writeUTFBytes( "	import blisc.templates.BliscUnitTemplate;\n" );
 			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscObjectInstanceTemplate;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscUnitView;\n" );
 			rs.writeUTFBytes( "	\n" );
 			rs.writeUTFBytes( "	///@endcond\n" );
 			rs.writeUTFBytes( "	\n" );
@@ -1513,14 +1514,14 @@ import view.Projection;
 			//units:
 			for each ( var resourceWithUnits : Resource in _project._data._resources )
 			{
-				for ( var unitDesc : UnitDesc in resourceWithUnits._units )
+				for each ( var unitDesc : UnitDesc in resourceWithUnits._units )
 				{
 					var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
 					
 					var unitSurfacesString : String = "new < BliscRegion >[ ";
 					for ( var surfaceWithinUnitIndex : int = 0; surfaceWithinUnitIndex < unitProperties._surfaces.length; ++surfaceWithinUnitIndex )
 					{
-						var surfaceWithinUnit : Region = unitProperties._surfaces[ regionWithinComplexIndex ];
+						var surfaceWithinUnit : Region = unitProperties._surfaces[ surfaceWithinUnitIndex ];
 						
 						if ( surfaceWithinUnitIndex > 0 )
 						{

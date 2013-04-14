@@ -1,35 +1,29 @@
 ///@cond
-package list_items 
+package list_items
 {
 	///@endcond
 	
 	
 	public class UnitListItem
 	{
-		private var _label:String;
-		private var _unit:UnitDesc;
+		private var _unit : UnitDesc;
 		
 		
-		public function UnitListItem( label:String, unit:UnitDesc )
+		public function UnitListItem( unit : UnitDesc )
 		{
-			_label = label;
 			_unit = unit;
 		}
 		
-		public function set label( value:String ): void
+		public function get label() : String
 		{
-			_label = value;
-		}
-		public function get label(): String
-		{
-			return _label;
+			return unit._singleResource._name;
 		}
 		
-		public function set unit( value:UnitDesc ): void
+		public function set unit( value : UnitDesc ) : void
 		{
 			_unit = value;
 		}
-		public function get unit(): UnitDesc
+		public function get unit() : UnitDesc
 		{
 			return _unit;
 		}

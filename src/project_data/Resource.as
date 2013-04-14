@@ -2,6 +2,7 @@
 package project_data
 {
 	import blisc.core.BliscAnimation;
+	import blisc.templates.BliscRegion;
 	import blisc.templates.BliscUnitTemplate;
 	import blisc.templates.BliscUnitView;
 	import flash.display.FrameLabel;
@@ -46,7 +47,7 @@ package project_data
 			//recognizing units:
 			for each ( var name : String in _names )
 			{
-				var parts:Array = name.split( "_" );
+				var parts : Array = name.split( "_" );
 				//units must start with "unit_" and be like "unit_move_name":
 				if ( parts.length < 3 || parts[ 0 ] != "unit" )
 				{
@@ -78,7 +79,13 @@ package project_data
 					continue;
 				}
 				
-				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( name );
+				//sadly, sometimes units are named something like "water_spirit" which breaks it as well:
+				var unitName : String = parts[ 2 ];
+				for ( var namePart : int = 3; namePart < parts.length; ++namePart )
+				{
+					unitName = unitName + "_" + parts[ namePart ];
+				}
+				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( unitName, parts[ 1 ], new Vector.< BliscRegion >, new Vector.< BliscUnitView > );
 				
 				var unitsSingleResource : SingleResource = new SingleResource;
 				unitsSingleResource.Init( _path, name );

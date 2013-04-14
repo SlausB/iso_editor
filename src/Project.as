@@ -405,13 +405,13 @@ package
 		{
 			_main._resources_list_data_provider.addItem( new ResourceListItem( resource._path, resource ) );
 			
-			for each ( var unitDesc:UnitDesc in resource._units )
+			for each ( var unitDesc : UnitDesc in resource._units )
 			{
-				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc._template._name, unitDesc ) );
+				_main._units_list_data_provider.addItem( new UnitListItem( unitDesc ) );
 			}
 		}
 		
-		public function AddObjectTemplate( template:ObjectTemplate ): void
+		public function AddObjectTemplate( template : ObjectTemplate ) : void
 		{
 			_data._objects.push( template );
 			
