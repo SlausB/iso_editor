@@ -39,7 +39,7 @@ package
 			_project = project;
 		}
 		
-		override public function draw( canvas:BitmapData, mouseCanvas:BitmapData, cameraX:Number, cameraY:Number, mouseCullX:int, mouseCullY:int, mouseCullX2:int, mouseCullY2:int, zoom:Number ) :void
+		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number ) :void
 		{
 			if ( _viewportWidth == 0 || _viewportHeight == 0 )
 			{

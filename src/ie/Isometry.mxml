@@ -557,12 +557,12 @@ import view.Projection;
 		
 		
 		/** Object which was captured to drag.*/
-		private var _dragging:IsometryObject = null;
+		private var _dragging : IsometryObject = null;
 		/** Did any mouse movement happened after mouse was pushed down.*/
-		private var _wasDrag:Boolean = false;
+		private var _wasDrag : Boolean = false;
 		/** Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
-		private var _isDragging:Point = null;
-		private function GetObj( e:MouseEvent, local:Point = null ): IsometryObject
+		private var _isDragging : Point = null;
+		private function GetObj( e : MouseEvent, local : Point = null ) : IsometryObject
 		{
 			if ( _blisc == null )
 			{
@@ -573,9 +573,16 @@ import view.Projection;
 			{
 				local = globalToLocal( new Point( e.stageX, e.stageY ) );
 			}
-			return _blisc.GetOpaqueDataAt( local.x, local.y ) as IsometryObject;
+			const globalX : Number = local.x + _blisc.cameraOffsetX;
+			const globalY : Number = local.y + _blisc.cameraOffsetY;
+			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY );
+			if ( over.length > 0 )
+			{
+				return over[ over.length - 1 ] as IsometryObject;
+			}
+			return null;
 		}
-		private function onMouseDown( e:MouseEvent ): void
+		private function onMouseDown( e : MouseEvent ) : void
 		{
 			_wasDrag = false;
 			
@@ -710,9 +717,9 @@ import view.Projection;
 		
 		private function UpdateHoverTip( local:Point ): void
 		{
-			var tipText:String = "";
-			const globalX:Number = local.x + _blisc.cameraOffsetX;
-			const globalY:Number = local.y + _blisc.cameraOffsetY;
+			var tipText : String = "";
+			const globalX : Number = local.x + _blisc.cameraOffsetX;
+			const globalY : Number = local.y + _blisc.cameraOffsetY;
 			
 			if ( _main._tipGraphics.selected )
 			{

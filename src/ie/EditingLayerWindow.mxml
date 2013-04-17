@@ -19,6 +19,9 @@
 	<s:Label text="Visible:" x="110" y="48" />
 	<s:CheckBox id="_visibleCheckBox" x="160" y="43" />
 	
+	<s:Label text="Selectable:" x="120" y="74" toolTip="Set to false if you do not wanna objects within this layer to be selected and to hide overlapping objects while hovering mouse over it" />
+	<s:CheckBox id="_selectableCheckBox" x="190" y="70" toolTip="Set to false if you do not wanna objects within this layer to be selected and to hide overlapping objects while hovering mouse over it" />
+	
 	<s:Button label="Ok" x="100" y="100" click="onOk(event)" />
 	<s:Button label="Cancel" x="200" y="100" click="onCancel(event)" />
 	
@@ -34,7 +37,7 @@ import project_data.Layer;
 		private var _layer : Layer;
 		
 		
-		public function Init( project : Project, layer : Layer, main : Main ): void
+		public function Init( project : Project, layer : Layer, main : Main ) : void
 		{
 			closeButton.visible = false;
 			
@@ -46,6 +49,7 @@ import project_data.Layer;
 			_units.selected = layer._units;
 			_gridHolder.selected = layer._gridHolder;
 			_visibleCheckBox.selected = layer._visible;
+			_selectableCheckBox.selected = layer._selectable;
 		}
 		
 		private function onOk( ... args ): void
@@ -54,12 +58,13 @@ import project_data.Layer;
 			_layer._units = _units.selected;
 			_layer._gridHolder = _gridHolder.selected;
 			_layer._visible = _visibleCheckBox.selected;
+			_layer._selectable = _selectableCheckBox.selected;
 			
 			if ( _main != null )
 			{
 				//inform list about item change:
-				var associatedItem:LayerListItem = null;
-				for each ( var item:LayerListItem in _main._layers_list_data_provider.source )
+				var associatedItem : LayerListItem = null;
+				for each ( var item : LayerListItem in _main._layers_list_data_provider.source )
 				{
 					if ( item.layer == _layer )
 					{

@@ -16,6 +16,9 @@ package project_data
 		
 		/** Are objects within this layer should be displayed.*/
 		public var _visible : Boolean = true;
+		
+		/** Set to false if you do not wanna objects within this layer to be selected and to hide overlapping objects while hovering mouse over it.*/
+		public var _selectable : Boolean = true;
 	}
 
 }
