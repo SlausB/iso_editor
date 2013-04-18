@@ -24,6 +24,7 @@ import blisc.instances.BliscCompound;
 import blisc.instances.BliscUnit;
 import blisc.pathfinding.AStar;
 import blisc.templates.BliscComplexTemplate;
+import blisc.templates.BliscLayerTemplate;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscRegionWithinComplex;
 import blisc.templates.BliscUnitTemplate;
@@ -283,7 +284,7 @@ import view.Projection;
 			_blisc.AddObject( bliscCompound );
 		}
 		
-		private static const GRID_DRAWER_LAYER_NAME:String = "grid_drawer_holder";
+		private static const GRID_DRAWER_LAYER_NAME : String = "grid_drawer_holder";
 		
 		/** Unload currently displaying map and display it again.*/
 		public function Reinit(): void
@@ -334,10 +335,10 @@ import view.Projection;
 			_main._unitsSpeed.text = _displaying._unitsSpeed.toString();
 			
 			var aStar : AStar = new AStar( map._right, map._down, _project._data._tileSize, _project.side );
-			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side, aStar );
+			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side, aStar, Blisc.SELECTION_LAST );
 			
 			//adding an ability to draw map's grid:
-			_blisc.AddLayer( GRID_DRAWER_LAYER_NAME );
+			_blisc.AddLayer( new BliscLayerTemplate( GRID_DRAWER_LAYER_NAME, false, false ) );
 			var drawerComplexTemplate : BliscComplexTemplate = new BliscComplexTemplate(
 				"grid_drawer",
 				null,
@@ -353,7 +354,7 @@ import view.Projection;
 			
 			for each ( var layer : Layer in _project._data._layers )
 			{
-				_blisc.AddLayer( layer._name, layer._visible );
+				_blisc.AddLayer( IE_Utils.LayerToBlisc( layer ), layer._visible );
 				
 				if ( layer._gridHolder )
 				{
@@ -575,7 +576,7 @@ import view.Projection;
 			}
 			const globalX : Number = local.x + _blisc.cameraOffsetX;
 			const globalY : Number = local.y + _blisc.cameraOffsetY;
-			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY );
+			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, true );
 			if ( over.length > 0 )
 			{
 				return over[ over.length - 1 ] as IsometryObject;
@@ -715,7 +716,7 @@ import view.Projection;
 			HideTip();
 		}
 		
-		private function UpdateHoverTip( local:Point ): void
+		private function UpdateHoverTip( local : Point ) : void
 		{
 			var tipText : String = "";
 			const globalX : Number = local.x + _blisc.cameraOffsetX;
@@ -723,10 +724,10 @@ import view.Projection;
 			
 			if ( _main._tipGraphics.selected )
 			{
-				var objects:Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY );
-				for ( var i:int = 0; i < objects.length; ++i )
+				var objects : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, true );
+				for ( var i : int = 0; i < objects.length; ++i )
 				{
-					var io:IsometryObject = objects[ i ] as IsometryObject;
+					var io : IsometryObject = objects[ i ] as IsometryObject;
 					if ( io == null )
 					{
 						continue;

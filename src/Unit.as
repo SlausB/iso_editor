@@ -131,18 +131,11 @@ package
 				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end, _main._project._data._slippingValue );
 				if ( path == null )
 				{
-					trace( "path not found" );
 					//keep unit standing or doing what he was doing:
 					//moveDirectly = true;
 				}
 				else
 				{
-					trace( "found path consisting from " + path.length.toString() + " tiles:" );
-					for ( var i : int = 0; i < path.length; ++i )
-					{
-						trace( "	" + path[ i ].tileX.toString() + " | " + path[ i ].tileY.toString() );
-					}
-					
 					_currentAction = new MoveTiled(
 						_view as BliscUnit,
 						path,

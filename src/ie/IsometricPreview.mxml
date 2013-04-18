@@ -123,7 +123,7 @@ import project_data.ObjectTemplate;
 			_blisc.OnMouseMove( local.x, local.y );
 		}
 		
-		public function Display( objectTemplate:ObjectTemplate, project:Project ): void
+		public function Display( objectTemplate : ObjectTemplate, project : Project ) : void
 		{
 			if ( _blisc != null )
 			{
@@ -144,7 +144,7 @@ import project_data.ObjectTemplate;
 			_blisc = new Blisc( _view, null, width, height, 10000, 10000, 0, project.side, aStar );
 			for each ( var layer : Layer in project._data._layers )
 			{
-				_blisc.AddLayer( layer._name, true );
+				_blisc.AddLayer( IE_Utils.LayerToBlisc( layer ), true );
 			}
 			
 			_displaying = IE_Utils.CreateBliscCompound( _regionsCache, null, _blisc, objectTemplate, project );

@@ -2,6 +2,7 @@
 package  
 {
 	import blisc.core.BliscDisplayObject;
+	import blisc.core.BliscSprite;
 	import flash.display.BitmapData;
 	import flash.display.BlendMode;
 	import flash.display.Sprite;
@@ -12,23 +13,23 @@ package
 	
 	///@endcond
 	
-	public class GridDrawer extends BliscDisplayObject 
+	public class GridDrawer extends BliscDisplayObject
 	{
-		private var _map:Map;
+		private var _map : Map;
 		
-		private var _viewportWidth:Number = 0;
-		private var _viewportHeight:Number = 0;
+		private var _viewportWidth : Number = 0;
+		private var _viewportHeight : Number = 0;
 		
 		/** Intermediate viewport-size canvas to dynamically draw grid and boundaries.*/
-		private var _bitmapData:BitmapData;
+		private var _bitmapData : BitmapData;
 		
-		private static const WIDTH:Number = 100;
-		private static const HEIGHT:Number = 100;
+		private static const WIDTH : Number = 100;
+		private static const HEIGHT : Number = 100;
 		
-		private var _project:Project;
+		private var _project : Project;
 		
 		
-		public function GridDrawer( map:Map, viewportWidth:Number, viewportHeight:Number, project:Project )
+		public function GridDrawer( map : Map, viewportWidth : Number, viewportHeight : Number, project : Project )
 		{
 			super( null, 0, 1, new Point );
 			
@@ -37,9 +38,15 @@ package
 			SetViewport( viewportWidth, viewportHeight );
 			
 			_project = project;
+			
+			//to allow BliscLayers calling drawing function:
+			_width = _map._right * 2.0;
+			_height = _map._down * 2.0;
+			//to allow BliscLayers calling drawing function:
+			_sprite = new BliscSprite( new BitmapData( 1, 1 ), new Rectangle( 0, 0, 1, 1 ), new Point, new Point );
 		}
 		
-		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number ) :void
+		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number ) : void
 		{
 			if ( _viewportWidth == 0 || _viewportHeight == 0 )
 			{
@@ -57,14 +64,14 @@ package
 			
 			if ( _map._drawGrid )
 			{
-				const X_TILE_BOUNDARY:Number = 4;
-				const Y_TILE_BOUNDARY:Number = 4;
-				var tileBitmapData:BitmapData = new BitmapData( _project._data._tileSize * 2.0 + X_TILE_BOUNDARY * 2.0, _project._data._tileSize + Y_TILE_BOUNDARY * 2.0, true, 0 );
-				var tileTemplate:Sprite = new Sprite;
+				const X_TILE_BOUNDARY : Number = 4;
+				const Y_TILE_BOUNDARY : Number = 4;
+				var tileBitmapData : BitmapData = new BitmapData( _project._data._tileSize * 2.0 + X_TILE_BOUNDARY * 2.0, _project._data._tileSize + Y_TILE_BOUNDARY * 2.0, true, 0 );
+				var tileTemplate : Sprite = new Sprite;
 				tileTemplate.graphics.lineStyle( 2, 0x49C221 );
 				//decrease tile size to create beautiful gap between tiles:
-				const TILE_EXTINGUISH:Number = 3;
-				const TILE_HALF:Number = _project._data._tileSize;
+				const TILE_EXTINGUISH : Number = 3;
+				const TILE_HALF : Number = _project._data._tileSize;
 				//north:
 				tileTemplate.graphics.moveTo( X_TILE_BOUNDARY + TILE_HALF, Y_TILE_BOUNDARY + TILE_EXTINGUISH );
 				//east:
@@ -76,13 +83,13 @@ package
 				//back to north:
 				tileTemplate.graphics.lineTo( X_TILE_BOUNDARY + TILE_HALF, Y_TILE_BOUNDARY + TILE_EXTINGUISH );
 				tileBitmapData.draw( tileTemplate, null, null, BlendMode.NORMAL );
-				const TILES:int = Math.ceil( Math.ceil( _map._right / _project._data._tileSize + 3 ) * Math.ceil( _map._down / _project._data._tileSize * 2.0 + 3 ) ) * 4;
-				var tilePos:Point = new Point;
-				var boundaryRect:Rectangle = new Rectangle( -_map._right, -_map._down, _map._right * 2.0, _map._down * 2.0 );
-				var viewportRect:Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth / zoom, _viewportHeight / zoom );
-				var tileRect:Rectangle = new Rectangle( 0, 0, _project._data._tileSize * 2.0, _project._data._tileSize );
-				var destPoint:Point = new Point;
-				for ( var i:int = 0; i < TILES; ++i )
+				const TILES : int = Math.ceil( Math.ceil( _map._right / _project._data._tileSize + 3 ) * Math.ceil( _map._down / _project._data._tileSize * 2.0 + 3 ) ) * 4;
+				var tilePos : Point = new Point;
+				var boundaryRect : Rectangle = new Rectangle( -_map._right, -_map._down, _map._right * 2.0, _map._down * 2.0 );
+				var viewportRect : Rectangle = new Rectangle( cameraX, cameraY, _viewportWidth / zoom, _viewportHeight / zoom );
+				var tileRect : Rectangle = new Rectangle( 0, 0, _project._data._tileSize * 2.0, _project._data._tileSize );
+				var destPoint : Point = new Point;
+				for ( var i : int = 0; i < TILES; ++i )
 				{
 					Utils.IsoSpriralFromTile( i, tilePos );
 					tilePos.x *= _project._data._tileSize;
@@ -102,9 +109,9 @@ package
 			
 			if ( _map._drawBorder )
 			{
-				var border:Sprite = new Sprite;
+				var border : Sprite = new Sprite;
 				//boundaries:
-				function DrawClampedLine( start:ClampedPoint, end:ClampedPoint ): void
+				function DrawClampedLine( start : ClampedPoint, end : ClampedPoint ) : void
 				{
 					if ( start._fits && end._fits )
 					{
@@ -113,7 +120,7 @@ package
 					}
 				}
 				/** Snap coordinate to visible range. Marks result as inappropriate (not visible) if both coordinates was clamped.*/
-				function Clamp( clampingX:Number, clampingY:Number ): ClampedPoint
+				function Clamp( clampingX : Number, clampingY : Number ): ClampedPoint
 				{
 					var clamped:int = 0;
 					
@@ -147,10 +154,10 @@ package
 					return new ClampedPoint( clampingX, clampingY, true );
 				}
 				border.graphics.lineStyle( 3, 0x780AFF );
-				var upperLeft:ClampedPoint = Clamp( -_map._right, -_map._down );
-				var upperRight:ClampedPoint = Clamp( _map._right, -_map._down );
-				var lowerRight:ClampedPoint = Clamp( _map._right, _map._down );
-				var lowerLeft:ClampedPoint = Clamp( -_map._right, _map._down );
+				var upperLeft : ClampedPoint = Clamp( -_map._right, -_map._down );
+				var upperRight : ClampedPoint = Clamp( _map._right, -_map._down );
+				var lowerRight : ClampedPoint = Clamp( _map._right, _map._down );
+				var lowerLeft : ClampedPoint = Clamp( -_map._right, _map._down );
 				//upper boundary:
 				DrawClampedLine( upperLeft, upperRight );
 				//right boundary:
@@ -167,17 +174,7 @@ package
 			canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ), null, null, true );
 		}
 		
-		override public function get width(): int
-		{
-			return _map._right * 2.0;
-		}
-		
-		override public function get height(): int
-		{
-			return _map._down * 2.0;
-		}
-		
-		public function SetViewport( width:Number, height:Number ): void
+		public function SetViewport( width : Number, height : Number ) : void
 		{
 			_viewportWidth = width;
 			_viewportHeight = height;
@@ -189,7 +186,7 @@ package
 			_bitmapData = new BitmapData( _viewportWidth, _viewportHeight, true, 0 );
 		}
 		
-		override public function Destroy(): void
+		override public function Destroy() : void
 		{
 			super.Destroy();
 			

@@ -7,6 +7,7 @@ package ie
 	import blisc.templates.BliscComplexTemplate;
 	import blisc.templates.BliscComplexWithinCompoundTemplate;
 	import blisc.templates.BliscCompoundTemplate;
+	import blisc.templates.BliscLayerTemplate;
 	import blisc.templates.BliscObjectTemplate;
 	import blisc.templates.BliscRegionWithinComplex;
 	import blisc.templates.BliscRegion;
@@ -15,6 +16,7 @@ package ie
 	import project_data.ComplexTemplate;
 	import project_data.ComplexWithinCompound;
 	import project_data.CompoundTemplate;
+	import project_data.Layer;
 	import project_data.ObjectTemplate;
 	import project_data.RegionWithinComplex;
 	import project_data.SingleResource;
@@ -87,6 +89,11 @@ package ie
 			var bliscCompound : BliscCompound = new BliscCompound( opaqueData, blisc, bliscObjectTemplate );
 			bliscCompound.SetIsoXY( 0, 0 );
 			return bliscCompound;
+		}
+		
+		public static function LayerToBlisc( layer : Layer ) : BliscLayerTemplate
+		{
+			return new BliscLayerTemplate( layer._name, layer._units, layer._selectable );
 		}
 		
 	}

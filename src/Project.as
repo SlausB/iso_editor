@@ -469,7 +469,8 @@ package
 		{
 			for each ( var unitProperties : UnitProperties in _data._unitProperties )
 			{
-				if ( unitProperties._unit == unitDesc._template._name )
+				var backToName : String = "unit_" + unitDesc._template._animation + "_" + unitDesc._template._name;
+				if ( unitProperties._unit == backToName )
 				{
 					return unitProperties;
 				}

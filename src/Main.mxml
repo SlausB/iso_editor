@@ -1436,7 +1436,7 @@ import view.Projection;
 			//layers:
 			for ( var layerIndex : int = 0; layerIndex < _project._data._layers.length; ++layerIndex )
 			{
-				rs.writeUTFBytes( "			_layers.push( new BliscLayerTemplate( \"" + _project._data._layers[ layerIndex ]._name + "\", " + _project._data._layers[ layerIndex ]._units.toString() + ", " + _project[ layerIndex ]._selectable.toString() + " ) );\n" );
+				rs.writeUTFBytes( "			_layers.push( new BliscLayerTemplate( \"" + _project._data._layers[ layerIndex ]._name + "\", " + _project._data._layers[ layerIndex ]._units.toString() + ", " + _project._data._layers[ layerIndex ]._selectable.toString() + " ) );\n" );
 			}
 			rs.writeUTFBytes( "			\n" );
 			//regions:
