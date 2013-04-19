@@ -89,7 +89,7 @@ package
 		
 		private function ShowSelectHighlight(): void
 		{
-			Highlight( new GlowFilter( 0xFF6100, 1, 10, 10 ) );
+			Highlight( new GlowFilter( 0xFF0098, 1, 10, 10 ) );
 		}
 		
 		public function Out(): void

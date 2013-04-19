@@ -165,71 +165,123 @@ import view.Projection;
 				}
 			}
 			
-			if ( _blisc != null )
+			
+			
+			if ( _blisc == null )
 			{
-				var currentTime : int = getTimer();
-				var elapsedSeconds : Number = ( currentTime - _previousTime ) / 1000.0;
-				_previousTime = currentTime;
-				if ( elapsedSeconds > 0.1 )
-				{
-					elapsedSeconds = 0.1;
-				}
-				
-				
-				if ( _positioning != null )
-				{
-					var positioningTilePos : Point = new Point;
-					ResolveMouseIso( _main._clampToTile.selected, positioningTilePos );
-					
-					_fitting.TryOn( _blisc, positioningTilePos.x, positioningTilePos.y );
-					
-					var positioningPlanar : Point = _blisc.IsoToDisplay( positioningTilePos.x * _blisc.tileSide, positioningTilePos.y * _blisc.tileSide, new Point );
-					_fitting.x = _positioning.x = positioningPlanar.x;
-					_fitting.y = _positioning.y = positioningPlanar.y;
-				}
-				//scroll isometric view using sensitive mouse:
-				else if ( _main._ctrlDown || DragManager.isDragging )
-				{
-					var horisontalScrolling : Number = 0;
-					var verticalScrolling : Number = 0;
-					const scrollStep : Number = SCROLL_SPEED * elapsedSeconds;
-					
-					//scroll right:
-					if ( mouseX >= ( width - SCROLL_FRAME ) && mouseX <= width )
-					{
-						horisontalScrolling = scrollStep;
-					}
-					//scroll left:
-					else if ( mouseX >= 0 && mouseX <= SCROLL_FRAME )
-					{
-						horisontalScrolling = -scrollStep;
-					}
-					
-					//scroll up:
-					if ( mouseY >= 0 && mouseY <= SCROLL_FRAME )
-					{
-						verticalScrolling = -scrollStep;
-					}
-					else if ( mouseY >= ( height - SCROLL_FRAME ) && mouseY <= height )
-					{
-						verticalScrolling = scrollStep;
-					}
-					
-					_blisc.MoveCamera( horisontalScrolling, verticalScrolling );
-				}
-				
-				
-				for each ( var isometryObject:IsometryObject in _isometryObjects )
-				{
-					isometryObject.Update( elapsedSeconds );
-				}
-				
-				
-				_blisc.draw();
+				return;
 			}
+			
+			var local : Point = new Point( mouseX, mouseY );
+			
+			if ( DragManager.isDragging == false )
+			{
+				if ( _main._qDown )
+				{
+					ShowPointerOverMouse( displaying._clampToTiles );
+				}
+				//try sending currently selected unit to hovering position:
+				else if ( _selected is Unit )
+				{
+					ShowPointerOverMouse( false );
+				}
+				else
+				{
+					_pointer.visible = false;
+				}
+			}
+			
+			//displaying hovering tile coordinates:
+			var iso : Point = new Point;
+			_blisc.ScreenToIso( local.x, local.y, iso );
+			_main._isoTileX.text = Math.floor( iso.x / _project.side ).toString();
+			_main._isoTileY.text = Math.floor( iso.y / _project.side ).toString();
+			
+			
+			var currentTime : int = getTimer();
+			var elapsedSeconds : Number = ( currentTime - _previousTime ) / 1000.0;
+			_previousTime = currentTime;
+			if ( elapsedSeconds > 0.1 )
+			{
+				elapsedSeconds = 0.1;
+			}
+			
+			
+			if ( _positioning != null )
+			{
+				var positioningTilePos : Point = new Point;
+				ResolveMouseIso( _main._clampToTile.selected, positioningTilePos );
+				
+				_fitting.TryOn( _blisc, positioningTilePos.x, positioningTilePos.y );
+				
+				var positioningPlanar : Point = _blisc.IsoToDisplay( positioningTilePos.x * _blisc.tileSide, positioningTilePos.y * _blisc.tileSide, new Point );
+				_fitting.x = _positioning.x = positioningPlanar.x;
+				_fitting.y = _positioning.y = positioningPlanar.y;
+			}
+			//scroll isometric view using sensitive mouse:
+			else if ( _main.moving || DragManager.isDragging || _isDragging != null )
+			{
+				var horisontalScrolling : Number = 0;
+				var verticalScrolling : Number = 0;
+				const scrollStep : Number = SCROLL_SPEED * elapsedSeconds;
+				
+				//scroll right:
+				if ( mouseX >= ( width - SCROLL_FRAME ) && mouseX <= width )
+				{
+					horisontalScrolling = scrollStep;
+				}
+				//scroll left:
+				else if ( mouseX >= 0 && mouseX <= SCROLL_FRAME )
+				{
+					horisontalScrolling = -scrollStep;
+				}
+				
+				//scroll up:
+				if ( mouseY >= 0 && mouseY <= SCROLL_FRAME )
+				{
+					verticalScrolling = -scrollStep;
+				}
+				else if ( mouseY >= ( height - SCROLL_FRAME ) && mouseY <= height )
+				{
+					verticalScrolling = scrollStep;
+				}
+				
+				_blisc.MoveCamera( horisontalScrolling, verticalScrolling );
+				
+				
+				
+				if ( _main.moving && _isDragging != null )
+				{
+					var newIsoPos : Point = Utils.ToIso( local.x - ( _isDragging.x - _blisc.cameraOffsetX ), local.y - ( _isDragging.y - _blisc.cameraOffsetY ), new Point );
+					var newTilePos : Point = new Point( newIsoPos.x / _project.side, newIsoPos.y / _project.side );
+					if ( displaying._clampToTiles )
+					{
+						newTilePos.x = Math.round( newTilePos.x );
+						newTilePos.y = Math.round( newTilePos.y );
+					}
+					_dragging._view.SetTileXY( newTilePos.x, newTilePos.y );
+					_dragging._objectInstance._tileCoords.x = newTilePos.x;
+					_dragging._objectInstance._tileCoords.y = newTilePos.y;
+					_main.ShowObjectProperties();
+				}
+			}
+			
+			if ( DragManager.isDragging == false && _isDragging == null )
+			{
+				UpdateHoverTip( local );
+			}
+			
+			
+			for each ( var isometryObject : IsometryObject in _isometryObjects )
+			{
+				isometryObject.Update( elapsedSeconds );
+			}
+			
+			
+			_blisc.draw();
 		}
 		
-		public function onIsometryMouseEvent( type:int, opaqueData:* ): void
+		public function onIsometryMouseEvent( type : int, opaqueData : * ) : void
 		{
 			var isometryObject:IsometryObject = opaqueData as IsometryObject;
 			if ( isometryObject != null )
@@ -352,7 +404,19 @@ import view.Projection;
 			_main._unitsSpeed.text = _displaying._unitsSpeed.toString();
 			
 			var aStar : AStar = new AStar( map._right, map._down, _project._data._tileSize, _project.side );
-			_blisc = new Blisc( _bliscViewport, onIsometryMouseEvent, width, height, map._right + 100, map._down + 100, 5, _project.side, aStar, Blisc.SELECTION_LAST );
+			_blisc = new Blisc(
+				_bliscViewport,
+				onIsometryMouseEvent,
+				width,
+				height,
+				map._right + 100,
+				map._down + 100,
+				5,
+				_project.side,
+				aStar,
+				_main._through.selected ? Blisc.SELECTION_FIRST : Blisc.SELECTION_LAST,
+				_project._data._throughAlpha
+			);
 			
 			//adding an ability to draw map's grid:
 			_blisc.AddLayer( new BliscLayerTemplate( GRID_DRAWER_LAYER_NAME, false, false ) );
@@ -593,9 +657,13 @@ import view.Projection;
 			}
 			const globalX : Number = local.x + _blisc.cameraOffsetX;
 			const globalY : Number = local.y + _blisc.cameraOffsetY;
-			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, true );
+			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, _main._through.selected == false );
 			if ( over.length > 0 )
 			{
+				if ( _main._through.selected )
+				{
+					return over[ 0 ] as IsometryObject;
+				}
 				return over[ over.length - 1 ] as IsometryObject;
 			}
 			return null;
@@ -615,17 +683,17 @@ import view.Projection;
 			{
 				if ( _lastPositioned != null )
 				{
-					var tilePos:Point = new Point;
+					var tilePos : Point = new Point;
 					ResolveMouseIso( displaying._clampToTiles, tilePos );
 					AddTemplate( _lastPositioned, tilePos.x, tilePos.y );
 				}
 			}
-			else if ( _main._ctrlDown )
+			else if ( _main.moving )
 			{
-				var newDragging:IsometryObject = GetObj( e, local );
+				var newDragging : IsometryObject = GetObj( e, local );
 				if ( newDragging != null )
 				{
-					_isDragging = new Point( local.x - newDragging._view.GetX(), local.y - newDragging._view.GetY() );
+					_isDragging = new Point( local.x - newDragging._view.GetX() + _blisc.cameraOffsetX, local.y - newDragging._view.GetY() + _blisc.cameraOffsetY );
 					_dragging = newDragging;
 					
 					if ( _selected != null )
@@ -653,7 +721,7 @@ import view.Projection;
 			
 			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
-			if ( _main._ctrlDown )
+			if ( _main.moving )
 			{
 			}
 			else
@@ -682,60 +750,14 @@ import view.Projection;
 		{
 			_wasDrag = true;
 			
-			if ( _blisc == null )
-			{
-				return;
-			}
+			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
-			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
-			
-			if ( DragManager.isDragging == false )
-			{
-				if ( _main._qDown )
-				{
-					ShowPointerOverMouse( displaying._clampToTiles );
-					return;
-				}
-				//try sending currently selected unit to hovering position:
-				else if ( _selected is Unit )
-				{
-					ShowPointerOverMouse( false );
-				}
-				else
-				{
-					_pointer.visible = false;
-				}
-			}
-			
-			//displaying hovering tile coordinates:
-			var iso:Point = new Point;
-			_blisc.ScreenToIso( local.x, local.y, iso );
-			_main._isoTileX.text = Math.floor( iso.x / _project.side ).toString();
-			_main._isoTileY.text = Math.floor( iso.y / _project.side ).toString();
-			
-			if ( _main._ctrlDown && _isDragging != null )
-			{
-				var newIsoPos:Point = Utils.ToIso( local.x - _isDragging.x, local.y - _isDragging.y, new Point );
-				var newTilePos:Point = new Point( newIsoPos.x / _project.side, newIsoPos.y / _project.side );
-				if ( displaying._clampToTiles )
-				{
-					newTilePos.x = Math.round( newTilePos.x );
-					newTilePos.y = Math.round( newTilePos.y );
-				}
-				_dragging._view.SetTileX( newTilePos.x );
-				_dragging._view.SetTileY( newTilePos.y );
-				_dragging._objectInstance._tileCoords.x = newTilePos.x;
-				_dragging._objectInstance._tileCoords.y = newTilePos.y;
-				_main.ShowObjectProperties();
-			}
-			else
+			if ( _isDragging == null && DragManager.isDragging == false )
 			{
 				_blisc.OnMouseMove( local.x, local.y );
-				
-				UpdateHoverTip( local );
 			}
 		}
-		private function onMouseOut( ... args ): void
+		private function onMouseOut( ... args ) : void
 		{
 			HideTip();
 		}
@@ -748,7 +770,7 @@ import view.Projection;
 			
 			if ( _main._tipGraphics.selected )
 			{
-				var objects : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, true );
+				var objects : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, _main._through.selected == false );
 				for ( var i : int = 0; i < objects.length; ++i )
 				{
 					var io : IsometryObject = objects[ i ] as IsometryObject;

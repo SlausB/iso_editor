@@ -65,6 +65,12 @@
 						<s:RadioButton id="_scale_4" width="30" groupName="scale" label="x4" click="onScale_4(event)" />
 					</s:HGroup>
 					
+					<s:Label x="402" y="33" text="Through:" />
+					<s:CheckBox id="_through" x="456" y="28" toolTip="Choose deepest selectable object under mouse and make remaining overlapping transparent" change="onThroughChange(event)" />
+					
+					<s:Label x="484" y="33" text="Move:" />
+					<s:CheckBox id="_move" x="520" y="28" toolTip="Toggle to enter moving mode where objects will be moved by mouse instead of viewport" />
+					
 					<s:VGroup x="550" y="4" >
 						<s:RadioButton id="_tipGraphics" groupName="tip" label="Graphics" selected="true" toolTip="Show objects selection tooltip using their graphics" />
 						<s:RadioButton id="_tipSpace" groupName="tip" label="Space" toolTip="Show objects selection using their any space regions" />
@@ -265,6 +271,7 @@
 	<fx:Script>
 		<![CDATA[
 import adobe.utils.CustomActions;
+import blisc.core.Blisc;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscUnitView;
 import com.junkbyte.console.Cc;
@@ -354,8 +361,7 @@ import view.Projection;
 		/** Currently displayed map and layers of which are displayed within "layers list".*/
 		public var _chosenMap:Map = null;
 		
-		public var _ctrlDown:Boolean = false;
-		public var _qDown:Boolean = false;
+		public var _qDown : Boolean = false;
 		
 		/** Is it need to clamp complex templates within compound editing window.*/
 		public static var _clampTemplatesToTile:Boolean = false;
@@ -390,8 +396,6 @@ import view.Projection;
 		
 		private function onKeyboardEvent( e : KeyboardEvent ) : void
 		{
-			_ctrlDown = e.ctrlKey;
-			
 			switch ( e.keyCode )
 			{
 				//esc:
@@ -432,7 +436,7 @@ import view.Projection;
 				
 				//ctrl+f to simulate program crash to check if editor is run in debug mode:
 				case 70:
-					if ( _ctrlDown )
+					if ( e.ctrlKey )
 					{
 						var falling : Sprite = null;
 						falling.addChild( null );
@@ -1354,6 +1358,10 @@ import view.Projection;
 			rs.writeUTFBytes( "		/** Distance from tile's north side to east.*/\n" );
 			rs.writeUTFBytes( "		public static const TILE_SIDE : Number = " + _project.side.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
+			//trough alpha:
+			rs.writeUTFBytes( "		/** Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque.*/\n" );
+			rs.writeUTFBytes( "		public static const THROUGH_ALPHA : int = " + _project._data._throughAlpha.toString() + ";\n" );
+			rs.writeUTFBytes( "		\n" );
 			//layers:
 			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
 			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
@@ -1933,6 +1941,21 @@ import view.Projection;
 			{
 				_isometry.Position( object );
 			}
+		}
+		
+		
+		private function onThroughChange( ... args ) : void
+		{
+			if ( _isometry._blisc != null )
+			{
+				_isometry._blisc._selection = _through.selected ? Blisc.SELECTION_FIRST : Blisc.SELECTION_LAST;
+			}
+		}
+		
+		
+		public function get moving() : Boolean
+		{
+			return _move.selected;
 		}
 		
 		

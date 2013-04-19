@@ -31,6 +31,9 @@ package project_data
 		public var _slippingValue : int = 0;
 		
 		public var _sourcesDirectory : String = "";
+		
+		/** Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque.*/
+		public var _throughAlpha : int = 100;
 	}
 
 }

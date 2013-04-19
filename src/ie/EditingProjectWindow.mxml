@@ -34,6 +34,9 @@
 	<s:Label text="Sources generation directory:" x="180" y="180" toolTip="Directory where one or more source files will be generated for future usage within game." />
 	<s:TextInput x="180" y="198" id="_sourcesDirectory" width="200" />
 	
+	<s:Label text="Through alpha:" toolTip="Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque." x="180" y="248" />
+	<s:NumericStepper id="_throughAlpha" x="270" y="242" toolTip="Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque." minimum="0" maximum="255" />
+	
 	
 	<s:Button x="220" y="330" label="Ok" click="onOk(event)" />
 	<s:Button x="310" y="330" label="Cancel" click="onCancel(event)" />
@@ -48,30 +51,30 @@ import flash.geom.Rectangle;
 import mx.managers.PopUpManager;
 import utils.Utils;
 		
-		private var _project:Project;
+		private var _project : Project;
 		
-		private var _sample:Sprite = new Sprite;
+		private var _sample : Sprite = new Sprite;
 		
-		private var _tileSize:Number;
+		private var _tileSize : Number;
 		
-		private var _sideValue:Number;
-		private var _widthValue:Number;
-		private var _heightValue:Number;
+		private var _sideValue : Number;
+		private var _widthValue : Number;
+		private var _heightValue : Number;
 		
-		private static const MEASURE_SIDE:int = 1;
-		private static const MEASURE_WIDTH:int = 2;
-		private static const MEASURE_HEIGHT:int = 3;
-		private var _measure:int = MEASURE_SIDE;
+		private static const MEASURE_SIDE : int = 1;
+		private static const MEASURE_WIDTH : int = 2;
+		private static const MEASURE_HEIGHT : int = 3;
+		private var _measure : int = MEASURE_SIDE;
 		
 		
-		private function onInit( ... args ): void
+		private function onInit( ... args ) : void
 		{
 			closeButton.visible = false;
 			
 			_sampleHolder.addChild( _sample );
 		}
 		
-		public function Init( project : Project ): void
+		public function Init( project : Project ) : void
 		{
 			_project = project;
 			
@@ -92,17 +95,19 @@ import utils.Utils;
 			
 			_sourcesDirectory.text = project._data._sourcesDirectory;
 			
+			_throughAlpha.value = project._data._throughAlpha;
+			
 			Update();
 		}
 		
-		private function Destroy(): void
+		private function Destroy() : void
 		{
 			_project = null;
 			
 			PopUpManager.removePopUp( this );
 		}
 		
-		private function Update(): void
+		private function Update() : void
 		{
 			_sideStepper.value = _sideValue = _tileSize * Utils.TILE_SIDE;
 			_widthStepper.value = _widthValue = _tileSize * 2.0;
@@ -175,11 +180,11 @@ import utils.Utils;
 			Update();
 		}
 		
-		private function onHeightChange( event:flash.events.Event ): void
+		private function onHeightChange( event : flash.events.Event ): void
 		{
 			_measure = MEASURE_HEIGHT;
 			
-			var value:Number = ( event.target as spark.components.NumericStepper ).value;
+			var value : Number = ( event.target as spark.components.NumericStepper ).value;
 			if ( isNaN( value ) )
 			{
 				value = Math.round( _heightValue ) + 1.0;
@@ -189,7 +194,7 @@ import utils.Utils;
 			Update();
 		}
 		
-		private function onOk( ... args ): void
+		private function onOk( ... args ) : void
 		{
 			_project._data._tileSize = _tileSize;
 			
@@ -208,10 +213,20 @@ import utils.Utils;
 			
 			_project._data._sourcesDirectory = _sourcesDirectory.text;
 			
+			_project._data._throughAlpha = _throughAlpha.value;
+			if ( _project._data._throughAlpha > 255 )
+			{
+				_project._data._throughAlpha = 255;
+			}
+			else if ( _project._data._throughAlpha < 0 )
+			{
+				_project._data._throughAlpha = 0;
+			}
+			
 			Destroy();
 		}
 		
-		private function onCancel( ... args ): void
+		private function onCancel( ... args ) : void
 		{
 			Destroy();
 		}
