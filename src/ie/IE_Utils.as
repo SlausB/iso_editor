@@ -36,21 +36,43 @@ package ie
 			return BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, center, singleResource._name );
 		}
 		
+		/** Any object template (ComplexTemplate or CompoundTemplate for now) to corresponding Blisc template.*/
+		public static function ObjectTemplateToBlisc( regionsCache : Vector.< BliscRegion >, object : ObjectTemplate, project : Project ) : BliscObjectTemplate
+		{
+			if ( object is ComplexTemplate )
+			{
+				return ComplexTemplateToBlisc( regionsCache, object as ComplexTemplate, project );
+			}
+			else
+			{
+				var compound : CompoundTemplate = object as CompoundTemplate;
+				var complexes : Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >;
+				for each ( var complexWithinCompound : ComplexWithinCompound in compound._consisting )
+				{
+					complexes.push( new BliscComplexWithinCompoundTemplate(
+						ComplexTemplateToBlisc( regionsCache, complexWithinCompound._complex, project ),
+						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ) )
+					);
+				}
+				return new BliscCompoundTemplate( compound._name, complexes );
+			}
+		}
+		
 		public static function ComplexTemplateToBlisc( regionsCache : Vector.< BliscRegion >, complex : ComplexTemplate, project : Project ) : BliscComplexTemplate
 		{
 			//again - use some caching here - create all regions (BliscRegion) only once:
-			var regions:Vector.< BliscRegionWithinComplex > = new Vector.< BliscRegionWithinComplex >;
+			var regions : Vector.< BliscRegionWithinComplex > = new Vector.< BliscRegionWithinComplex >;
 			for each ( var regionWithinComplex : RegionWithinComplex in complex._regions )
 			{
 				var bliscRegion : BliscRegion = Isometry.ObtainBliscRegion( regionWithinComplex._region, regionsCache );
 				
-				var bliscTiles:Vector.< Point > = new Vector.< Point >;
-				for each ( var tile:Point in regionWithinComplex._tiles )
+				var bliscTiles : Vector.< Point > = new Vector.< Point >;
+				for each ( var tile : Point in regionWithinComplex._tiles )
 				{
 					bliscTiles.push( tile.clone() );
 				}
 				
-				var bliscRegionWithinComplex:BliscRegionWithinComplex = new BliscRegionWithinComplex( bliscRegion, bliscTiles );
+				var bliscRegionWithinComplex : BliscRegionWithinComplex = new BliscRegionWithinComplex( bliscRegion, bliscTiles );
 				regions.push( bliscRegionWithinComplex );
 			}
 			
@@ -66,25 +88,7 @@ package ie
 		
 		public static function CreateBliscCompound( regionsCache : Vector.< BliscRegion >, opaqueData : *, blisc : Blisc, objectTemplate : ObjectTemplate, project : Project ) : BliscCompound
 		{
-			var bliscObjectTemplate : BliscObjectTemplate;
-			
-			if ( objectTemplate is ComplexTemplate )
-			{
-				bliscObjectTemplate = ComplexTemplateToBlisc( regionsCache, objectTemplate as ComplexTemplate, project );
-			}
-			else
-			{
-				var compound:CompoundTemplate = objectTemplate as CompoundTemplate;
-				var complexes:Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >;
-				for each ( var complexWithinCompound : ComplexWithinCompound in compound._consisting )
-				{
-					complexes.push( new BliscComplexWithinCompoundTemplate(
-						ComplexTemplateToBlisc( regionsCache, complexWithinCompound._complex, project ),
-						new Point( complexWithinCompound._tileDispX, complexWithinCompound._tileDispY ) )
-					);
-				}
-				bliscObjectTemplate = new BliscCompoundTemplate( compound._name, complexes );
-			}
+			var bliscObjectTemplate : BliscObjectTemplate = ObjectTemplateToBlisc( regionsCache, objectTemplate, project );
 			
 			var bliscCompound : BliscCompound = new BliscCompound( opaqueData, blisc, bliscObjectTemplate );
 			bliscCompound.SetIsoXY( 0, 0 );

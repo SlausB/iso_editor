@@ -22,9 +22,11 @@ import blisc.instances.BliscComplex;
 import blisc.instances.BliscComplexWithinCompound;
 import blisc.instances.BliscCompound;
 import blisc.instances.BliscUnit;
+import blisc.ObjectRenderer;
 import blisc.pathfinding.AStar;
 import blisc.templates.BliscComplexTemplate;
 import blisc.templates.BliscLayerTemplate;
+import blisc.templates.BliscObjectTemplate;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscRegionWithinComplex;
 import blisc.templates.BliscUnitTemplate;
@@ -103,6 +105,8 @@ import view.Projection;
 		
 		private var _regionsCache : Vector.< BliscRegion > = new Vector.< BliscRegion >;
 		
+		public var _positioning : ObjectRenderer;
+		
 		
 		
 		public function HideTip() : void
@@ -113,7 +117,7 @@ import view.Projection;
 				_objectTip = null;
 			}
 		}
-		public function ShowTip( tip:IToolTip ) : void
+		public function ShowTip( tip : IToolTip ) : void
 		{
 			HideTip();
 			_objectTip = tip;
@@ -133,14 +137,14 @@ import view.Projection;
 			stage.addEventListener( Event.ENTER_FRAME, onEnterFrame );
 		}
 		
-		public function Init( project:Project, main:Main ): void
+		public function Init( project : Project, main : Main ) : void
 		{
 			_project = project;
 			_main = main;
 		}
 		
-		private var _previousTime:int = 0;
-		private function onEnterFrame( ... args ): void
+		private var _previousTime : int = 0;
+		private function onEnterFrame( ... args ) : void
 		{
 			if ( width != _previousWidth || height != _previousHeight )
 			{
@@ -156,6 +160,12 @@ import view.Projection;
 				{
 					_gridDrawer.SetViewport( width, height );
 				}
+			}
+			
+			if ( _positioning != null )
+			{
+				_positioning.x = mouseX;
+				_positioning.y = mouseY;
 			}
 			
 			if ( _blisc != null )
@@ -826,6 +836,25 @@ import view.Projection;
 			{
 				HideTip();
 			}
+		}
+		
+		public function CancelPositioning() : void
+		{
+			if ( _positioning != null )
+			{
+				_positioning.Destroy();
+				_positioning = null;
+			}
+		}
+		
+		public function Position( object : ObjectTemplate ) : void
+		{
+			CancelPositioning();
+			
+			var bliscObjectTemplate : BliscObjectTemplate = IE_Utils.ObjectTemplateToBlisc( _regionsCache, object, _main._project );
+			
+			_positioning = new ObjectRenderer( _blisc, bliscObjectTemplate );
+			addChild( _positioning );
 		}
 		
 		]]>

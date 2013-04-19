@@ -388,24 +388,15 @@ import view.Projection;
 			stage.addEventListener( KeyboardEvent.KEY_UP, onKeyboardEvent );
 		}
 		
-		private function onKeyboardEvent( e:KeyboardEvent ): void
+		private function onKeyboardEvent( e : KeyboardEvent ) : void
 		{
 			_ctrlDown = e.ctrlKey;
 			
 			switch ( e.keyCode )
 			{
-				//ctrl+f to simulate program crash to check if editor is run in debug mode:
-				case 70:
-					if ( _ctrlDown )
-					{
-						var falling : Sprite = null;
-						falling.addChild( null );
-					}
-					break;
-				
-				//q:
-				case 81:
-					_qDown = e.type == KeyboardEvent.KEY_DOWN;
+				//esc:
+				case 27:
+					_isometry.CancelPositioning();
 					break;
 				
 				//del:
@@ -419,7 +410,7 @@ import view.Projection;
 							{
 								editingTemplateWindow._lastDragged.parent.removeChild( editingTemplateWindow._lastDragged );
 								
-								for ( var i:int = 0; i < editingTemplateWindow._templates.length; ++i )
+								for ( var i : int = 0; i < editingTemplateWindow._templates.length; ++i )
 								{
 									if ( editingTemplateWindow._templates[ i ] == editingTemplateWindow._lastDragged )
 									{
@@ -437,6 +428,20 @@ import view.Projection;
 					{
 						RemoveObjectFromMap( _isometry._selected._objectInstance, _isometry.displaying );
 					}
+					break;
+				
+				//ctrl+f to simulate program crash to check if editor is run in debug mode:
+				case 70:
+					if ( _ctrlDown )
+					{
+						var falling : Sprite = null;
+						falling.addChild( null );
+					}
+					break;
+				
+				//q:
+				case 81:
+					_qDown = e.type == KeyboardEvent.KEY_DOWN;
 					break;
 			}
 		}
@@ -634,8 +639,9 @@ import view.Projection;
 				if ( templateTableItem != null )
 				{
 					menuData = menuData.concat(
-						[ { label: "Edit...", id: "edit", template: templateTableItem.template } ],
-						[ { label: "Delete", id: "delete", template: templateTableItem.template } ]
+						[ { label : "Edit...", id : "edit", template : templateTableItem.template } ],
+						[ { label : "Delete", id : "delete", template : templateTableItem.template } ],
+						[ { label : "Position", id : "position", template : templateTableItem.template } ]
 					);
 				}
 			}
@@ -675,6 +681,10 @@ import view.Projection;
 						{
 							RemoveTemplate( templatesDependence );
 						}
+						break;
+					
+					case "position":
+						Position( menuEvent.item.template );
 						break;
 				}
 			} );
@@ -743,17 +753,18 @@ import view.Projection;
 				_compoundsContextMenu = null;
 			}
 			
-			var menuData:Array = [ { label:"Add compound...", id:"add_compound" } ];
+			var menuData : Array = [ { label:"Add compound...", id:"add_compound" } ];
 			
-			var gridItemRenderer:IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
+			var gridItemRenderer : IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
 			if ( gridItemRenderer != null )
 			{
-				var compoundTableItem:CompoundTableItem = gridItemRenderer.data as CompoundTableItem;
+				var compoundTableItem : CompoundTableItem = gridItemRenderer.data as CompoundTableItem;
 				if ( compoundTableItem != null )
 				{
 					menuData = menuData.concat(
-						[ { label: "Edit...", id: "edit", compound: compoundTableItem.compound } ],
-						[ { label: "Delete", id: "delete", compound: compoundTableItem.compound } ]
+						[ { label : "Edit...", id : "edit", compound : compoundTableItem.compound } ],
+						[ { label : "Delete", id : "delete", compound : compoundTableItem.compound } ],
+						[ { label : "Position...", id : "position", compound : compoundTableItem.compound } ]
 					);
 				}
 			}
@@ -793,6 +804,10 @@ import view.Projection;
 						{
 							RemoveCompound( compoundsDependence );
 						}
+						break;
+					
+					case "position":
+						Position( menuEvent.item.compound );
 						break;
 				}
 			} );
@@ -1905,6 +1920,19 @@ import view.Projection;
 		{
 			_isometry.Reinit();
 			_reloadMapButton.enabled = false;
+		}
+		
+		
+		private function Position( object : ObjectTemplate ) : void
+		{
+			if ( _isometry.displaying == null )
+			{
+				PopUp( "Choose some map first.", POP_UP_ERROR );
+			}
+			else
+			{
+				_isometry.Position( object );
+			}
 		}
 		
 		
