@@ -90,9 +90,7 @@ package ie
 		{
 			var bliscObjectTemplate : BliscObjectTemplate = ObjectTemplateToBlisc( regionsCache, objectTemplate, project );
 			
-			var bliscCompound : BliscCompound = new BliscCompound( opaqueData, blisc, bliscObjectTemplate );
-			bliscCompound.SetIsoXY( 0, 0 );
-			return bliscCompound;
+			return new BliscCompound( opaqueData, blisc, bliscObjectTemplate );
 		}
 		
 		public static function LayerToBlisc( layer : Layer ) : BliscLayerTemplate

@@ -18,6 +18,7 @@
 	<fx:Script>
 		<![CDATA[
 import blisc.core.Blisc;
+import blisc.Fitting;
 import blisc.instances.BliscComplex;
 import blisc.instances.BliscComplexWithinCompound;
 import blisc.instances.BliscCompound;
@@ -105,7 +106,9 @@ import view.Projection;
 		
 		private var _regionsCache : Vector.< BliscRegion > = new Vector.< BliscRegion >;
 		
-		public var _positioning : ObjectRenderer;
+		private var _positioning : ObjectRenderer;
+		private var _fitting : Fitting;
+		private var _positioningTemplate : ObjectTemplate;
 		
 		
 		
@@ -162,16 +165,10 @@ import view.Projection;
 				}
 			}
 			
-			if ( _positioning != null )
-			{
-				_positioning.x = mouseX;
-				_positioning.y = mouseY;
-			}
-			
 			if ( _blisc != null )
 			{
-				var currentTime:int = getTimer();
-				var elapsedSeconds:Number = ( currentTime - _previousTime ) / 1000.0;
+				var currentTime : int = getTimer();
+				var elapsedSeconds : Number = ( currentTime - _previousTime ) / 1000.0;
 				_previousTime = currentTime;
 				if ( elapsedSeconds > 0.1 )
 				{
@@ -179,12 +176,23 @@ import view.Projection;
 				}
 				
 				
-				//scroll isometric view using sensitive mouse:
-				if ( _main._ctrlDown || DragManager.isDragging )
+				if ( _positioning != null )
 				{
-					var horisontalScrolling:Number = 0;
-					var verticalScrolling:Number = 0;
-					const scrollStep:Number = SCROLL_SPEED * elapsedSeconds;
+					var positioningTilePos : Point = new Point;
+					ResolveMouseIso( _main._clampToTile.selected, positioningTilePos );
+					
+					_fitting.TryOn( _blisc, positioningTilePos.x, positioningTilePos.y );
+					
+					var positioningPlanar : Point = _blisc.IsoToDisplay( positioningTilePos.x * _blisc.tileSide, positioningTilePos.y * _blisc.tileSide, new Point );
+					_fitting.x = _positioning.x = positioningPlanar.x;
+					_fitting.y = _positioning.y = positioningPlanar.y;
+				}
+				//scroll isometric view using sensitive mouse:
+				else if ( _main._ctrlDown || DragManager.isDragging )
+				{
+					var horisontalScrolling : Number = 0;
+					var verticalScrolling : Number = 0;
+					const scrollStep : Number = SCROLL_SPEED * elapsedSeconds;
 					
 					//scroll right:
 					if ( mouseX >= ( width - SCROLL_FRAME ) && mouseX <= width )
@@ -280,7 +288,7 @@ import view.Projection;
 			return newBliscRegion;
 		}
 		
-		private function AddObject( objectInstance:ObjectInstance ): void
+		private function AddObject( objectInstance : ObjectInstance ) : void
 		{
 			var isometryObject:IsometryObject = new IsometryObject( objectInstance, _main );
 			_isometryObjects.push( isometryObject );
@@ -289,9 +297,8 @@ import view.Projection;
 			
 			isometryObject._view = bliscCompound;
 			
-			bliscCompound.SetTileX( objectInstance._tileCoords.x );
-			bliscCompound.SetTileY( objectInstance._tileCoords.y );
 			_blisc.AddObject( bliscCompound );
+			bliscCompound.SetTileXY( objectInstance._tileCoords.x, objectInstance._tileCoords.y );
 		}
 		
 		private static const GRID_DRAWER_LAYER_NAME : String = "grid_drawer_holder";
@@ -431,15 +438,15 @@ import view.Projection;
 		}
 		
 		/** Returns isometric coordinates of the mouse within Blisc view.*/
-		private function ResolveMouseIso( clampToTiles:Boolean = false, tilePosToFill:Point = null ): Point
+		private function ResolveMouseIso( clampToTiles : Boolean = false, tilePosToFill : Point = null ) : Point
 		{
-			var result:Point = new Point;
+			var result : Point = new Point;
 			if ( _blisc != null )
 			{
 				_blisc.ScreenToIso( _bliscViewport.mouseX, _bliscViewport.mouseY, result );
 				
-				var tileX:Number = result.x / _project.side;
-				var tileY:Number = result.y / _project.side;
+				var tileX : Number = result.x / _project.side;
+				var tileY : Number = result.y / _project.side;
 				
 				if ( clampToTiles )
 				{
@@ -458,16 +465,16 @@ import view.Projection;
 			return result;
 		}
 		
-		public function ShowPointerOverMouse( clampToTiles:Boolean ): void
+		public function ShowPointerOverMouse( clampToTiles : Boolean ) : void
 		{
 			_pointer.visible = true;
-			var mouse:Point = ResolveMouseIso( clampToTiles );
-			var flatMouse:Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
+			var mouse : Point = ResolveMouseIso( clampToTiles );
+			var flatMouse : Point = _blisc.IsoToDisplay( mouse.x, mouse.y, new Point );
 			_pointer.x = flatMouse.x - POINTER_X;
 			_pointer.y = flatMouse.y - POINTER_Y;
 		}
 		
-		public function onDragOver( event:DragEvent ): void
+		public function onDragOver( event : DragEvent ) : void
 		{
 			if ( _blisc != null )
 			{
@@ -485,7 +492,7 @@ import view.Projection;
 			DragManager.showFeedback( DragManager.NONE );
 		}
 		
-		public function onDragDrop( event:DragEvent ): void
+		public function onDragDrop( event : DragEvent ): void
 		{
 			if ( _displaying == null || _blisc == null )
 			{
@@ -495,7 +502,7 @@ import view.Projection;
 			
 			_pointer.visible = false;
 			var tileMousePos:Point = new Point;
-			var mouse:Point = ResolveMouseIso( displaying._clampToTiles, tileMousePos );
+			var mouse : Point = ResolveMouseIso( displaying._clampToTiles, tileMousePos );
 			
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAG_UNIT_DESC ) )
 			{
@@ -549,19 +556,19 @@ import view.Projection;
 			}
 		}
 		
-		public function AddTemplate( template:ObjectTemplate, x:Number, y:Number ): void
+		public function AddTemplate( template : ObjectTemplate, tileX : Number, tileY : Number ) : void
 		{
 			var addingInstance:ObjectInstance = new ObjectInstance;
 			addingInstance.Init( template );
-			addingInstance._tileCoords.x = x;
-			addingInstance._tileCoords.y = y;
+			addingInstance._tileCoords.x = tileX;
+			addingInstance._tileCoords.y = tileY;
 			
 			_displaying._instances.push( addingInstance );
 			
 			AddObject( addingInstance );
 		}
 		
-		public function get displaying(): project_data.Map
+		public function get displaying() : project_data.Map
 		{
 			return _displaying;
 		}
@@ -602,7 +609,7 @@ import view.Projection;
 				return;
 			}
 			
-			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
 			if ( _main._qDown )
 			{
@@ -635,7 +642,7 @@ import view.Projection;
 				_blisc.OnMouseDown( local.x, local.y );
 			}
 		}
-		private function onMouseUp( e:MouseEvent ): void
+		private function onMouseUp( e : MouseEvent ) : void
 		{
 			if ( _blisc == null )
 			{
@@ -644,7 +651,7 @@ import view.Projection;
 			
 			_isDragging = null;
 			
-			var local:Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
 			if ( _main._ctrlDown )
 			{
@@ -653,10 +660,17 @@ import view.Projection;
 			{
 				if ( _wasDrag == false )
 				{
-					//send currently selected unit to specified position:
-					if ( _selected is Unit )
+					if ( _positioning != null )
 					{
-						var sendingUnitPos:Point = ResolveMouseIso();
+						if ( _fitting.canPut )
+						{
+							AddTemplate( _positioningTemplate, _fitting._tryingTileX, _fitting._tryingTileY );
+						}
+					}
+					//send currently selected unit to specified position:
+					else if ( _selected is Unit )
+					{
+						var sendingUnitPos : Point = ResolveMouseIso();
 						( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y, _main._strictMove.selected );
 					}
 				}
@@ -664,7 +678,7 @@ import view.Projection;
 				_blisc.OnMouseUp( local.x, local.y );
 			}
 		}
-		private function onMouseMove( e:MouseEvent ): void
+		private function onMouseMove( e : MouseEvent ) : void
 		{
 			_wasDrag = true;
 			
@@ -844,6 +858,11 @@ import view.Projection;
 			{
 				_positioning.Destroy();
 				_positioning = null;
+				
+				_fitting.Destroy();
+				_fitting = null;
+				
+				_positioningTemplate = null;
 			}
 		}
 		
@@ -855,6 +874,11 @@ import view.Projection;
 			
 			_positioning = new ObjectRenderer( _blisc, bliscObjectTemplate );
 			addChild( _positioning );
+			
+			_fitting = new Fitting( bliscObjectTemplate );
+			addChild( _fitting );
+			
+			_positioningTemplate = object;
 		}
 		
 		]]>
