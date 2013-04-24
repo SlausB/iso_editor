@@ -4,6 +4,7 @@ package
 	import blisc.instances.BliscIsometric;
 	import blisc.instances.BliscUnit;
 	import blisc.pathfinding.AStarNode;
+	import blisc.pathfinding.Path;
 	import blisc.templates.BliscUnitTemplate;
 	import blisc.unit_actions.Idle;
 	import blisc.unit_actions.MoveDirectly;
@@ -189,12 +190,12 @@ package
 				const startX : Number = _view.GetIsoX() - _view._blisc.tileSide / 2;
 				const startY : Number = _view.GetIsoY() - _view._blisc.tileSide / 2;
 				var start : AStarNode = _view._blisc._aStar.grid.GetTile(
-					Math.round( startX / _view._blisc.tileSide ),
-					Math.round( startY / _view._blisc.tileSide ) );
+					Math.floor( startX / _view._blisc.tileSide ),
+					Math.floor( startY / _view._blisc.tileSide ) );
 				var end : AStarNode = _view._blisc._aStar.grid.GetTile(
-					Math.round( isoX / _view._blisc.tileSide ),
-					Math.round( isoY / _view._blisc.tileSide ) );
-				var path : Vector.< AStarNode > = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end, _main._project._data._slippingValue );
+					Math.floor( isoX / _view._blisc.tileSide ),
+					Math.floor( isoY / _view._blisc.tileSide ) );
+				var path : Path = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end, _main._project._data._slippingValue, true );
 				if ( path == null )
 				{
 					//keep unit standing or doing what he was doing:

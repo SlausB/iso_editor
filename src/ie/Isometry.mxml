@@ -268,7 +268,11 @@ import view.Projection;
 			
 			if ( DragManager.isDragging == false && _isDragging == null )
 			{
-				UpdateHoverTip( local );
+				//mouse should be within isometry to display hovering tips to avoid overlapping while working with interfaces:
+				if ( _bliscViewport.mouseX >= 0 && _bliscViewport.mouseY >= 0 && _bliscViewport.mouseX < width && _bliscViewport.mouseY < height )
+				{
+					UpdateHoverTip( local );
+				}
 			}
 			
 			
@@ -291,7 +295,7 @@ import view.Projection;
 		}
 		
 		
-		private function AddUnit( unitDesc : UnitDesc, tileX : Number, tileY : Number ): void
+		private function AddUnit( unitDesc : UnitDesc, tileX : Number, tileY : Number ) : void
 		{
 			var foundLayer : String = null;
 			for each ( var layer : Layer in _project._data._layers )
@@ -309,7 +313,7 @@ import view.Projection;
 			}
 			
 			
-			var unit:Unit = new Unit( _main, unitDesc );
+			var unit : Unit = new Unit( _main, unitDesc );
 			_isometryObjects.push( unit );
 			
 			//initing surfaces:
