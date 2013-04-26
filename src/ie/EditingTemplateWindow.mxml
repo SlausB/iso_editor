@@ -149,7 +149,7 @@ import utils.Utils;
 			_space.stage.removeEventListener( MouseEvent.MOUSE_UP, onMouseUp );
 			_space.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
 			
-			_main.editingTemplateWindow = null;
+			_main._editingTemplateWindow = null;
 			
 			_project = null;
 			_editing = null;

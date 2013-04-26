@@ -42,7 +42,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="+configname=air" />
+    <option additional="+configname=air&#xA;-swf-version=13" />
     <option compilerConstants="" />
     <option minorVersion="" />
   </build>

@@ -149,6 +149,7 @@ import project_data.ObjectTemplate;
 			
 			_displaying = IE_Utils.CreateBliscCompound( _regionsCache, null, _blisc, objectTemplate, project );
 			_blisc.AddObject( _displaying );
+			_displaying.SetXY( 0, 0 );
 		}
 		
 		]]>

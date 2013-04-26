@@ -3,7 +3,9 @@
                xmlns:s="library://ns.adobe.com/flex/spark"
                xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:ie="ie.*"
-			   addedToStage="onInit()" >
+			   addedToStage="onInit()"
+			   backgroundAlpha="0"
+			   >
 	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -367,7 +369,7 @@ import view.Projection;
 		public static var _clampTemplatesToTile:Boolean = false;
 		
 		/** Currently opened editing window if not null.*/
-		public var editingTemplateWindow : EditingTemplateWindow = null;
+		public var _editingTemplateWindow : EditingTemplateWindow = null;
 		
 		/** Last chosen surface and space to prechoose it when window is displayed. Null if no such.*/
 		public var _lastSurface:Region = null;
@@ -406,24 +408,24 @@ import view.Projection;
 				//del:
 				case 46:
 					//remove currently selected complex within compound editing window:
-					if ( editingTemplateWindow != null )
+					if ( _editingTemplateWindow != null )
 					{
-						if ( editingTemplateWindow._compound != null )
+						if ( _editingTemplateWindow._compound != null )
 						{
-							if ( editingTemplateWindow._lastDragged != null )
+							if ( _editingTemplateWindow._lastDragged != null )
 							{
-								editingTemplateWindow._lastDragged.parent.removeChild( editingTemplateWindow._lastDragged );
+								_editingTemplateWindow._lastDragged.parent.removeChild( _editingTemplateWindow._lastDragged );
 								
-								for ( var i : int = 0; i < editingTemplateWindow._templates.length; ++i )
+								for ( var i : int = 0; i < _editingTemplateWindow._templates.length; ++i )
 								{
-									if ( editingTemplateWindow._templates[ i ] == editingTemplateWindow._lastDragged )
+									if ( _editingTemplateWindow._templates[ i ] == _editingTemplateWindow._lastDragged )
 									{
-										editingTemplateWindow._templates.splice( i, 1 );
+										_editingTemplateWindow._templates.splice( i, 1 );
 										break;
 									}
 								}
 								
-								editingTemplateWindow._lastDragged = null;
+								_editingTemplateWindow._lastDragged = null;
 							}
 						}
 					}
@@ -660,9 +662,9 @@ import view.Projection;
 						break;
 					
 					case "edit":
-						editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
-						editingTemplateWindow.Init( _project, menuEvent.item.template, thisOne );
-						PopUpManager.centerPopUp( editingTemplateWindow );
+						_editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						_editingTemplateWindow.Init( _project, menuEvent.item.template, thisOne );
+						PopUpManager.centerPopUp( _editingTemplateWindow );
 						break;
 					
 					case "delete":
@@ -783,9 +785,9 @@ import view.Projection;
 						break;
 					
 					case "edit":
-						editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
-						editingTemplateWindow.Init( _project, menuEvent.item.compound, thisOne );
-						PopUpManager.centerPopUp( editingTemplateWindow );
+						_editingTemplateWindow = PopUpManager.createPopUp( thisOne, EditingTemplateWindow, false ) as EditingTemplateWindow;
+						_editingTemplateWindow.Init( _project, menuEvent.item.compound, thisOne );
+						PopUpManager.centerPopUp( _editingTemplateWindow );
 						break;
 					
 					case "delete":
@@ -1449,6 +1451,30 @@ import view.Projection;
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			return null;\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//custom graphics resolving function:
+			rs.writeUTFBytes( "		public function ResolveCustomGraphics( name : String ) : DisplayObject\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				if ( embeddedResource._applicationDomain.hasDefinition( name ) == false )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					continue;\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				var found : DisplayObject = ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as DisplayObject;\n" );
+			rs.writeUTFBytes( "				if ( found == null )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + embeddedResource._editorsPath + \"\\\" is NOT of DisplayObject type. Returning null.\" );\n" );
+			rs.writeUTFBytes( "					return null;\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				return found;\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" was NOT found. Returning null.\" );\n" );
 			rs.writeUTFBytes( "			return null;\n" );
 			rs.writeUTFBytes( "		}\n" );
 			rs.writeUTFBytes( "		\n" );

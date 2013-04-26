@@ -271,7 +271,10 @@ import view.Projection;
 				//mouse should be within isometry to display hovering tips to avoid overlapping while working with interfaces:
 				if ( _bliscViewport.mouseX >= 0 && _bliscViewport.mouseY >= 0 && _bliscViewport.mouseX < width && _bliscViewport.mouseY < height )
 				{
-					UpdateHoverTip( local );
+					if ( _main._editingTemplateWindow == null )
+					{
+						UpdateHoverTip( local );
+					}
 				}
 			}
 			
