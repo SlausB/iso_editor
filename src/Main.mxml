@@ -457,7 +457,7 @@ import view.Projection;
 			//if removing object from currently selected map:
 			if ( _isometry.displaying == map )
 			{
-				var selected:IsometryObject = _isometry._selected;
+				var selected : IsometryObject = _isometry._selected;
 				
 				if ( selected != null && selected._objectInstance == objectInstance )
 				{
@@ -472,7 +472,7 @@ import view.Projection;
 				}
 				
 				//remove from displaying:
-				for ( var isometryObjectIndex:int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
+				for ( var isometryObjectIndex : int = 0; isometryObjectIndex < _isometry._isometryObjects.length; ++isometryObjectIndex )
 				{
 					var isometryObject : IsometryObject = _isometry._isometryObjects[ isometryObjectIndex ];
 					if ( isometryObject._objectInstance == objectInstance )
@@ -1332,6 +1332,7 @@ import view.Projection;
 			rs.writeUTFBytes( "///@cond\n" );
 			rs.writeUTFBytes( "package\n" );
 			rs.writeUTFBytes( "{\n" );
+			rs.writeUTFBytes( "	import flash.display.DisplayObject;\n" );
 			rs.writeUTFBytes( "	import flash.display.Loader;\n" );
 			rs.writeUTFBytes( "	import flash.display.LoaderInfo;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscLayerTemplate;\n" );
@@ -1424,6 +1425,7 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			
 			//graphics resolving function:
+			rs.writeUTFBytes( "		/** Returns any graphical item with specified name occured within first SWF.*/\n" );
 			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String, center : Point, startingFrame : int = 0, endingFrame : int = int.MAX_VALUE ) : BliscAnimation\n" );
 			rs.writeUTFBytes( "		{\n" );
 			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
@@ -1465,7 +1467,7 @@ import view.Projection;
 			rs.writeUTFBytes( "					continue;\n" );
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "				\n" );
-			rs.writeUTFBytes( "				var found : DisplayObject = ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as DisplayObject;\n" );
+			rs.writeUTFBytes( "				var found : DisplayObject = new ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as DisplayObject;\n" );
 			rs.writeUTFBytes( "				if ( found == null )\n" );
 			rs.writeUTFBytes( "				{\n" );
 			rs.writeUTFBytes( "					Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + embeddedResource._editorsPath + \"\\\" is NOT of DisplayObject type. Returning null.\" );\n" );
