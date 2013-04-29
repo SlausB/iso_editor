@@ -465,12 +465,11 @@ package
 		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.
 		\param create True if need to create and add new one if wasn't found.
 		*/
-		public function FindUnitProperties( unitDesc : UnitDesc, create : Boolean ): UnitProperties
+		public function FindUnitProperties( unitDesc : UnitDesc, create : Boolean ) : UnitProperties
 		{
 			for each ( var unitProperties : UnitProperties in _data._unitProperties )
 			{
-				var backToName : String = "unit_" + unitDesc._template._animation + "_" + unitDesc._template._name;
-				if ( unitProperties._unit == backToName )
+				if ( unitProperties._unit == unitDesc._template.MakeFullName() )
 				{
 					return unitProperties;
 				}
@@ -479,7 +478,7 @@ package
 			if ( create )
 			{
 				var creating : UnitProperties = new UnitProperties;
-				creating.Init( unitDesc._template._name );
+				creating.Init( unitDesc._template.MakeFullName() );
 				
 				_data._unitProperties.push( creating );
 				

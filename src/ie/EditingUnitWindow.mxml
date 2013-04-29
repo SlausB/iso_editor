@@ -30,16 +30,16 @@ import project_data.Region;
 import project_data.UnitProperties;
 		
 		
-		private var _project:Project;
-		private var _unit:UnitDesc;
-		private var _main:Main;
+		private var _project : Project;
+		private var _unit : UnitDesc;
+		private var _main : Main;
 		
-		private var _unitProperties:UnitProperties = null;
+		private var _unitProperties : UnitProperties = null;
 		
 		private var _choices : Vector.< RegionChoice > = new Vector.< RegionChoice >;
 		
 		
-		public function Init( project : Project, unit : UnitDesc, main:Main ): void
+		public function Init( project : Project, unit : UnitDesc, main : Main ) : void
 		{
 			closeButton.visible = false;
 			

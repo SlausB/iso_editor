@@ -27,7 +27,7 @@ package project_data
 		/** Not exactly for any existing unit - only that was specified.*/
 		public var _unitProperties : Vector.< UnitProperties > = new Vector.< UnitProperties >;
 		
-		/** Maximum amoung of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/
+		/** Maximum amount of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/
 		public var _slippingValue : int = 0;
 		
 		public var _sourcesDirectory : String = "";

@@ -1365,6 +1365,9 @@ import view.Projection;
 			rs.writeUTFBytes( "		/** Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque.*/\n" );
 			rs.writeUTFBytes( "		public static const THROUGH_ALPHA : int = " + _project._data._throughAlpha.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
+			rs.writeUTFBytes( "		/** Maximum amount of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/\n" );
+			rs.writeUTFBytes( "		public static const SLIPPING_VALUE : int = " + _project._data._slippingValue.toString() + ";\n" );
+			rs.writeUTFBytes( "		\n" );
 			//layers:
 			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
 			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
