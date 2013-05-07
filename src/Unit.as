@@ -206,6 +206,7 @@ package
 				{
 					_currentAction = new MoveTiled(
 						_view as BliscUnit,
+						( _view as BliscUnit )._template,
 						path,
 						parseFloat( _main._unitsSpeed.text ),
 						_view.bdo.GetIsoX(),
@@ -221,7 +222,15 @@ package
 			
 			if ( moveDirectly )
 			{
-				_currentAction = new MoveDirectly( _view as BliscUnit, parseFloat( _main._unitsSpeed.text ), _view.bdo.GetIsoX(), _view.bdo.GetIsoY(), isoX, isoY );
+				_currentAction = new MoveDirectly(
+					_view as BliscUnit,
+					( _view as BliscUnit )._template,
+					parseFloat( _main._unitsSpeed.text ),
+					_view.bdo.GetIsoX(),
+					_view.bdo.GetIsoY(),
+					isoX,
+					isoY
+				);
 			}
 		}
 		
