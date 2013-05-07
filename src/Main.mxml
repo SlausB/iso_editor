@@ -1368,6 +1368,9 @@ import view.Projection;
 			rs.writeUTFBytes( "		/** Maximum amount of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/\n" );
 			rs.writeUTFBytes( "		public static const SLIPPING_VALUE : int = " + _project._data._slippingValue.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
+			//animations cache:
+			rs.writeUTFBytes( "		/** Animations cache.*/\n" );
+			rs.writeUTFBytes( "		public var _animationsCache : Vector.< CachedAnimation > = new Vector.< CachedAnimation >;\n" );
 			//layers:
 			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
 			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
@@ -1428,39 +1431,79 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			
 			//graphics resolving function:
-			rs.writeUTFBytes( "		/** Returns any graphical item with specified name occured within first SWF.*/\n" );
-			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String, center : Point, startingFrame : int = 0, endingFrame : int = int.MAX_VALUE ) : BliscAnimation\n" );
+			rs.writeUTFBytes( "		/** Returns any graphical item with specified name within specified SWF or any first (within cache or SWF) if editorsPath is null.\n" );
+			rs.writeUTFBytes( "		\param name MovieClip's name within SWF.\n" );
+			rs.writeUTFBytes( "		\param editorsPath Within which SWF to look or within any if null.*/\n" );
+			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String = null, startingFrame : int = 0, endingFrame : int = int.MAX_VALUE ) : BliscAnimation\n" );
 			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			//trying to find within cache:\n" );
+			rs.writeUTFBytes( "			for each ( var cachedAnimation : CachedAnimation in _animationsCache )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				if ( name != cachedAnimation._animation._name\n" );
+			rs.writeUTFBytes( "					|| cachedAnimation._startingFrame != startingFrame\n" );
+			rs.writeUTFBytes( "					|| cachedAnimation._endingFrame != endingFrame\n" );
+			rs.writeUTFBytes( "					|| ( editorsPath != null && editorsPath != cachedAnimation._editorsPath )\n" );
+			rs.writeUTFBytes( "				)\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					continue;\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				return cachedAnimation._animation;\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
 			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
 			rs.writeUTFBytes( "			{\n" );
-			rs.writeUTFBytes( "				if ( embeddedResource._editorsPath == editorsPath )\n" );
+			rs.writeUTFBytes( "				if ( editorsPath != null && embeddedResource._editorsPath != editorsPath )\n" );
 			rs.writeUTFBytes( "				{\n" );
-			rs.writeUTFBytes( "					var found : MovieClip;\n" );
-			rs.writeUTFBytes( "					try\n" );
-			rs.writeUTFBytes( "					{\n" );
-			rs.writeUTFBytes( "						found = new ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as MovieClip;\n" );
-			rs.writeUTFBytes( "					}\n" )
-			rs.writeUTFBytes( "					catch( e : Error )\n" );
+			rs.writeUTFBytes( "					continue;\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				var found : MovieClip;\n" );
+			rs.writeUTFBytes( "				try\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					found = new ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as MovieClip;\n" );
+			rs.writeUTFBytes( "				}\n" )
+			rs.writeUTFBytes( "				catch( e : Error )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					if ( editorsPath != null )\n" );
 			rs.writeUTFBytes( "					{\n" );
 			rs.writeUTFBytes( "						Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + editorsPath + \"\\\". Returning null.\" );\n" );
 			rs.writeUTFBytes( "						return null;\n" );
 			rs.writeUTFBytes( "					}\n" );
-			rs.writeUTFBytes( "					\n" );
-			rs.writeUTFBytes( "					if ( found == null )\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				if ( found == null )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					if ( editorsPath == null )\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						continue;\n" );
+			rs.writeUTFBytes( "					}\n" );
+			rs.writeUTFBytes( "					else\n" );
 			rs.writeUTFBytes( "					{\n" );
 			rs.writeUTFBytes( "						Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + editorsPath + \"\\\" is NOT of type MovieClip. Returning null.\" );\n" );
 			rs.writeUTFBytes( "						return null;\n" );
 			rs.writeUTFBytes( "					}\n" );
-			rs.writeUTFBytes( "					\n" );
-			rs.writeUTFBytes( "					return BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, center, name, startingFrame, endingFrame );\n" );
 			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				var resolved : BliscAnimation = BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, name, startingFrame, endingFrame );\n" );
+			rs.writeUTFBytes( "				_animationsCache.push( new CachedAnimation( resolved, embeddedResource._editorsPath, startingFrame, endingFrame ) );\n" );
+			rs.writeUTFBytes( "				return resolved;\n" );
 			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			if ( editorsPath == null )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" was NOT found. Returning null.\" );\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			else\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				Cc.error( \"E: Resources.ResolveGraphics(): resource \\\"\" + name + \"\\\" within SWF \\\"\" + editorsPath + \"\\\" was NOT found. Returning null.\" );\n" );
+			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			return null;\n" );
 			rs.writeUTFBytes( "		}\n" );
 			rs.writeUTFBytes( "		\n" );
 			
 			//custom graphics resolving function:
+			rs.writeUTFBytes( "		/** Doesn't concern caching.*/\n" );
 			rs.writeUTFBytes( "		public function ResolveCustomGraphics( name : String ) : DisplayObject\n" );
 			rs.writeUTFBytes( "		{\n" );
 			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
@@ -1536,7 +1579,7 @@ import view.Projection;
 				}
 				regionsString = regionsString + " ]";
 				
-				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\", new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ) ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + " ) );\n" );
+				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\" ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + " ) );\n" );
 			}
 			rs.writeUTFBytes( "			\n" );
 			//compounds:
@@ -1598,7 +1641,7 @@ import view.Projection;
 							unitViewsString = unitViewsString + ", ";
 						}
 						
-						unitViewsString = unitViewsString + "new BliscUnitView( " + unitViewOrientation._orientation.toString() + ", ResolveGraphics( \"" + unitDesc._singleResource._name + "\", \"" + unitDesc._singleResource._resourcePath + "\", new Point, " + unitViewOrientation._startingFrame.toString() + ", " + unitViewOrientation._endingFrame.toString() + " ) )";
+						unitViewsString = unitViewsString + "new BliscUnitView( " + unitViewOrientation._orientation.toString() + ", ResolveGraphics( \"" + unitDesc._singleResource._name + "\", \"" + unitDesc._singleResource._resourcePath + "\", " + unitViewOrientation._startingFrame.toString() + ", " + unitViewOrientation._endingFrame.toString() + " ) )";
 					}
 					unitViewsString = unitViewsString + " ]";
 					
@@ -1637,14 +1680,17 @@ import view.Projection;
 			
 			rs.writeUTFBytes( "}\n" );
 			
-			//EmbeddedResource:
+			//private classes:
 			rs.writeUTFBytes( "\n" );
+			rs.writeUTFBytes( "import blisc.core.BliscAnimation;\n" );
 			rs.writeUTFBytes( "import mx.core.MovieClipAsset;\n" );
 			rs.writeUTFBytes( "import flash.system.ApplicationDomain;\n" );
 			rs.writeUTFBytes( "import flash.events.Event;\n" );
 			rs.writeUTFBytes( "import flash.display.LoaderInfo;\n" );
 			rs.writeUTFBytes( "import flash.display.Loader;\n" );
 			rs.writeUTFBytes( "\n" );
+			rs.writeUTFBytes( "\n" );
+			//EmbeddedResource:
 			rs.writeUTFBytes( "class EmbeddedResource\n" );
 			rs.writeUTFBytes( "{\n" );
 			rs.writeUTFBytes( "	public var _editorsPath : String;\n" );
@@ -1667,6 +1713,24 @@ import view.Projection;
 			rs.writeUTFBytes( "			\n" );
 			rs.writeUTFBytes( "			onLoaded();\n" );
 			rs.writeUTFBytes( "		} );\n" );
+			rs.writeUTFBytes( "	}\n" );
+			rs.writeUTFBytes( "}\n" );
+			rs.writeUTFBytes( "\n" );
+			//cached animation:
+			rs.writeUTFBytes( "class CachedAnimation\n" );
+			rs.writeUTFBytes( "{\n" );
+			rs.writeUTFBytes( "	public var _animation : BliscAnimation;\n" );
+			rs.writeUTFBytes( "	public var _editorsPath : String;\n" );
+			rs.writeUTFBytes( "	public var _startingFrame : int;\n" );
+			rs.writeUTFBytes( "	public var _endingFrame : int;\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	\n" );
+			rs.writeUTFBytes( "	public function CachedAnimation( animation : BliscAnimation, editorsPath : String, startingFrame : int, endingFrame : int )\n" );
+			rs.writeUTFBytes( "	{\n" );
+			rs.writeUTFBytes( "		_animation = animation;\n" );
+			rs.writeUTFBytes( "		_editorsPath = editorsPath;\n" );
+			rs.writeUTFBytes( "		_startingFrame = startingFrame;\n" );
+			rs.writeUTFBytes( "		_endingFrame = endingFrame;\n" );
 			rs.writeUTFBytes( "	}\n" );
 			rs.writeUTFBytes( "}\n" );
 			rs.writeUTFBytes( "\n" );

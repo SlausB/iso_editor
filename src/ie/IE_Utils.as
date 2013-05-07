@@ -31,9 +31,9 @@ package ie
 			1: need to use it with some cashing - avoid creating animations for each similar object.
 			2: create prope animations from MovieClip's
 		*/
-		public static function CreateAnimation( singleResource : SingleResource, center : Point, project : Project ) : BliscAnimation
+		public static function CreateAnimation( singleResource : SingleResource, project : Project ) : BliscAnimation
 		{
-			return BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, center, singleResource._name );
+			return BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, singleResource._name );
 		}
 		
 		/** Any object template (ComplexTemplate or CompoundTemplate for now) to corresponding Blisc template.*/
@@ -78,7 +78,7 @@ package ie
 			
 			return new BliscComplexTemplate(
 				complex._name,
-				CreateAnimation( complex._singleResource, complex._center, project ),
+				CreateAnimation( complex._singleResource, project ),
 				complex._disp,
 				complex._center,
 				complex._layer._name,

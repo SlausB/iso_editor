@@ -44,7 +44,7 @@ package
 			_height = _map._down * 2;
 			_roundGlobal.x = -_map._right;
 			_roundGlobal.y = -_map._down;
-			_sprite = new BliscSprite( new BitmapData( 1, 1 ), new Rectangle( 0, 0, 1, 1 ), new Point, new Point );
+			_sprite = new BliscSprite( new BitmapData( 1, 1 ), new Rectangle( 0, 0, 1, 1 ), new Point );
 		}
 		
 		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number ) : void
