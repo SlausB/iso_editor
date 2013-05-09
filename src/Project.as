@@ -80,7 +80,7 @@ package
 		/** Initialize using specified data.
 		\param onResult function( errorText:String ): void where errorText is non-null value when anything gone wrong.
 		*/
-		public function Accept( data:ByteArray, onResult:Function ): void
+		public function Accept( data : ByteArray, onResult : Function ) : void
 		{
 			try
 			{
@@ -95,7 +95,7 @@ package
 			_loadingResourceIndex = 0;
 			_main._resources_list_data_provider.removeAll();
 			_main._units_list_data_provider.removeAll();
-			LoadNextResource( function( errorText:String ): void
+			LoadNextResource( function( errorText : String ): void
 			{
 				if ( errorText == null )
 				{
@@ -196,7 +196,7 @@ package
 			for ( var i1:int = 0; i1 < what.length; ++i1 )
 			{
 				//looking for copy:
-				for ( var i2:int = i1 + 1; i2 < what.length; ++i2 )
+				for ( var i2 : int = i1 + 1; i2 < what.length; ++i2 )
 				{
 					if ( what[ i1 ] == what[ i2 ] )
 					{

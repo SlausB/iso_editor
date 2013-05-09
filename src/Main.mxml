@@ -354,29 +354,32 @@ import ie.EditingUnitWindow;
 import ie.EditingRegionWindow;
 import view.Projection;
 
-		public var _projectPath:String = null;
+		public var _projectPath : String = null;
 		
-		public var _project:Project;
+		public var _project : Project;
 		
-		public var _resourcesPreview:ResourcesPreview = new ResourcesPreview;
+		public var _resourcesPreview : ResourcesPreview = new ResourcesPreview;
 		
 		/** Currently displayed map and layers of which are displayed within "layers list".*/
-		public var _chosenMap:Map = null;
+		public var _chosenMap : Map = null;
 		
 		public var _qDown : Boolean = false;
 		
 		/** Is it need to clamp complex templates within compound editing window.*/
-		public static var _clampTemplatesToTile:Boolean = false;
+		public static var _clampTemplatesToTile : Boolean = false;
 		
 		/** Currently opened editing window if not null.*/
 		public var _editingTemplateWindow : EditingTemplateWindow = null;
 		
 		/** Last chosen surface and space to prechoose it when window is displayed. Null if no such.*/
-		public var _lastSurface:Region = null;
-		public var _lastSpace:Region = null;
+		public var _lastSurface : Region = null;
+		public var _lastSpace : Region = null;
+		
+		/** True if any modification was made with editor and other project file cannot be loaded - editor must be restarted.*/
+		public var _changeMade : Boolean = false;
 		
 		
-		public function onInit( ... args ): void
+		public function onInit( ... args ) : void
 		{
 			_project = new Project( this );
 			
@@ -605,6 +608,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_resource":
+						_changeMade = true;
 						_project.AddResource();
 						break;
 				}
@@ -688,6 +692,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_template":
+						_changeMade = true;
 						AddTemplate();
 						break;
 					
@@ -811,6 +816,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_compound":
+						_changeMade = true;
 						AddCompound();
 						break;
 					
@@ -909,6 +915,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_map":
+						_changeMade = true;
 						AddMap();
 						break;
 				}
@@ -988,6 +995,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_layer":
+						_changeMade = true;
 						AddLayer();
 						break;
 				}
@@ -1243,19 +1251,25 @@ import view.Projection;
 				/// FILE:
 				
 				case "open_project":
-					var openingProjectFile:File = new File;
+					if ( _changeMade )
+					{
+						PopUp( "Some modifications was already made. Restart the editor to be able to load a project file.", POP_UP_ERROR );
+						break;
+					}
+					
+					var openingProjectFile : File = new File;
 					
 					openingProjectFile.addEventListener( Event.SELECT, function( e:Event ): void
 					{
 						projectPath = openingProjectFile.nativePath;
 						
-						var openingProjectFileStream:FileStream = new FileStream;
-						var ok:Boolean = true;
+						var openingProjectFileStream : FileStream = new FileStream;
+						var ok : Boolean = true;
 						try
 						{
 							openingProjectFileStream.open( openingProjectFile, FileMode.READ );
 						}
-						catch ( e:Error )
+						catch ( e : Error )
 						{
 							PopUp( "Project file opening failed with error: " + e.message, POP_UP_ERROR );
 							ok = false;
@@ -1263,15 +1277,18 @@ import view.Projection;
 						
 						if ( ok )
 						{
-							var bytes:ByteArray = new ByteArray;
+							_changeMade = true;
+							
+							var bytes : ByteArray = new ByteArray;
 							openingProjectFileStream.readBytes( bytes );
 							
 							//let's try clean-up currently existing instances a little:
 							_isometry.Unload();
 							//TODO
 							///...
+							//well, not we got rid of it using _changeMade variable...
 							
-							_project.Accept( bytes, function( errorText:String ): void
+							_project.Accept( bytes, function( errorText : String ) : void
 							{
 								if ( errorText == null )
 								{
@@ -1286,11 +1303,11 @@ import view.Projection;
 						
 						openingProjectFileStream.close();
 					} );
-					openingProjectFile.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent:IOErrorEvent ): void
+					openingProjectFile.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent : IOErrorEvent ) : void
 					{
 						PopUp( "Opening failed with error: " + ioErrorEvent.text, POP_UP_ERROR );
 					} );
-					openingProjectFile.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent:SecurityErrorEvent ): void
+					openingProjectFile.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent : SecurityErrorEvent ): void
 					{
 						PopUp( "Opening failed with error: " + securityErrorEvent.text, POP_UP_ERROR );
 					} );
@@ -1977,6 +1994,7 @@ import view.Projection;
 				switch ( menuEvent.item.id )
 				{
 					case "add_region":
+						_changeMade = true;
 						AddRegion();
 						break;
 					

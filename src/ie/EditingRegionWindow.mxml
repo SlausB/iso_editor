@@ -59,6 +59,8 @@ import project_data.Region;
 		
 		private function onOk( ... args ): void
 		{
+			_main._changeMade = true;
+			
 			_region._name = _name.text;
 			
 			if ( _surface.selected )
@@ -74,10 +76,10 @@ import project_data.Region;
 			
 			
 			//inform list about item change:
-			var associatedItem:RegionListItem = null;
-			for ( var i:int = 0; i < _main._regions_list.dataProvider.length; ++i )
+			var associatedItem : RegionListItem = null;
+			for ( var i : int = 0; i < _main._regions_list.dataProvider.length; ++i )
 			{
-				var item:RegionListItem = _main._regions_list.dataProvider.getItemAt( i ) as RegionListItem;
+				var item : RegionListItem = _main._regions_list.dataProvider.getItemAt( i ) as RegionListItem;
 				if ( item.region == _region )
 				{
 					associatedItem = item;

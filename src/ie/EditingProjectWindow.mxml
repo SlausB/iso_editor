@@ -196,6 +196,8 @@ import utils.Utils;
 		
 		private function onOk( ... args ) : void
 		{
+			_project._main._changeMade = true;
+			
 			_project._data._tileSize = _tileSize;
 			
 			if ( _slipping_0.selected )
