@@ -31,7 +31,7 @@ package
 		
 		public function GridDrawer( map : Map, viewportWidth : Number, viewportHeight : Number, project : Project )
 		{
-			super( null, 0, 1, new Point );
+			super( null, null );
 			
 			_map = map;
 			
@@ -47,7 +47,7 @@ package
 			_sprite = new BliscSprite( new BitmapData( 1, 1 ), new Rectangle( 0, 0, 1, 1 ), new Point );
 		}
 		
-		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number ) : void
+		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number, dispX : Number = 0, dispY : Number = 0 ) : void
 		{
 			if ( _viewportWidth == 0 || _viewportHeight == 0 )
 			{

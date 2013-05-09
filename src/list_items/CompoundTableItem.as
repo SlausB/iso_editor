@@ -29,28 +29,28 @@ package list_items
 			UpdateView( main );
 		}
 		
-		public function get compound(): CompoundTemplate
+		public function get compound() : CompoundTemplate
 		{
 			return super.data as CompoundTemplate;
 		}
 		
 		
-		public function get name(): String
+		public function get name() : String
 		{
 			return compound._name;
 		}
 		
-		public function get used(): int
+		public function get used() : int
 		{
 			return _used;
 		}
-		public function UpdateUsage( main:Main ): void
+		public function UpdateUsage( main : Main ) : void
 		{
 			_used = 0;
 			
-			for each ( var map:Map in main._project._data._maps )
+			for each ( var map : Map in main._project._data._maps )
 			{
-				for each ( var objectInstance:ObjectInstance in map._instances )
+				for each ( var objectInstance : ObjectInstance in map._instances )
 				{
 					if ( objectInstance._template == _data )
 					{
@@ -60,18 +60,18 @@ package list_items
 			}
 		}
 		
-		public function get view(): DisplayObject
+		public function get view() : DisplayObject
 		{
 			return _view;
 		}
-		public function UpdateView( main:Main ): void
+		public function UpdateView( main : Main ) : void
 		{
 			Utils.RemoveAllChildren( _view );
 			
-			var mediate:Sprite = new Sprite;
-			var views:Vector.< ComplexView > = new Vector.< ComplexView >;
+			var mediate : Sprite = new Sprite;
+			var views : Vector.< ComplexView > = new Vector.< ComplexView >;
 			
-			for each ( var cwc:ComplexWithinCompound in compound._consisting )
+			for each ( var cwc : ComplexWithinCompound in compound._consisting )
 			{
 				var addingView:DisplayObject = cwc._complex._singleResource.Display( main._project );
 				

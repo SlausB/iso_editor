@@ -581,7 +581,7 @@ import view.Projection;
 				return;
 			}
 			
-			var addingTemplate:ObjectTemplate = null;
+			var addingTemplate : ObjectTemplate = null;
 			
 			if ( event.dragSource.hasFormat( Global.DRAG_FORMAT_COMPLEX_TEMPLATE ) )
 			{
@@ -597,33 +597,7 @@ import view.Projection;
 				_lastPositioned = addingTemplate;
 				
 				AddTemplate( addingTemplate, tileMousePos.x, tileMousePos.y );
-				
-				if ( addingTemplate is ComplexTemplate )
-				{
-					var templateTableItem:TemplateTableItem = ListItem.FindListItem( addingTemplate, _main._templates_table.dataProvider ) as TemplateTableItem;
-					if ( templateTableItem == null )
-					{
-						Cc.error( "E: Isometry.onDragDrop(): TemplateTableItem was NOT found." );
-					}
-					else
-					{
-						templateTableItem.UpdateUsage( _main );
-						_main._templates_table.dataProvider.itemUpdated( templateTableItem );
-					}
-				}
-				else if ( addingTemplate is CompoundTemplate )
-				{
-					var compoundTableItem:CompoundTableItem = ListItem.FindListItem( addingTemplate, _main._compounds_table.dataProvider ) as CompoundTableItem;
-					if ( compoundTableItem == null )
-					{
-						Cc.error( "E: Isometry.onDragDrop(): CompoundTableItem was NOT found." );
-					}
-					else
-					{
-						compoundTableItem.UpdateUsage( _main );
-						_main._compounds_table.dataProvider.itemUpdated( compoundTableItem );
-					}
-				}
+				_main.UpdateUsage( addingTemplate );
 			}
 		}
 		
@@ -693,6 +667,7 @@ import view.Projection;
 					var tilePos : Point = new Point;
 					ResolveMouseIso( displaying._clampToTiles, tilePos );
 					AddTemplate( _lastPositioned, tilePos.x, tilePos.y );
+					_main.UpdateUsage( _lastPositioned );
 				}
 			}
 			else if ( _main.moving )

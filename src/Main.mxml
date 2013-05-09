@@ -452,6 +452,36 @@ import view.Projection;
 			}
 		}
 		
+		public function UpdateUsage( template : ObjectTemplate ) : void
+		{
+			if ( template is ComplexTemplate )
+			{
+				var templateTableItem : TemplateTableItem = ListItem.FindListItem( template, _templates_table.dataProvider ) as TemplateTableItem;
+				if ( templateTableItem == null )
+				{
+					Cc.error( "E: Main.UpdateUsage(): TemplateTableItem was NOT found." );
+				}
+				else
+				{
+					templateTableItem.UpdateUsage( this );
+					_templates_table.dataProvider.itemUpdated( templateTableItem );
+				}
+			}
+			else if ( template is CompoundTemplate )
+			{
+				var compoundTableItem : CompoundTableItem = ListItem.FindListItem( template, _compounds_table.dataProvider ) as CompoundTableItem;
+				if ( compoundTableItem == null )
+				{
+					Cc.error( "E: Main.UpdateUsage(): CompoundTableItem was NOT found." );
+				}
+				else
+				{
+					compoundTableItem.UpdateUsage( this );
+					_compounds_table.dataProvider.itemUpdated( compoundTableItem );
+				}
+			}
+		}
+		
 		public function RemoveObjectFromMap( objectInstance : ObjectInstance, map : Map, updateUsage : Boolean = true ): void
 		{
 			//if removing object from currently selected map:
@@ -1320,6 +1350,8 @@ import view.Projection;
 				return;
 			}
 			
+			var wasError : Boolean = false;
+			
 			//only this way (creating new File object from applicationDirectory.nativePath) allows to navigate from application directory somewhere (otherwise call to createDirectory() thrown SecurityError exception):
 			var directory : File = new File ( File.applicationDirectory.nativePath );
 			directory = directory.resolvePath( _project._data._sourcesDirectory );
@@ -1664,7 +1696,19 @@ import view.Projection;
 						mapObjectsString = mapObjectsString + ", ";
 					}
 					
-					mapObjectsString = mapObjectsString + "new BliscObjectInstanceTemplate( _objects[ " + _project._data._objects.indexOf( mapObjectInstance._template ).toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) )";
+					const indexWithinData : int = _project._data._objects.indexOf( mapObjectInstance._template );
+					if ( indexWithinData < 0 )
+					{
+						var errorString : String = "\"" + mapObjectInstance._template._name + "\" at tile " + mapObjectInstance._tileCoords.x.toString() + " | " + mapObjectInstance._tileCoords.y.toString() + " was NOT found within data.";
+						Cc.error( "E: Main.GenerateSources(): " + errorString );
+						if ( wasError == false )
+						{
+							wasError = true;
+							PopUp( errorString, POP_UP_ERROR );
+						}
+					}
+					
+					mapObjectsString = mapObjectsString + "new BliscObjectInstanceTemplate( _objects[ " + indexWithinData.toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) )";
 				}
 				mapObjectsString = mapObjectsString + " ]";
 				
@@ -1738,8 +1782,10 @@ import view.Projection;
 			
 			rs.close();
 			
-			
-			PopUp( "Resources successfully generated.", POP_UP_INFO );
+			if ( wasError == false )
+			{
+				PopUp( "Resources successfully generated.", POP_UP_INFO );
+			}
 		}
 		
 		private function set projectPath( value:String ): void
