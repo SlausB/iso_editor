@@ -260,8 +260,16 @@ import view.Projection;
 						newTilePos.y = Math.round( newTilePos.y );
 					}
 					_dragging._view.SetTileXY( newTilePos.x, newTilePos.y );
-					_dragging._objectInstance._tileCoords.x = newTilePos.x;
-					_dragging._objectInstance._tileCoords.y = newTilePos.y;
+					//weird runtime null-referencing error here, so get rid of it:
+					if ( _dragging._objectInstance == null || _dragging._objectInstance._tileCoords == null )
+					{
+						Cc.error( "E: Isometry.onEnterFrame(): weird bug happened." );
+					}
+					else
+					{
+						_dragging._objectInstance._tileCoords.x = newTilePos.x;
+						_dragging._objectInstance._tileCoords.y = newTilePos.y;
+					}
 					_main.ShowObjectProperties();
 				}
 			}
