@@ -34,6 +34,7 @@ package
 	import project_data.Map;
 	import project_data.ObjectInstance;
 	import project_data.ObjectTemplate;
+	import project_data.Preferences;
 	import project_data.ProjectData;
 	import project_data.Region;
 	import project_data.RegionWithinComplex;
@@ -72,6 +73,7 @@ package
 			registerClassAlias( "project_data.Region", Region );
 			registerClassAlias( "project_data.RegionWithinComplex", RegionWithinComplex );
 			registerClassAlias( "project_data.UnitProperties", UnitProperties );
+			registerClassAlias( "project_data.Preferences", Preferences );
 			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;

@@ -28,6 +28,10 @@
 				<menuitem label="Properties..." id="project_properties" />
 			</menuitem>
 			
+			<menuitem label="Preferences" >
+				<menuitem label="Edit..." id="preferences_edit" />
+			</menuitem>
+			
 			<menuitem label="Help" >
 				<menuitem label="About" id="about" />
 			</menuitem>
@@ -304,6 +308,7 @@ import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
 import ie.ConfirmationWindow;
 import ie.EditingMapWindow;
+import ie.EditingPreferencesWindow;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
@@ -377,6 +382,9 @@ import view.Projection;
 		
 		/** True if any modification was made with editor and other project file cannot be loaded - editor must be restarted.*/
 		public var _changeMade : Boolean = false;
+		
+		/** How much windows currently displayed - isometry will be mouse interactive only if there are 0.*/
+		public var _windows : int = 0;
 		
 		
 		public function onInit( ... args ) : void
@@ -518,7 +526,7 @@ import view.Projection;
 			}
 			
 			//remove from map's objects:
-			for ( var mapObjectIndex:int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
+			for ( var mapObjectIndex : int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
 			{
 				if ( map._instances[ mapObjectIndex ] == objectInstance )
 				{
@@ -558,37 +566,37 @@ import view.Projection;
 			}
 		}
 		
-		public function onResourceChoice( e:IndexChangeEvent ): void
+		public function onResourceChoice( e : IndexChangeEvent ) : void
 		{
-			var resource:Resource = ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ].resource as Resource;
+			var resource : Resource = ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ].resource as Resource;
 			_resourcesPreview.Display( resource, _project );
 		}
-		public function onTemplateChoice( e:GridSelectionEvent ): void
+		public function onTemplateChoice( e : GridSelectionEvent ) : void
 		{
-			var templateTableItem:TemplateTableItem = _templates_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as TemplateTableItem;
+			var templateTableItem : TemplateTableItem = _templates_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as TemplateTableItem;
 			_isometricPreview.Display( templateTableItem.template, _project );
 		}
-		public function onCompoundsChoice( e:GridSelectionEvent ): void
+		public function onCompoundsChoice( e : GridSelectionEvent ) : void
 		{
-			var compoundTableItem:CompoundTableItem = _compounds_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as CompoundTableItem;
+			var compoundTableItem : CompoundTableItem = _compounds_table.dataProvider.getItemAt( e.selectionChange.rowIndex ) as CompoundTableItem;
 			_isometricPreview.Display( compoundTableItem.compound, _project );
 		}
-		public function onUnitChoice( e:IndexChangeEvent ): void
+		public function onUnitChoice( e : IndexChangeEvent ) : void
 		{
 			trace( "unit" );
 		}
-		public function onMapsChoice( e:IndexChangeEvent ): void
+		public function onMapsChoice( e : IndexChangeEvent ) : void
 		{
 			_chosenMap = ( ( ( e.target as spark.components.List ).dataProvider as ArrayList ).source[ e.newIndex ] as MapListItem ).map;
 			_isometry.Display( _chosenMap );
 		}
-		public function onLayersChoice( e:IndexChangeEvent ): void
+		public function onLayersChoice( e : IndexChangeEvent ) : void
 		{
 			trace( "layer" );
 		}
 		
-		public var _resourcesContextMenu:Menu = null;
-		public function onResourcesContextMenu( e:MouseEvent ): void
+		public var _resourcesContextMenu : Menu = null;
+		public function onResourcesContextMenu( e : MouseEvent ) : void
 		{
 			//for now we're ignoring right clicks on resource elements (menus like "Remove" can be added at future):
 			if ( ( e.target is DataGroup ) == false )
@@ -1345,9 +1353,18 @@ import view.Projection;
 				///PROJECT:
 				
 				case "project_properties":
-					var editingProjectWindow:EditingProjectWindow = PopUpManager.createPopUp( thisOne, EditingProjectWindow, false ) as EditingProjectWindow;
+					var editingProjectWindow : EditingProjectWindow = PopUpManager.createPopUp( thisOne, EditingProjectWindow, false ) as EditingProjectWindow;
 					editingProjectWindow.Init( _project );
 					PopUpManager.centerPopUp( editingProjectWindow );
+					break;
+				
+				
+				///PREFERENCES:
+				
+				case "preferences_edit":
+					var editingPreferencesWindow : EditingPreferencesWindow = PopUpManager.createPopUp( thisOne, EditingPreferencesWindow, false ) as EditingPreferencesWindow;
+					editingPreferencesWindow.Init( _project );
+					PopUpManager.centerPopUp( editingPreferencesWindow );
 					break;
 				
 				

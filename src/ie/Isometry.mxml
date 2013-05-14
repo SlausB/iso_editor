@@ -58,6 +58,7 @@ import project_data.Layer;
 import project_data.Map;
 import project_data.ObjectInstance;
 import project_data.ObjectTemplate;
+import project_data.Preferences;
 import project_data.Region;
 import project_data.SingleResource;
 import project_data.UnitProperties;
@@ -109,6 +110,7 @@ import view.Projection;
 		private var _positioning : ObjectRenderer;
 		private var _fitting : Fitting;
 		private var _positioningTemplate : ObjectTemplate;
+		private var _causedByMovement : Boolean = false;
 		
 		
 		
@@ -219,7 +221,12 @@ import view.Projection;
 				_fitting.y = _positioning.y = positioningPlanar.y;
 			}
 			//scroll isometric view using sensitive mouse:
-			else if ( _main.moving || DragManager.isDragging || _isDragging != null )
+			else if (
+				( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
+				|| DragManager.isDragging
+				|| _isDragging
+				!= null
+			)
 			{
 				var horisontalScrolling : Number = 0;
 				var verticalScrolling : Number = 0;
@@ -274,7 +281,7 @@ import view.Projection;
 				}
 			}
 			
-			if ( DragManager.isDragging == false && _isDragging == null )
+			if ( DragManager.isDragging == false && _isDragging == null && _main._windows <= 0 )
 			{
 				//mouse should be within isometry to display hovering tips to avoid overlapping while working with interfaces:
 				if ( _bliscViewport.mouseX >= 0 && _bliscViewport.mouseY >= 0 && _bliscViewport.mouseX < width && _bliscViewport.mouseY < height )
@@ -626,13 +633,17 @@ import view.Projection;
 			return _displaying;
 		}
 		
-		
-		/** Object which was captured to drag.*/
-		private var _dragging : IsometryObject = null;
 		/** Did any mouse movement happened after mouse was pushed down.*/
-		private var _wasDrag : Boolean = false;
-		/** Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
-		private var _isDragging : Point = null;
+		public var _wasDrag : Boolean = false;
+		
+		/** Sensora: Object which was captured to drag.*/
+		public var _dragging : IsometryObject = null;
+		/** Sensora: Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
+		public var _isDragging : Point = null;
+		
+		/** Pulliny: local mouse position at clicking moment to ignore small mouse moves.*/
+		public var _clickMoment : Point = new Point;
+		
 		private function GetObj( e : MouseEvent, local : Point = null ) : IsometryObject
 		{
 			if ( _blisc == null )
@@ -646,7 +657,15 @@ import view.Projection;
 			}
 			const globalX : Number = local.x + _blisc.cameraOffsetX;
 			const globalY : Number = local.y + _blisc.cameraOffsetY;
-			var over : Vector.< * > = _blisc.ObjectsUnderPoint( globalX, globalY, null, false, _main._through.selected == false );
+			var over : Vector.< * > = _blisc.ObjectsUnderPoint(
+				globalX,
+				globalY,
+				null,
+				false,
+				( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_PULLINY )
+					? false
+					: ( _main._through.selected == false )
+			);
 			if ( over.length > 0 )
 			{
 				if ( _main._through.selected )
@@ -668,6 +687,9 @@ import view.Projection;
 			
 			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
+			_clickMoment.x = local.x;
+			_clickMoment.y = local.y;
+			
 			if ( _main._qDown )
 			{
 				if ( _lastPositioned != null )
@@ -678,7 +700,7 @@ import view.Projection;
 					_main.UpdateUsage( _lastPositioned );
 				}
 			}
-			else if ( _main.moving )
+			else if ( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
 			{
 				var newDragging : IsometryObject = GetObj( e, local );
 				if ( newDragging != null )
@@ -711,11 +733,13 @@ import view.Projection;
 			
 			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
 			
-			if ( _main.moving )
+			if ( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
 			{
 			}
 			else
 			{
+				var movedRightNow : Boolean = false;
+				
 				if ( _wasDrag == false )
 				{
 					if ( _positioning != null )
@@ -723,6 +747,12 @@ import view.Projection;
 						if ( _fitting.canPut )
 						{
 							AddTemplate( _positioningTemplate, _fitting._tryingTileX, _fitting._tryingTileY );
+							
+							if ( _causedByMovement && _project._data._preferences._spawning == false )
+							{
+								CancelPositioning();
+								movedRightNow = true;
+							}
 						}
 					}
 					//send currently selected unit to specified position:
@@ -734,6 +764,22 @@ import view.Projection;
 				}
 				
 				_blisc.OnMouseUp( local.x, local.y );
+				
+				if (
+					_main.moving
+					&& _project._data._preferences._movingWay == Preferences.MOVING_WAY_PULLINY
+					&& _positioning == null
+					&& Utils.Distance( local.x - _clickMoment.x, local.y - _clickMoment.y ) < 5
+					&& movedRightNow == false
+				)
+				{
+					var removing : IsometryObject = GetObj( e, local );
+					if ( removing != null )
+					{
+						Position( removing._objectInstance._template, true );
+						_main.RemoveObjectFromMap( removing._objectInstance, displaying );
+					}
+				}
 			}
 		}
 		private function onMouseMove( e : MouseEvent ) : void
@@ -768,7 +814,7 @@ import view.Projection;
 					{
 						continue;
 					}
-					//units doesn't have that property:
+					//units don't have that property:
 					if ( io._objectInstance == null )
 					{
 						continue;
@@ -878,8 +924,10 @@ import view.Projection;
 			}
 		}
 		
-		public function Position( object : ObjectTemplate ) : void
+		public function Position( object : ObjectTemplate, causedByMovement : Boolean = false ) : void
 		{
+			_causedByMovement = causedByMovement;
+			
 			CancelPositioning();
 			
 			var bliscObjectTemplate : BliscObjectTemplate = IE_Utils.ObjectTemplateToBlisc( _regionsCache, object, _main._project );

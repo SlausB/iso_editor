@@ -34,6 +34,10 @@ package project_data
 		
 		/** Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque.*/
 		public var _throughAlpha : int = 100;
+		
+		/** Global user's preferences for this project.*/
+		public var _preferences : Preferences = new Preferences;
 	}
 
 }
+

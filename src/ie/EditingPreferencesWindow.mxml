@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="Edit preferences"
+			   initialize="onInit(event)"
+			   minWidth="400"
+			   minHeight="400"
+			   >
+	
+	<s:Label text="Moving way:" x="12" y="12" toolTip="How isometric objects must be moved using mouse when `moving` property is set. Try out each to learn more." />
+	<s:VGroup x="10" y="28" >
+		<s:RadioButton id="_moving_way_0" groupName="movingWay" label="Sensora" toolTip="Objects are dragged to new position holding mouse button. Screen can be moved hovering mouse over it's boundaries." />
+		<s:RadioButton id="_moving_way_1" groupName="movingWay" label="Pulliny" toolTip="Screen can be moved using simple drag-and-drop operation. When mouse released on same position where it was pushed object under it will be removed and normal positioning process will start with new instance of it. Toggle `Spawning` property to create multiple instances of moved object." />
+	</s:VGroup>
+	
+	<s:Label text="Spawning:" x="102" y="12" toolTip="When `pulliny` moving way is active and this toggled on object will keep spawning after it's first instance." />
+	<s:CheckBox x="166" y="8" id="_spawning" toolTip="When `pulliny` moving way is active and this toggled on object will keep spawning after it's first instance." />
+	
+	
+	<s:Button x="220" y="330" label="Ok" click="onOk(event)" />
+	<s:Button x="310" y="330" label="Cancel" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import mx.managers.PopUpManager;
+import project_data.Preferences;
+import utils.Utils;
+		
+		private var _project : Project;
+		
+		
+		private function onInit( ... args ) : void
+		{
+			closeButton.visible = false;
+		}
+		
+		public function Init( project : Project ) : void
+		{
+			project._main._windows++;
+			
+			_project = project;
+			
+			switch ( project._data._preferences._movingWay )
+			{
+				case Preferences.MOVING_WAY_SENSORA:
+					_moving_way_0.selected = true;
+					break;
+				
+				case Preferences.MOVING_WAY_PULLINY:
+					_moving_way_1.selected = true;
+					break;
+				
+				default:
+					Cc.error( "E: EditingPreferencesWindow.Init(): undefined moving way." );
+					break;
+			}
+			
+			_spawning.selected = _project._data._preferences._spawning;
+		}
+		
+		private function Destroy() : void
+		{
+			_project._main._windows--;
+			
+			_project = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		private function onOk( ... args ) : void
+		{
+			if ( _moving_way_0.selected )
+			{
+				_project._data._preferences._movingWay = Preferences.MOVING_WAY_SENSORA;
+			}
+			else if ( _moving_way_1.selected )
+			{
+				_project._data._preferences._movingWay = Preferences.MOVING_WAY_PULLINY;
+			}
+			else
+			{
+				_project._main.PopUp( "Chosen unrecognized moving way. Choose some other please.", Main.POP_UP_ERROR );
+				return;
+			}
+			
+			_project._data._preferences._spawning = _spawning.selected;
+			
+			//drop any currently dragging object:
+			if ( _project._data._preferences._movingWay != Preferences.MOVING_WAY_SENSORA
+				&& _project._main._isometry != null
+				&& _project._main._isometry.displaying != null
+			)
+			{
+				_project._main._isometry._dragging = null;
+				_project._main._isometry._isDragging = null;
+			}
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ) : void
+		{
+			Destroy();
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>
