@@ -82,7 +82,8 @@ package ie
 				complex._disp,
 				complex._center,
 				complex._layer == null ? Blisc.LAYER_DEFAULT : complex._layer._name,
-				regions
+				regions,
+				complex._interactive
 			);
 		}
 		

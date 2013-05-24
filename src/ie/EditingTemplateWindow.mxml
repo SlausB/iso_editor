@@ -46,6 +46,9 @@
 		<mx:ArrayList />
 	</s:DropDownList>
 	
+	<s:Label x="500" y="42" text="Interactive:" id="_interactiveLabel" toolTip="Should object react on mouse movements and clicks or not" />
+	<s:CheckBox x="564" y="36" id="_interactive" toolTip="Should object react on mouse movements and clicks or not" />
+	
 	<s:Button x="624" y="620" label="Ok" click="onOk()" />
 	<s:Button x="704" y="620" label="Cancel" click="onCancel()" />
 	
@@ -265,6 +268,8 @@ import utils.Utils;
 					
 					_complex._singleResource = draggingComplex._aimingResource;
 				}
+				
+				_complex._interactive = _interactive.selected;
 				
 				
 				//update preview within table:
@@ -914,6 +919,17 @@ import utils.Utils;
 				title = "Compound";
 			}
 			ApplyDisplacement();
+			
+			//interactivity:
+			if ( _complex == null )
+			{
+				_interactiveLabel.visible = false;
+				_interactive.visible = false;
+			}
+			else
+			{
+				_interactive.selected = _complex._interactive;
+			}
 			
 			
 			//draw cursor frame:

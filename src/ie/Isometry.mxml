@@ -448,7 +448,8 @@ import view.Projection;
 				new Point,
 				new Point,
 				GRID_DRAWER_LAYER_NAME,
-				new Vector.< BliscRegionWithinComplex >
+				new Vector.< BliscRegionWithinComplex >,
+				false
 			);
 			var drawerCompound:BliscCompound = new BliscCompound( null, _blisc, drawerComplexTemplate );
 			_gridDrawer = new GridDrawer( map, width, height, _project );

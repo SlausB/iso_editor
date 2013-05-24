@@ -1645,7 +1645,7 @@ import view.Projection;
 				}
 				regionsString = regionsString + " ]";
 				
-				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\" ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + " ) );\n" );
+				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\" ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + ", " + complex._interactive + " ) );\n" );
 			}
 			rs.writeUTFBytes( "			\n" );
 			//compounds:

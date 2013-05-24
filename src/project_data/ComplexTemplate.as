@@ -25,6 +25,9 @@ package project_data
 		
 		/** Archaic field to avoid project loading errors/warnings - not used anymore.*/
 		public var _tiles : Vector.< Point >;
+		
+		/** Should object react on mouse movements and clicks or not.*/
+		public var _interactive : Boolean = true;
 	}
 
 }
