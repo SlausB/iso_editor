@@ -81,7 +81,7 @@ package ie
 				CreateAnimation( complex._singleResource, project ),
 				complex._disp,
 				complex._center,
-				complex._layer._name,
+				complex._layer == null ? Blisc.LAYER_DEFAULT : complex._layer._name,
 				regions
 			);
 		}

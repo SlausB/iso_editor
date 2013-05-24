@@ -19,6 +19,7 @@ import blisc.core.Blisc;
 import blisc.instances.BliscComplexWithinCompound;
 import blisc.instances.BliscCompound;
 import blisc.pathfinding.AStar;
+import blisc.templates.BliscLayerTemplate;
 import blisc.templates.BliscRegion;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -146,6 +147,8 @@ import project_data.ObjectTemplate;
 			{
 				_blisc.AddLayer( IE_Utils.LayerToBlisc( layer ), true );
 			}
+			var defaultLayer : BliscLayerTemplate = new BliscLayerTemplate( Blisc.LAYER_DEFAULT, true, true );
+			_blisc.AddLayer( defaultLayer );
 			
 			_displaying = IE_Utils.CreateBliscCompound( _regionsCache, null, _blisc, objectTemplate, project );
 			_blisc.AddObject( _displaying );
