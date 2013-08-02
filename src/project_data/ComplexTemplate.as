@@ -28,6 +28,52 @@ package project_data
 		
 		/** Should object react on mouse movements and clicks or not.*/
 		public var _interactive : Boolean = true;
+		
+		
+		public function clone() : ComplexTemplate
+		{
+			var result : ComplexTemplate = new ComplexTemplate;
+			
+			result._name = _name;
+			
+			if ( _singleResource != null )
+			{
+				var sr : SingleResource = new SingleResource;
+				sr.Init( _singleResource._resourcePath, _singleResource._name );
+				result._singleResource = sr;
+			}
+			
+			result._disp.x = _disp.x;
+			result._disp.y = _disp.y;
+			
+			for ( var regionIndex : int = 0; regionIndex < _regions.length; ++regionIndex )
+			{
+				var copyingRWC : RegionWithinComplex = _regions[ regionIndex ];
+				
+				var rwc : RegionWithinComplex = new RegionWithinComplex;
+				rwc.Init( copyingRWC._region );
+				
+				for ( var copyingRegionPointIndex : int = 0; copyingRegionPointIndex < copyingRWC._tiles.length; ++copyingRegionPointIndex )
+				{
+					var copyingRegionPoint : Point = copyingRWC._tiles[ copyingRegionPointIndex ];
+					
+					rwc._tiles.push( new Point( copyingRegionPoint.x, copyingRegionPoint.y ) );
+				}
+				
+				result._regions.push( rwc );
+			}
+			
+			result._layer = _layer;
+			
+			if ( _center != null )
+			{
+				result._center = new Point( _center.x, _center.y );
+			}
+			
+			result._interactive = _interactive;
+			
+			return result;
+		}
 	}
 
 }

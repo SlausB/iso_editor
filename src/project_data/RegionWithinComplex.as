@@ -23,11 +23,11 @@ package project_data
 		
 		public function Clone() : RegionWithinComplex
 		{
-			var result:RegionWithinComplex = new RegionWithinComplex;
+			var result : RegionWithinComplex = new RegionWithinComplex;
 			
 			result.Init( _region );
 			
-			for each ( var tile:Point in _tiles )
+			for each ( var tile : Point in _tiles )
 			{
 				result._tiles.push( tile.clone() );
 			}

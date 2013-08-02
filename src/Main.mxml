@@ -667,10 +667,10 @@ import view.Projection;
 			return null;
 		}
 		
-		public var _templatesContextMenu:Menu = null;
-		private function onTemplatesContextMenu( e:MouseEvent ): void
+		public var _templatesContextMenu : Menu = null;
+		private function onTemplatesContextMenu( e : MouseEvent ) : void
 		{
-			var thisOne:Main = this;
+			var thisOne : Main = this;
 			
 			if ( _templatesContextMenu != null )
 			{
@@ -678,18 +678,19 @@ import view.Projection;
 				_templatesContextMenu = null;
 			}
 			
-			var menuData:Array = [ { label:"Add template...", id:"add_template" } ];
+			var menuData:Array = [ { label : "Add template...", id : "add_template" } ];
 			
-			var gridItemRenderer:IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
+			var gridItemRenderer : IGridItemRenderer = Utils.FindParentByType( e.target as DisplayObject, IGridItemRenderer ) as IGridItemRenderer;
 			if ( gridItemRenderer != null )
 			{
-				var templateTableItem:TemplateTableItem = gridItemRenderer.data as TemplateTableItem;
+				var templateTableItem : TemplateTableItem = gridItemRenderer.data as TemplateTableItem;
 				if ( templateTableItem != null )
 				{
 					menuData = menuData.concat(
 						[ { label : "Edit...", id : "edit", template : templateTableItem.template } ],
 						[ { label : "Delete", id : "delete", template : templateTableItem.template } ],
-						[ { label : "Position", id : "position", template : templateTableItem.template } ]
+						[ { label : "Position", id : "position", template : templateTableItem.template } ],
+						[ { label : "Duplicate", id : "duplicate", template : templateTableItem.template } ]
 					);
 				}
 			}
@@ -734,6 +735,11 @@ import view.Projection;
 					
 					case "position":
 						Position( menuEvent.item.template );
+						break;
+					
+					case "duplicate":
+						_changeMade = true;
+						AddTemplate( menuEvent.item.template.clone() );
 						break;
 				}
 			} );
@@ -813,7 +819,8 @@ import view.Projection;
 					menuData = menuData.concat(
 						[ { label : "Edit...", id : "edit", compound : compoundTableItem.compound } ],
 						[ { label : "Delete", id : "delete", compound : compoundTableItem.compound } ],
-						[ { label : "Position...", id : "position", compound : compoundTableItem.compound } ]
+						[ { label : "Position...", id : "position", compound : compoundTableItem.compound } ],
+						[ { label : "Duplicate", id : "duplicate", compound : compoundTableItem.compound } ]
 					);
 				}
 			}
@@ -858,6 +865,11 @@ import view.Projection;
 					
 					case "position":
 						Position( menuEvent.item.compound );
+						break;
+					
+					case "duplicate":
+						_changeMade = true;
+						AddCompound( menuEvent.item.compound.clone() );
 						break;
 				}
 			} );
@@ -1847,14 +1859,14 @@ import view.Projection;
 			PopUp( "Project file successfully saved.", POP_UP_INFO );
 		}
 		
-		public function AddTemplate(): void
+		public function AddTemplate( complexTemplate : ComplexTemplate = null ): void
 		{
-			_project.AddObjectTemplate( new ComplexTemplate );
+			_project.AddObjectTemplate( complexTemplate == null ? new ComplexTemplate : complexTemplate );
 		}
 		
-		public function AddCompound(): void
+		public function AddCompound( compoundTemplate : CompoundTemplate = null ): void
 		{
-			_project.AddObjectTemplate( new CompoundTemplate );
+			_project.AddObjectTemplate( compoundTemplate == null ? new CompoundTemplate : compoundTemplate );
 		}
 		
 		public function AddMap(): void
