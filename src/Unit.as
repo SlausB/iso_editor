@@ -186,16 +186,10 @@ package
 			
 			if ( tiled )
 			{
-				//units stay on tile's center:
-				const startX : Number = _view.GetIsoX() - _view._blisc.tileSide / 2;
-				const startY : Number = _view.GetIsoY() - _view._blisc.tileSide / 2;
-				var start : AStarNode = _view._blisc._aStar.grid.GetTile(
-					Math.floor( startX / _view._blisc.tileSide ),
-					Math.floor( startY / _view._blisc.tileSide ) );
 				var end : AStarNode = _view._blisc._aStar.grid.GetTile(
 					Math.floor( isoX / _view._blisc.tileSide ),
 					Math.floor( isoY / _view._blisc.tileSide ) );
-				var path : Path = _view._blisc._aStar.search( ( _view as BliscUnit )._template, start, end, _main._project._data._slippingValue, true );
+				var path : Path = _view._blisc._aStar.search( ( _view as BliscUnit )._template, _view.node, end, _main._project._data._slippingValue, true );
 				if ( path == null )
 				{
 					//keep unit standing or doing what he was doing:
