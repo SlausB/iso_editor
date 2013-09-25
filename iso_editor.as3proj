@@ -43,7 +43,7 @@
     <option loadExterns="" />
     <option staticLinkRSL="True" />
     <option additional="+configname=air&#xA;-swf-version=13" />
-    <option compilerConstants="" />
+    <option compilerConstants="DEBUG::profiling,false&#xA;DEBUG::mouse_slow,false" />
     <option minorVersion="" />
   </build>
   <!-- SWC Include Libraries -->
