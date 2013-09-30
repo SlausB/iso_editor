@@ -85,7 +85,7 @@ package project_data
 				{
 					unitName = unitName + "_" + parts[ namePart ];
 				}
-				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( unitName, parts[ 1 ], new Vector.< BliscRegion >, new Vector.< BliscUnitView > );
+				var bliscUnitTemplate : BliscUnitTemplate = new BliscUnitTemplate( unitName, parts[ 1 ], new Vector.< BliscRegion >, new Vector.< BliscUnitView >, new Vector.< int > );
 				
 				var unitsSingleResource : SingleResource = new SingleResource;
 				unitsSingleResource.Init( _path, name );

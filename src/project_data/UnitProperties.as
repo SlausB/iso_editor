@@ -17,6 +17,9 @@ package project_data
 		/** Surfaces designer managed to choose for this unit - where he is walking on.*/
 		public var _surfaces : Vector.< Region > = new Vector.< Region >;
 		
+		/** Which directions unit cannot go.*/
+		public var _refusedDirections : Vector.< int > = new Vector.< int >;
+		
 		
 		public function Init( unit : String ) : void
 		{

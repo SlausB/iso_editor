@@ -3,7 +3,7 @@
                xmlns:s="library://ns.adobe.com/flex/spark" 
                xmlns:mx="library://ns.adobe.com/flex/mx"
 			   title="Adjust unit"
-			   minWidth="360"
+			   minWidth="500"
 			   minHeight="380"
 			   >
 	
@@ -17,17 +17,25 @@
 		</s:Scroller >
 	</s:BorderContainer>
 	
-	<s:Button label="Ok" x="190" y="310" click="onOk(event)" />
-	<s:Button label="Cancel" x="270" y="310" click="onCancel(event)" />
+	<s:Label x="220" y="60" text="Refused directions:" toolTip="Mark directions as red which unit should NOT go." />
+	<s:BorderContainer percentWidth="100" percentHeight="100" x="220" y="76" width="240" height="200" >
+		<s:SpriteVisualElement id="_arrows" x="10" y="10" percentWidth="100" percentHeight="100" />
+	</s:BorderContainer>
+	
+	<s:Button label="Ok" x="320" y="310" click="onOk(event)" />
+	<s:Button label="Cancel" x="400" y="310" click="onCancel(event)" />
 	
 	<fx:Script>
 		<![CDATA[
 import com.junkbyte.console.Cc;
+import flash.display.DisplayObject;
+import iso.orient.Orientation;
 import list_items.ListItem;
 import mx.collections.IList;
 import mx.managers.PopUpManager;
 import project_data.Region;
 import project_data.UnitProperties;
+import utils.Utils;
 		
 		
 		private var _project : Project;
@@ -37,6 +45,81 @@ import project_data.UnitProperties;
 		private var _unitProperties : UnitProperties = null;
 		
 		private var _choices : Vector.< RegionChoice > = new Vector.< RegionChoice >;
+		
+		
+		[Embed(source = "../../bin/orientations/N_up.png")]
+		private var N_up : Class;
+		[Embed(source = "../../bin/orientations/N_over.png")]
+		private var N_over : Class;
+		[Embed(source = "../../bin/orientations/N_refused.png")]
+		private var N_refused : Class;
+		[Embed(source = "../../bin/orientations/N_refused_over.png")]
+		private var N_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/NE_up.png")]
+		private var NE_up : Class;
+		[Embed(source = "../../bin/orientations/NE_over.png")]
+		private var NE_over : Class;
+		[Embed(source = "../../bin/orientations/NE_refused.png")]
+		private var NE_refused : Class;
+		[Embed(source = "../../bin/orientations/NE_refused_over.png")]
+		private var NE_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/E_up.png")]
+		private var E_up : Class;
+		[Embed(source = "../../bin/orientations/E_over.png")]
+		private var E_over : Class;
+		[Embed(source = "../../bin/orientations/E_refused.png")]
+		private var E_refused : Class;
+		[Embed(source = "../../bin/orientations/E_refused_over.png")]
+		private var E_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/SE_up.png")]
+		private var SE_up : Class;
+		[Embed(source = "../../bin/orientations/SE_over.png")]
+		private var SE_over : Class;
+		[Embed(source = "../../bin/orientations/SE_refused.png")]
+		private var SE_refused : Class;
+		[Embed(source = "../../bin/orientations/SE_refused_over.png")]
+		private var SE_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/S_up.png")]
+		private var S_up : Class;
+		[Embed(source = "../../bin/orientations/S_over.png")]
+		private var S_over : Class;
+		[Embed(source = "../../bin/orientations/S_refused.png")]
+		private var S_refused : Class;
+		[Embed(source = "../../bin/orientations/S_refused_over.png")]
+		private var S_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/SW_up.png")]
+		private var SW_up : Class;
+		[Embed(source = "../../bin/orientations/SW_over.png")]
+		private var SW_over : Class;
+		[Embed(source = "../../bin/orientations/SW_refused.png")]
+		private var SW_refused : Class;
+		[Embed(source = "../../bin/orientations/SW_refused_over.png")]
+		private var SW_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/W_up.png")]
+		private var W_up : Class;
+		[Embed(source = "../../bin/orientations/W_over.png")]
+		private var W_over : Class;
+		[Embed(source = "../../bin/orientations/W_refused.png")]
+		private var W_refused : Class;
+		[Embed(source = "../../bin/orientations/W_refused_over.png")]
+		private var W_refused_over : Class;
+		
+		[Embed(source = "../../bin/orientations/NW_up.png")]
+		private var NW_up : Class;
+		[Embed(source = "../../bin/orientations/NW_over.png")]
+		private var NW_over : Class;
+		[Embed(source = "../../bin/orientations/NW_refused.png")]
+		private var NW_refused : Class;
+		[Embed(source = "../../bin/orientations/NW_refused_over.png")]
+		private var NW_refused_over : Class;
+		
+		private var _directions : Vector.< DirectionChoice > = new Vector.< DirectionChoice >;
 		
 		
 		public function Init( project : Project, unit : UnitDesc, main : Main ) : void
@@ -79,6 +162,35 @@ import project_data.UnitProperties;
 				y += STEP;
 				regionChoice.Init( region, chosen );
 			}
+			
+			function CreateArrow( passedArrowX : Number, passedArrowY : Number, orientation : int, up : Class, over : Class, refused : Class, refusedOver : Class ) : void
+			{
+				var refusedState : Boolean = false;
+				for each ( var alreadyRefused : int in _unitProperties._refusedDirections )
+				{
+					if ( orientation == alreadyRefused )
+					{
+						refusedState = true;
+						break;
+					}
+				}
+				
+				var directionChoice : DirectionChoice = new DirectionChoice( orientation, refusedState, new up, new over, new refused, new refusedOver );
+				_directions.push( directionChoice );
+				directionChoice.x = passedArrowX;
+				directionChoice.y = passedArrowY;
+				_arrows.addChild( directionChoice );
+			}
+			const arrowX : Number = 0;
+			const arrowY : Number = 10;
+			CreateArrow( arrowX + 76, arrowY + 0, Orientation.N, N_up, N_over, N_refused, N_refused_over );
+			CreateArrow( arrowX + 129, arrowY + 34, Orientation.NE, NE_up, NE_over, NE_refused, NE_refused_over );
+			CreateArrow( arrowX + 151, arrowY + 69, Orientation.E, E_up, E_over, E_refused, E_refused_over );
+			CreateArrow( arrowX + 131, arrowY + 108, Orientation.SE, SE_up, SE_over, SE_refused, SE_refused_over );
+			CreateArrow( arrowX + 76, arrowY + 127, Orientation.S, S_up, S_over, S_refused, S_refused_over );
+			CreateArrow( arrowX + 27, arrowY + 106, Orientation.SW, SW_up, SW_over, SW_refused, SW_refused_over );
+			CreateArrow( arrowX + 0, arrowY + 67, Orientation.W, W_up, W_over, W_refused, W_refused_over );
+			CreateArrow( arrowX + 26, arrowY + 34, Orientation.NW, NW_up, NW_over, NW_refused, NW_refused_over );
 		}
 		
 		private function onOk( ... args ): void
@@ -90,6 +202,15 @@ import project_data.UnitProperties;
 				if ( regionChoice._selected.selected )
 				{
 					_unitProperties._surfaces.push( regionChoice._region );
+				}
+			}
+			
+			_unitProperties._refusedDirections.length = 0;
+			for each ( var direction : DirectionChoice in _directions )
+			{
+				if ( direction.refusedState )
+				{
+					_unitProperties._refusedDirections.push( direction.orientation );
 				}
 			}
 			

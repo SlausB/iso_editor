@@ -1723,7 +1723,21 @@ import view.Projection;
 					}
 					unitViewsString = unitViewsString + " ]";
 					
-					rs.writeUTFBytes( "			_units.push( new BliscUnitTemplate( \"" + unitDesc._template._name + "\", \"" + unitDesc._template._animation + "\", " + unitSurfacesString + ", " + unitViewsString + " ) );\n" );
+					var refusedDirectionsString : String = "new < int >[ ";
+					for ( var refusedDirectionIndex : int = 0; refusedDirectionIndex < unitDesc._template._refusedDirections.length; ++refusedDirectionIndex )
+					{
+						var refusedDirection : int = unitDesc._template._refusedDirections[ refusedDirectionIndex ];
+						
+						if ( refusedDirectionIndex > 0 )
+						{
+							refusedDirectionsString = refusedDirectionsString + ", ";
+						}
+						
+						refusedDirectionsString = refusedDirectionsString + refusedDirection.toString();
+					}
+					refusedDirectionsString = refusedDirectionsString + " ]";
+					
+					rs.writeUTFBytes( "			_units.push( new BliscUnitTemplate( \"" + unitDesc._template._name + "\", \"" + unitDesc._template._animation + "\", " + unitSurfacesString + ", " + unitViewsString + ", " + refusedDirectionsString + " ) );\n" );
 				}
 			}
 			rs.writeUTFBytes( "			\n" );

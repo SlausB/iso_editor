@@ -334,12 +334,19 @@ import view.Projection;
 			var unit : Unit = new Unit( _main, unitDesc );
 			_isometryObjects.push( unit );
 			
-			//initing surfaces:
-			unitDesc._template._surfaces.length = 0;
+			//initing properties:
 			var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
+			//surfaces:
+			unitDesc._template._surfaces.length = 0;
 			for each ( var surface : Region in unitProperties._surfaces )
 			{
 				unitDesc._template._surfaces.push( ObtainBliscRegion( surface, _regionsCache ) );
+			}
+			//refused directions:
+			unitDesc._template._refusedDirections.length = 0;
+			for each ( var refusedDirection : int in unitProperties._refusedDirections )
+			{
+				unitDesc._template._refusedDirections.push( refusedDirection );
 			}
 			
 			var bliscUnit : BliscUnit = new BliscUnit( unitDesc._template, unit, _blisc, foundLayer );
