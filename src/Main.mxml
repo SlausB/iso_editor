@@ -1443,6 +1443,7 @@ import view.Projection;
 			rs.writeUTFBytes( "		/** Which alpha value must be set to overlapping objects when deeper one is chosen. 0 - fully transparent, 255 - fully opaque.*/\n" );
 			rs.writeUTFBytes( "		public static const THROUGH_ALPHA : int = " + _project._data._throughAlpha.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
+			//slipping value:
 			rs.writeUTFBytes( "		/** Maximum amount of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/\n" );
 			rs.writeUTFBytes( "		public static const SLIPPING_VALUE : int = " + _project._data._slippingValue.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
@@ -1724,9 +1725,9 @@ import view.Projection;
 					unitViewsString = unitViewsString + " ]";
 					
 					var refusedDirectionsString : String = "new < int >[ ";
-					for ( var refusedDirectionIndex : int = 0; refusedDirectionIndex < unitDesc._template._refusedDirections.length; ++refusedDirectionIndex )
+					for ( var refusedDirectionIndex : int = 0; refusedDirectionIndex < unitProperties._refusedDirections.length; ++refusedDirectionIndex )
 					{
-						var refusedDirection : int = unitDesc._template._refusedDirections[ refusedDirectionIndex ];
+						var refusedDirection : int = unitProperties._refusedDirections[ refusedDirectionIndex ];
 						
 						if ( refusedDirectionIndex > 0 )
 						{

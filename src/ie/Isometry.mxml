@@ -18,12 +18,10 @@
 	<fx:Script>
 		<![CDATA[
 import blisc.core.Blisc;
-import blisc.Fitting;
 import blisc.instances.BliscComplex;
 import blisc.instances.BliscComplexWithinCompound;
 import blisc.instances.BliscCompound;
 import blisc.instances.BliscUnit;
-import blisc.ObjectRenderer;
 import blisc.pathfinding.AStar;
 import blisc.templates.BliscComplexTemplate;
 import blisc.templates.BliscLayerTemplate;
@@ -31,6 +29,8 @@ import blisc.templates.BliscObjectTemplate;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscRegionWithinComplex;
 import blisc.templates.BliscUnitTemplate;
+import blisc.utils.Fitting;
+import blisc.utils.ObjectRenderer;
 import com.junkbyte.console.Cc;
 import flash.display.Bitmap;
 import flash.display.BitmapData;

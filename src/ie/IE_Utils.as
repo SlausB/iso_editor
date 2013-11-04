@@ -26,14 +26,33 @@ package ie
 	
 	public class IE_Utils 
 	{
+		private static var _animationsCache : Vector.< CachedAnimation > = null;
 		
 		/** TODO:
-			1: need to use it with some cashing - avoid creating animations for each similar object.
-			2: create prope animations from MovieClip's
+			1: need to use it with some cashing - avoid creating animations for each similar object - done.
+			2: create proper animations from MovieClip's - seems like done with some assumptions (cycled embedded MovieClips) and limitations (inability to execute code within frames).
 		*/
 		public static function CreateAnimation( singleResource : SingleResource, project : Project ) : BliscAnimation
 		{
-			return BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, singleResource._name );
+			if ( _animationsCache == null )
+			{
+				_animationsCache = new Vector.< CachedAnimation >;
+			}
+			
+			//trying to look within cache:
+			for each ( var cachedAnimation : CachedAnimation in _animationsCache )
+			{
+				if ( cachedAnimation._resource._name == singleResource._name && cachedAnimation._resource._resourcePath == singleResource._resourcePath )
+				{
+					return cachedAnimation._animation;
+				}
+			}
+			
+			var newAnimation : BliscAnimation = BliscAnimation.FromMovieClip( singleResource.Display( project ) as MovieClip, project.FindResource( singleResource._resourcePath )._FPS, singleResource._name );
+			
+			_animationsCache.push( new CachedAnimation( singleResource, newAnimation ) );
+			
+			return newAnimation;
 		}
 		
 		/** Any object template (ComplexTemplate or CompoundTemplate for now) to corresponding Blisc template.*/
@@ -102,4 +121,21 @@ package ie
 	}
 
 }
+import blisc.core.BliscAnimation;
+import project_data.SingleResource;
+
+class CachedAnimation
+{
+	public var _resource : SingleResource;
+	public var _animation : BliscAnimation;
+	
+	
+	public function CachedAnimation( resource : SingleResource, animation : BliscAnimation )
+	{
+		_resource = resource;
+		_animation = animation;
+	}
+}
+
+
 
