@@ -1581,28 +1581,41 @@ import view.Projection;
 			rs.writeUTFBytes( "		}\n" );
 			rs.writeUTFBytes( "		\n" );
 			
+			//class resolving function:
+			rs.writeUTFBytes( "		/** Searches class with specified name within any resource returning first occurence.*/\n" );
+			rs.writeUTFBytes( "		public function ResolveClass( name : String ) : Class\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				if ( embeddedResource._applicationDomain.hasDefinition( name ) )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					return embeddedResource._applicationDomain.getDefinition( name ) as Class;\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			return null;\n" );
+			rs.writeUTFBytes( "		}\n" );
+			
 			//custom graphics resolving function:
 			rs.writeUTFBytes( "		/** Doesn't concern caching.*/\n" );
 			rs.writeUTFBytes( "		public function ResolveCustomGraphics( name : String ) : DisplayObject\n" );
 			rs.writeUTFBytes( "		{\n" );
-			rs.writeUTFBytes( "			for each ( var embeddedResource : EmbeddedResource in _allEmbeddedResources )\n" );
+			rs.writeUTFBytes( "			var resolvedClass : Class = ResolveClass( name );\n" );
+			rs.writeUTFBytes( "			if ( resolvedClass == null )\n" );
 			rs.writeUTFBytes( "			{\n" );
-			rs.writeUTFBytes( "				if ( embeddedResource._applicationDomain.hasDefinition( name ) == false )\n" );
-			rs.writeUTFBytes( "				{\n" );
-			rs.writeUTFBytes( "					continue;\n" );
-			rs.writeUTFBytes( "				}\n" );
-			rs.writeUTFBytes( "				\n" );
-			rs.writeUTFBytes( "				var found : DisplayObject = new ( embeddedResource._applicationDomain.getDefinition( name ) as Class ) as DisplayObject;\n" );
+			rs.writeUTFBytes( "				Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" was NOT found. Returning null.\" );\n" );
+			rs.writeUTFBytes( "				return null;\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			else\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				var found : DisplayObject = new resolvedClass as DisplayObject;\n" );
 			rs.writeUTFBytes( "				if ( found == null )\n" );
 			rs.writeUTFBytes( "				{\n" );
-			rs.writeUTFBytes( "					Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" within \\\"\" + embeddedResource._editorsPath + \"\\\" is NOT of DisplayObject type. Returning null.\" );\n" );
+			rs.writeUTFBytes( "					Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" is NOT of DisplayObject type. Returning null.\" );\n" );
 			rs.writeUTFBytes( "					return null;\n" );
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "				return found;\n" );
 			rs.writeUTFBytes( "			}\n" );
-			rs.writeUTFBytes( "			\n" );
-			rs.writeUTFBytes( "			Cc.error( \"E: Resources.ResolveCustomGraphics(): resource \\\"\" + name + \"\\\" was NOT found. Returning null.\" );\n" );
-			rs.writeUTFBytes( "			return null;\n" );
 			rs.writeUTFBytes( "		}\n" );
 			rs.writeUTFBytes( "		\n" );
 			
