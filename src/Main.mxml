@@ -278,6 +278,7 @@
 		<![CDATA[
 import adobe.utils.CustomActions;
 import blisc.core.Blisc;
+import blisc.templates.BliscMapTemplate;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscUnitView;
 import com.junkbyte.console.Cc;
@@ -1428,6 +1429,8 @@ import view.Projection;
 			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscObjectInstanceTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscUnitView;\n" );
+			rs.writeUTFBytes( "	import flash.utils.Timer;\n" );
+			rs.writeUTFBytes( "	import flash.events.TimerEvent;\n" );
 			rs.writeUTFBytes( "	\n" );
 			rs.writeUTFBytes( "	///@endcond\n" );
 			rs.writeUTFBytes( "	\n" );
@@ -1447,18 +1450,21 @@ import view.Projection;
 			rs.writeUTFBytes( "		/** Maximum amount of adjacent neighbour tiles unit can slip through when walking over tile's angle (north, east, south, west).*/\n" );
 			rs.writeUTFBytes( "		public static const SLIPPING_VALUE : int = " + _project._data._slippingValue.toString() + ";\n" );
 			rs.writeUTFBytes( "		\n" );
+			//onReady():
+			rs.writeUTFBytes( "		/** Will be called when everything is done.*/\n" );
+			rs.writeUTFBytes( "		private var _onReady : Function;\n" );
 			//animations cache:
-			rs.writeUTFBytes( "		/** Animations cache.*/\n" );
+			rs.writeUTFBytes( "		/** Single instance for each template.*/\n" );
 			rs.writeUTFBytes( "		public var _animationsCache : Vector.< CachedAnimation > = new Vector.< CachedAnimation >;\n" );
 			//layers:
-			rs.writeUTFBytes( "		/** In order of displaing.*/\n" );
-			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >;\n" );
+			rs.writeUTFBytes( "		/** In order of displaying.*/\n" );
+			rs.writeUTFBytes( "		public var _layers : Vector.< BliscLayerTemplate > = new Vector.< BliscLayerTemplate >( " + _project._data._layers.length + ", true );\n" );
 			rs.writeUTFBytes( "		\n" );
 			//regions:
-			rs.writeUTFBytes( "		public var _regions : Vector.< BliscRegion > = new Vector.< BliscRegion >;\n" );
+			rs.writeUTFBytes( "		public var _regions : Vector.< BliscRegion > = new Vector.< BliscRegion >( " + _project._data._regions.length + ", true );\n" );
 			rs.writeUTFBytes( "		\n" );
 			//complexes and compounds:
-			rs.writeUTFBytes( "		public var _objects : Vector.< BliscObjectTemplate > = new Vector.< BliscObjectTemplate >;\n" );
+			rs.writeUTFBytes( "		public var _objects : Vector.< BliscObjectTemplate > = new Vector.< BliscObjectTemplate >( " + _project._data._objects.length + ", true );\n" );
 			rs.writeUTFBytes( "		\n" );
 			//units:
 			rs.writeUTFBytes( "		public var _units : Vector.< BliscUnitTemplate > = new Vector.< BliscUnitTemplate >;\n" );
@@ -1492,13 +1498,15 @@ import view.Projection;
 			rs.writeUTFBytes( "		*/\n" );
 			rs.writeUTFBytes( "		public function Resources( onReady : Function )\n" );
 			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			_onReady = onReady;\n" );
+			rs.writeUTFBytes( "			\n" );
 			//resource loading function:
 			rs.writeUTFBytes( "			function OnResourceLoaded() : void\n" );
 			rs.writeUTFBytes( "			{\n" );
 			rs.writeUTFBytes( "				--_leftResources;\n" );
 			rs.writeUTFBytes( "				if ( _leftResources <= 0 )\n" );
 			rs.writeUTFBytes( "				{\n" );
-			rs.writeUTFBytes( "					InitTemplates( onReady );\n" );
+			rs.writeUTFBytes( "					InitTemplates();\n" );
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			\n" );
@@ -1620,86 +1628,23 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			
 			//templates initing function:
-			rs.writeUTFBytes( "		private function InitTemplates( onReady : Function ) : void\n" );
+			rs.writeUTFBytes( "		private function InitTemplates() : void\n" );
 			rs.writeUTFBytes( "		{\n" );
+			
 			//layers:
 			for ( var layerIndex : int = 0; layerIndex < _project._data._layers.length; ++layerIndex )
 			{
-				rs.writeUTFBytes( "			_layers.push( new BliscLayerTemplate( \"" + _project._data._layers[ layerIndex ]._name + "\", " + _project._data._layers[ layerIndex ]._units.toString() + ", " + _project._data._layers[ layerIndex ]._selectable.toString() + " ) );\n" );
+				rs.writeUTFBytes( "			_layers[ " + layerIndex + " ] = new BliscLayerTemplate( \"" + _project._data._layers[ layerIndex ]._name + "\", " + _project._data._layers[ layerIndex ]._units.toString() + ", " + _project._data._layers[ layerIndex ]._selectable.toString() + " );\n" );
 			}
 			rs.writeUTFBytes( "			\n" );
+			
 			//regions:
 			for ( var regionIndex : int = 0; regionIndex < _project._data._regions.length; ++regionIndex )
 			{
-				rs.writeUTFBytes( "			_regions.push( new BliscRegion( \"" + _project._data._regions[ regionIndex ]._name + "\", " + _project._data._regions[ regionIndex ]._type.toString() + ", 0x" + _project._data._regions[ regionIndex ]._color.toString( 16 ) + " ) )\n" );
+				rs.writeUTFBytes( "			_regions[ " + regionIndex + " ] = new BliscRegion( \"" + _project._data._regions[ regionIndex ]._name + "\", " + _project._data._regions[ regionIndex ]._type.toString() + ", 0x" + _project._data._regions[ regionIndex ]._color.toString( 16 ) + " );\n" );
 			}
 			rs.writeUTFBytes( "			\n" );
-			//complexes:
-			for ( var complexIndex : int = 0; complexIndex < _project._data._objects.length; ++complexIndex )
-			{
-				var complex : ComplexTemplate = _project._data._objects[ complexIndex ] as ComplexTemplate;
-				if ( complex == null )
-				{
-					//will be added later as compound:
-					rs.writeUTFBytes( "			_objects.push( null );\n" );
-					continue;
-				}
-				
-				var regionsString : String = "new < BliscRegionWithinComplex >[ ";
-				for ( var regionWithinComplexIndex : int = 0; regionWithinComplexIndex < complex._regions.length; ++regionWithinComplexIndex )
-				{
-					var regionWithinComplex : RegionWithinComplex = complex._regions[ regionWithinComplexIndex ];
-					
-					if ( regionWithinComplexIndex > 0 )
-					{
-						regionsString = regionsString + ", ";
-					}
-					
-					var tilesString : String = "new < Point >[ ";
-					for ( var tileWithinRegionIndex : int = 0; tileWithinRegionIndex < regionWithinComplex._tiles.length; ++tileWithinRegionIndex )
-					{
-						if ( tileWithinRegionIndex > 0 )
-						{
-							tilesString = tilesString + ", ";
-						}
-						
-						tilesString = tilesString + "new Point( " + regionWithinComplex._tiles[ tileWithinRegionIndex ].x.toString() + ", " + regionWithinComplex._tiles[ tileWithinRegionIndex ].y.toString() + " )";
-					}
-					tilesString = tilesString + " ]";
-					
-					regionsString = regionsString + "new BliscRegionWithinComplex( _regions[ " + _project._data._regions.indexOf( regionWithinComplex._region ).toString() + " ], " + tilesString + " )";
-				}
-				regionsString = regionsString + " ]";
-				
-				rs.writeUTFBytes( "			_objects.push( new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\" ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + ", " + complex._interactive + " ) );\n" );
-			}
-			rs.writeUTFBytes( "			\n" );
-			//compounds:
-			for ( var compoundIndex : int = 0; compoundIndex < _project._data._objects.length; ++compoundIndex )
-			{
-				var compound : CompoundTemplate = _project._data._objects[ compoundIndex ] as CompoundTemplate;
-				if ( compound == null )
-				{
-					continue;
-				}
-				
-				var compoundConsistingString : String = "new < BliscComplexWithinCompoundTemplate >[ ";
-				for ( var compoundConsistingIndex : int = 0; compoundConsistingIndex < compound._consisting.length; ++compoundConsistingIndex )
-				{
-					var compoundConsisting : ComplexWithinCompound = compound._consisting[ compoundConsistingIndex ];
-					
-					if ( compoundConsistingIndex > 0 )
-					{
-						compoundConsistingString = compoundConsistingString + ", ";
-					}
-					
-					compoundConsistingString = compoundConsistingString + "new BliscComplexWithinCompoundTemplate( _objects[ " + _project._data._objects.indexOf( compoundConsisting._complex ).toString() + " ] as BliscComplexTemplate, new Point( " + compoundConsisting._tileDispX.toString() + ", " + compoundConsisting._tileDispY.toString() + " ) )";
-				}
-				compoundConsistingString = compoundConsistingString + " ]";
-				
-				rs.writeUTFBytes( "			_objects[ " + compoundIndex.toString() + " ] = new BliscCompoundTemplate( \"" + compound._name + "\", " + compoundConsistingString + " );\n" );
-			}
-			rs.writeUTFBytes( "			\n" );
+			
 			//units:
 			for each ( var resourceWithUnits : Resource in _project._data._resources )
 			{
@@ -1755,21 +1700,240 @@ import view.Projection;
 				}
 			}
 			rs.writeUTFBytes( "			\n" );
-			//maps:
-			for ( var mapIndex : int = 0; mapIndex < _project._data._maps.length; ++mapIndex )
+			
+			//initiating step-by-step objects initialization:
+			rs.writeUTFBytes( "			ResolveObjects( 0 );\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//complexes and compounds initialization functions:
+			const OBJECTS_PER_STEP : int = 50;
+			var complexes : int = 0;
+			var compounds : int = 0;
+			for each ( var object : ObjectTemplate in _project._data._objects )
 			{
-				var map : Map = _project._data._maps[ mapIndex ];
-				
-				var mapObjectsString : String = "new < BliscObjectInstanceTemplate >[ ";
-				for ( var mapObjectIndex : int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
+				if ( object is ComplexTemplate )
 				{
-					var mapObjectInstance : ObjectInstance = map._instances[ mapObjectIndex ];
+					++complexes;
+				}
+				else if ( object is CompoundTemplate )
+				{
+					++compounds;
+				}
+			}
+			const objectsInitingSteps : int = Math.ceil( _project._data._objects.length / OBJECTS_PER_STEP );
+			rs.writeUTFBytes( "		private function ResolveObjects( nextStep : int ) : void\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			var toCall : Function;\n" );
+			rs.writeUTFBytes( "			if ( nextStep >= " + objectsInitingSteps + " )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				toCall = ResolveMaps;\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			else\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				switch ( nextStep )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			for ( var objectsInitingCase : int = 0; objectsInitingCase < objectsInitingSteps; ++objectsInitingCase )
+			{
+				if ( objectsInitingCase > 0 )
+				{
+					rs.writeUTFBytes( "					\n" );
+				}
+				
+				rs.writeUTFBytes( "					case " + objectsInitingCase + ":\n" );
+				rs.writeUTFBytes( "						toCall = InitObjects_" + objectsInitingCase + ";\n" );
+				rs.writeUTFBytes( "						break;\n" );
+			}
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			var timer : Timer = new Timer( 20, 1 );\n" );
+			rs.writeUTFBytes( "			timer.addEventListener( TimerEvent.TIMER_COMPLETE, function( ... args ) : void\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				toCall();\n" );
+			rs.writeUTFBytes( "			} );\n" );
+			rs.writeUTFBytes( "			timer.start();\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//objects initing functions:
+			var objectIndex : int = -1;
+			//complexes must be inited first:
+			var complexesInited : int = 0;
+			for ( var initObjects : int = 0; initObjects < objectsInitingSteps; ++initObjects )
+			{
+				const nextStop : int = Math.min( OBJECTS_PER_STEP * ( initObjects + 1 ), _project._data._objects.length );
+				
+				rs.writeUTFBytes( "		private function InitObjects_" + initObjects + "() : void\n" );
+				rs.writeUTFBytes( "		{\n" );
+				
+				for ( var objectPos : int = initObjects * OBJECTS_PER_STEP; objectPos < nextStop; ++objectPos )
+				{
+					++objectIndex;
 					
-					if ( mapObjectIndex > 0 )
+					var complex : ComplexTemplate = _project._data._objects[ objectIndex ] as ComplexTemplate;
+					var compound : CompoundTemplate = _project._data._objects[ objectIndex ] as CompoundTemplate;
+					
+					//if still complexes initing process:
+					if ( complexesInited < complexes )
 					{
-						mapObjectsString = mapObjectsString + ", ";
+						if ( complex == null )
+						{
+							--objectPos;
+							continue;
+						}
+					}
+					else
+					{
+						if ( compound == null )
+						{
+							--objectPos;
+							continue;
+						}
 					}
 					
+					if ( complex != null )
+					{
+						var regionsString : String = "new < BliscRegionWithinComplex >[ ";
+						for ( var regionWithinComplexIndex : int = 0; regionWithinComplexIndex < complex._regions.length; ++regionWithinComplexIndex )
+						{
+							var regionWithinComplex : RegionWithinComplex = complex._regions[ regionWithinComplexIndex ];
+							
+							if ( regionWithinComplexIndex > 0 )
+							{
+								regionsString = regionsString + ", ";
+							}
+							
+							var tilesString : String = "new < Point >[ ";
+							for ( var tileWithinRegionIndex : int = 0; tileWithinRegionIndex < regionWithinComplex._tiles.length; ++tileWithinRegionIndex )
+							{
+								if ( tileWithinRegionIndex > 0 )
+								{
+									tilesString = tilesString + ", ";
+								}
+								
+								tilesString = tilesString + "new Point( " + regionWithinComplex._tiles[ tileWithinRegionIndex ].x.toString() + ", " + regionWithinComplex._tiles[ tileWithinRegionIndex ].y.toString() + " )";
+							}
+							tilesString = tilesString + " ]";
+							
+							regionsString = regionsString + "new BliscRegionWithinComplex( _regions[ " + _project._data._regions.indexOf( regionWithinComplex._region ).toString() + " ], " + tilesString + " )";
+						}
+						regionsString = regionsString + " ]";
+						
+						rs.writeUTFBytes( "			_objects[ " + objectIndex + " ] = new BliscComplexTemplate( \"" + complex._name + "\", ResolveGraphics( \"" + complex._singleResource._name + "\", \"" + complex._singleResource._resourcePath + "\" ), new Point( " + complex._disp.x.toString() + ", " + complex._disp.y.toString() + " ), new Point( " + complex._center.x.toString() + ", " + complex._center.y.toString() + " ), \"" + complex._layer._name + "\", " + regionsString + ", " + complex._interactive + " );\n" );
+						
+						++complexesInited;
+						//if next cycle will (must) be first compound initialization:
+						if ( complexesInited == complexes )
+						{
+							objectIndex = -1;
+						}
+					}
+					else if ( compound != null )
+					{
+						var compoundConsistingString : String = "new < BliscComplexWithinCompoundTemplate >[ ";
+						for ( var compoundConsistingIndex : int = 0; compoundConsistingIndex < compound._consisting.length; ++compoundConsistingIndex )
+						{
+							var compoundConsisting : ComplexWithinCompound = compound._consisting[ compoundConsistingIndex ];
+							
+							if ( compoundConsistingIndex > 0 )
+							{
+								compoundConsistingString = compoundConsistingString + ", ";
+							}
+							
+							compoundConsistingString = compoundConsistingString + "new BliscComplexWithinCompoundTemplate( _objects[ " + _project._data._objects.indexOf( compoundConsisting._complex ).toString() + " ] as BliscComplexTemplate, new Point( " + compoundConsisting._tileDispX.toString() + ", " + compoundConsisting._tileDispY.toString() + " ) )";
+						}
+						compoundConsistingString = compoundConsistingString + " ]";
+						
+						rs.writeUTFBytes( "			_objects[ " + objectIndex + " ] = new BliscCompoundTemplate( \"" + compound._name + "\", " + compoundConsistingString + " );\n" );
+					}
+				}
+				
+				rs.writeUTFBytes( "			\n" );
+				
+				rs.writeUTFBytes( "			ResolveObjects( " + ( initObjects + 1 ) + " );\n" );
+				
+				rs.writeUTFBytes( "		}\n" );
+				rs.writeUTFBytes( "		\n" );
+			}
+			rs.writeUTFBytes( "		\n" );
+			
+			//maps:
+			//resolving all instances initialization steps:
+			var instances : int = 0;
+			for each ( var instancesOfMap : Map in _project._data._maps )
+			{
+				instances += instancesOfMap._instances.length;
+			}
+			const INTSTANCES_PER_STEP : int = 300;
+			const instancesSteps : int = Math.ceil( instances / INTSTANCES_PER_STEP );
+			rs.writeUTFBytes( "		private function ResolveMaps( nextStep : int = 0 ) : void\n" );
+			rs.writeUTFBytes( "		{\n" );
+			rs.writeUTFBytes( "			var toCall : Function;\n" );
+			rs.writeUTFBytes( "			if ( nextStep >= " + instancesSteps + " )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				toCall = _onReady;\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			else\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				switch ( nextStep )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			for ( var instancesInitingCase : int = 0; instancesInitingCase < instancesSteps; ++instancesInitingCase )
+			{
+				if ( instancesInitingCase > 0 )
+				{
+					rs.writeUTFBytes( "					\n" );
+				}
+				
+				rs.writeUTFBytes( "					case " + instancesInitingCase + ":\n" );
+				rs.writeUTFBytes( "						toCall = InitInstances_" + instancesInitingCase + ";\n" );
+				rs.writeUTFBytes( "						break;\n" );
+			}
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "			}\n" );
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			var timer : Timer = new Timer( 20, 1 );\n" );
+			rs.writeUTFBytes( "			timer.addEventListener( TimerEvent.TIMER_COMPLETE, function( ... args ) : void\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				toCall();\n" );
+			rs.writeUTFBytes( "			} );\n" );
+			rs.writeUTFBytes( "			timer.start();\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			//map initing functions:
+			var mapIndex : int = 0;
+			var instanceIndex : int = 0;
+			var instance : int = 0;
+			for ( var instancesStep : int = 0; instancesStep < instancesSteps; ++instancesStep )
+			{
+				const nextInstanceStop : int = Math.min( INTSTANCES_PER_STEP * ( instancesStep + 1 ), instances );
+				
+				rs.writeUTFBytes( "		private function InitInstances_" + instancesStep + "() : void\n" );
+				rs.writeUTFBytes( "		{\n" );
+				
+				for ( ; instance < nextInstanceStop; ++instance )
+				{
+					if ( mapIndex >= _project._data._maps.length )
+					{
+						break;
+					}
+					var map : Map = _project._data._maps[ mapIndex ];
+					
+					if ( instanceIndex >= map._instances.length )
+					{
+						++mapIndex;
+						--instance;
+						instanceIndex = 0;
+						continue;
+					}
+					
+					if ( instanceIndex == 0 )
+					{
+						rs.writeUTFBytes( "			_maps.push( new BliscMapTemplate( \"" + map._name + "\", " + map._right + ", " + map._down + ", new Vector.< BliscObjectInstanceTemplate >( " + map._instances.length + ", true ) ) );\n" );
+					}
+					
+					var mapObjectInstance : ObjectInstance = map._instances[ instanceIndex ];
 					const indexWithinData : int = _project._data._objects.indexOf( mapObjectInstance._template );
 					if ( indexWithinData < 0 )
 					{
@@ -1779,20 +1943,55 @@ import view.Projection;
 						{
 							wasError = true;
 							PopUp( errorString, POP_UP_ERROR );
+							return;
 						}
 					}
+					rs.writeUTFBytes( "			_maps[ " + mapIndex + " ]._objects[ " + instanceIndex + " ] = new BliscObjectInstanceTemplate( _objects[ " + indexWithinData.toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) );\n" );
 					
-					mapObjectsString = mapObjectsString + "new BliscObjectInstanceTemplate( _objects[ " + indexWithinData.toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) )";
+					++instanceIndex;
+					
+					//leave this code for a while:
+					/*for ( var mapIndex : int = 0; mapIndex < _project._data._maps.length; ++mapIndex )
+					{
+						var map : Map = _project._data._maps[ mapIndex ];
+						
+						var mapObjectsString : String = "new < BliscObjectInstanceTemplate >[ ";
+						for ( var mapObjectIndex : int = 0; mapObjectIndex < map._instances.length; ++mapObjectIndex )
+						{
+							var mapObjectInstance : ObjectInstance = map._instances[ mapObjectIndex ];
+							
+							if ( mapObjectIndex > 0 )
+							{
+								mapObjectsString = mapObjectsString + ", ";
+							}
+							
+							const indexWithinData : int = _project._data._objects.indexOf( mapObjectInstance._template );
+							if ( indexWithinData < 0 )
+							{
+								var errorString : String = "\"" + mapObjectInstance._template._name + "\" at tile " + mapObjectInstance._tileCoords.x.toString() + " | " + mapObjectInstance._tileCoords.y.toString() + " was NOT found within data.";
+								Cc.error( "E: Main.GenerateSources(): " + errorString );
+								if ( wasError == false )
+								{
+									wasError = true;
+									PopUp( errorString, POP_UP_ERROR );
+								}
+							}
+							
+							mapObjectsString = mapObjectsString + "new BliscObjectInstanceTemplate( _objects[ " + indexWithinData.toString() + " ], new Point( " + mapObjectInstance._tileCoords.x.toString() + ", " + mapObjectInstance._tileCoords.y.toString() + " ) )";
+						}
+						mapObjectsString = mapObjectsString + " ]";
+						
+						rs.writeUTFBytes( "			_maps.push( new BliscMapTemplate( \"" + map._name + "\", " + map._right.toString() + ", " + map._down.toString() + ", " + mapObjectsString + " ) );\n" );
+					}*/
 				}
-				mapObjectsString = mapObjectsString + " ]";
 				
-				rs.writeUTFBytes( "			_maps.push( new BliscMapTemplate( \"" + map._name + "\", " + map._right.toString() + ", " + map._down.toString() + ", " + mapObjectsString + " ) );\n" );
+				rs.writeUTFBytes( "			\n" );
+				
+				rs.writeUTFBytes( "			ResolveMaps( " + ( instancesStep + 1 ) + " );\n" );
+				
+				rs.writeUTFBytes( "		}\n" );
+				rs.writeUTFBytes( "		\n" );
 			}
-			rs.writeUTFBytes( "			\n" );
-			
-			rs.writeUTFBytes( "			onReady();\n" );
-			
-			rs.writeUTFBytes( "		}\n" );
 			
 			rs.writeUTFBytes( "	}\n" );
 			
