@@ -9,6 +9,8 @@ package
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+	import ie.AnimationPropertiesWindow;
+	import mx.managers.PopUpManager;
 	import mx.managers.ToolTipManager;
 	import project_data.SingleResource;
 	import utils.Utils;
@@ -18,26 +20,26 @@ package
 	
 	public class SingleResourcePreview extends Sprite
 	{
-		public var _singleResource:SingleResource;
-		public var _project:Project;
+		public var _singleResource : SingleResource;
+		public var _project : Project;
 		
 		/** Sum dimentions of name, preview and possible highlight.*/
-		private var _width:Number = 0;
-		private var _height:Number = 0;
+		private var _width : Number = 0;
+		private var _height : Number = 0;
 		
 		/** Gap between object's view and it's highlighting border.*/
-		private static const BORDER_GAP:Number = 10;
-		private var _border:Rectangle = new Rectangle;
+		private static const BORDER_GAP : Number = 10;
+		private var _border : Rectangle = new Rectangle;
 		
 		
-		public function SingleResourcePreview( singleResource:SingleResource, project:Project, view:DisplayObject )
+		public function SingleResourcePreview( singleResource : SingleResource, project : Project, view : DisplayObject )
 		{
 			_singleResource = singleResource;
 			_project = project;
 			
 			addChild( view );
 			
-			const NAME_HEIGHT:Number = 40;
+			const NAME_HEIGHT : Number = 40;
 			
 			//caption:
 			var name:TextField = new TextField;
@@ -53,7 +55,7 @@ package
 			_height += name.height;
 			
 			//resource preview:
-			var bounds:Rectangle = view.getRect( view );
+			var bounds : Rectangle = view.getRect( view );
 			view.x = BORDER_GAP - bounds.x;
 			view.y = BORDER_GAP + NAME_HEIGHT - bounds.y;
 			_border.y = NAME_HEIGHT;
@@ -67,13 +69,15 @@ package
 			addEventListener( MouseEvent.MOUSE_OVER, OnOver );
 			addEventListener( MouseEvent.MOUSE_OUT, OnOut );
 			addEventListener( MouseEvent.MOUSE_DOWN, OnDown );
+			addEventListener( MouseEvent.RIGHT_CLICK, OnRightDown );
 		}
 		
-		public function Destroy(): void
+		public function Destroy() : void
 		{
 			removeEventListener( MouseEvent.MOUSE_OVER, OnOver );
 			removeEventListener( MouseEvent.MOUSE_OUT, OnOut );
 			removeEventListener( MouseEvent.MOUSE_DOWN, OnDown );
+			removeEventListener( MouseEvent.RIGHT_CLICK, OnRightDown );
 			
 			_singleResource = null;
 			_project = null;
@@ -81,49 +85,61 @@ package
 			Utils.RemoveAllChildren( this );
 		}
 		
-		private function OnOver( ... args ): void
+		private function OnOver( ... args ) : void
 		{
 			graphics.clear();
 			graphics.lineStyle( 4, 0x44C97C );
 			graphics.drawRect( _border.x, _border.y, _border.width, _border.height );
 			
 			ResourcesPreview.HideTip();
-			ResourcesPreview._resourceTip = ToolTipManager.createToolTip( '"' + _singleResource._name + '". Drag and drop it to template editing window.', stage.mouseX, stage.mouseY );
+			ResourcesPreview._resourceTip = ToolTipManager.createToolTip(
+				'"' + _singleResource._name + '". Drag and drop it to template editing window.',
+				stage.mouseX,
+				stage.mouseY
+			);
 		}
 		
-		private function OnOut( ... args ): void
+		private function OnOut( ... args ) : void
 		{
 			graphics.clear();
 			
 			ResourcesPreview.HideTip();
 		}
 		
-		private function OnDown( event:MouseEvent ): void
+		private function OnDown( event : MouseEvent ) : void
 		{
 			Main.StartDrag( event, _singleResource, Global.DRAG_FORMAT_SINGLE_RESOURCE, _singleResource.FindClass( _project ) );
 		}
 		
-		override public function get width(): Number
+		private function OnRightDown( ... args ) : void
+		{
+			var animationPropertiesWindow : AnimationPropertiesWindow = PopUpManager.createPopUp( _project._main, AnimationPropertiesWindow, false ) as AnimationPropertiesWindow;
+			animationPropertiesWindow.Init( _project, _project._main, _singleResource );
+			PopUpManager.centerPopUp( animationPropertiesWindow );
+		}
+		
+		override public function get width() : Number
 		{
 			return _width;
 		}
 		
-		override public function set width( value:Number ): void
+		override public function set width( value : Number ) : void
 		{
 			Cc.error( "E: SingleResourcePreview.set width(): meaningless." );
 		}
 		
-		override public function get height(): Number
+		override public function get height() : Number
 		{
 			return _height;
 		}
 		
-		override public function set height( value:Number ): void
+		override public function set height( value : Number ) : void
 		{
 			Cc.error( "E: SingleResourcePreview.set height(): meaningless." );
 		}
 	}
 
 }
+
 
 

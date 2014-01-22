@@ -21,9 +21,16 @@ package project_data
 			_name = name;
 		}
 		
+		/** Null if wasn't found.*/
 		public function FindClass( project : Project ) : Class
 		{
-			return project.FindResource( _resourcePath )._applicationDomain.getDefinition( _name ) as Class;
+			var resource : Resource = project.FindResource( _resourcePath );
+			if ( resource == null )
+			{
+				return null;
+			}
+			
+			return resource._applicationDomain.getDefinition( _name ) as Class;
 		}
 		
 		public function Display( project : Project ) : DisplayObject

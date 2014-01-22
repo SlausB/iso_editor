@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   minWidth="320"
+			   minHeight="200"
+			   title="Edit animation"
+			   >
+	
+	
+	<s:Label text="Editor's path:" x="10" y="16" />
+	<s:Label id="_editorsPath" x="90" y="16" width="220" />
+	
+	<s:Label text="Name:" x="10" y="36" />
+	<s:Label id="_name" x="56" y="36" width="220" />
+	
+	<s:Label text="Each frame:" x="10" y="73" toolTip="Which each frame resulting animation must have. Say, original animation has frames '1, 2, 3, 4, 5, 6, 7, 8', if 'each value' is set to 3, then resulting animation will be '1, 4, 7'. Time gaps will be properly keepen (time to play '1, 4, 7' animation will be the same as '1, 2, 3, 4, 5, 6, 7, 8'." />
+	<s:NumericStepper id="_eachFrame" x="86" y="65" width="90" minimum="-2147483648" maximum="2147483647" toolTip="Which each frame resulting animation must have. Say, original animation has frames '1, 2, 3, 4, 5, 6, 7, 8', if 'each value' is set to 3, then resulting animation will be '1, 4, 7'. Time gaps will be properly keepen (time to play '1, 4, 7' animation will be the same as '1, 2, 3, 4, 5, 6, 7, 8'." />
+	
+	<s:Button label="Ok" x="148" y="134" click="onOk(event)" />
+	<s:Button label="Cancel" x="230" y="134" click="onCancel(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+import com.junkbyte.console.Cc;
+import list_items.MapListItem;
+import mx.managers.PopUpManager;
+import project_data.AnimationProperties;
+import project_data.Map;
+import project_data.SingleResource;
+		
+		private var _project : Project;
+		private var _main : Main;
+		private var _singleResource : SingleResource;
+		private var _animationProperties : AnimationProperties;
+		
+		
+		public function Init( project : Project, main : Main, singleResource : SingleResource ) : void
+		{
+			closeButton.visible = false;
+			
+			_project = project;
+			_main = main;
+			_singleResource = singleResource;
+			
+			//looking for animation properties specified for current resource, if was:
+			for each ( var sap : AnimationProperties in _project._data._animationProperties )
+			{
+				if ( sap._editorsPath == singleResource._resourcePath && sap._animationName == singleResource._name )
+				{
+					_animationProperties = sap;
+					break;
+				}
+			}
+			
+			//creating the new one if user specifies it for the first time:
+			if ( _animationProperties == null )
+			{
+				_animationProperties = new AnimationProperties;
+				_animationProperties.Init( singleResource._resourcePath, singleResource._name, 1 );
+				
+				_project._data._animationProperties.push( _animationProperties );
+			}
+			
+			_editorsPath.text = _animationProperties._editorsPath;
+			_name.text = _animationProperties._animationName;
+			_eachFrame.value = _animationProperties._eachFrame;
+		}
+		
+		private function onOk( ... args ): void
+		{
+			if ( _animationProperties == null )
+			{
+				return;
+			}
+			
+			_animationProperties._eachFrame = _eachFrame.value;
+			
+			Destroy();
+		}
+		
+		private function onCancel( ... args ): void
+		{
+			Destroy();
+		}
+		
+		private function Destroy(): void
+		{
+			_project = null;
+			_main = null;
+			
+			PopUpManager.removePopUp( this );
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:TitleWindow>

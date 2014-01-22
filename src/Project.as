@@ -27,6 +27,7 @@ package
 	import mx.collections.IList;
 	import mx.managers.PopUpManager;
 	import mx.rpc.soap.types.MapType;
+	import project_data.AnimationProperties;
 	import project_data.ComplexTemplate;
 	import project_data.ComplexWithinCompound;
 	import project_data.CompoundTemplate;
@@ -49,15 +50,15 @@ package
 	/** Where everything (templates, locations, animations...) is stored.*/
 	public class Project
 	{
-		public var _data:ProjectData = new ProjectData;
+		public var _data : ProjectData = new ProjectData;
 		
 		
-		public var _main:Main;
+		public var _main : Main;
 		
-		private var _loadingResourceIndex:int;
+		private var _loadingResourceIndex : int;
 		
 		
-		public function Project( main:Main )
+		public function Project( main : Main )
 		{
 			//to save and load project using AMF:
 			registerClassAlias( "project_data.ProjectData", ProjectData );
@@ -74,6 +75,7 @@ package
 			registerClassAlias( "project_data.RegionWithinComplex", RegionWithinComplex );
 			registerClassAlias( "project_data.UnitProperties", UnitProperties );
 			registerClassAlias( "project_data.Preferences", Preferences );
+			registerClassAlias( "project_data.AnimationProperties", AnimationProperties );
 			registerClassAlias( "flash.geom.Point", Point );
 			
 			_main = main;
@@ -193,7 +195,7 @@ package
 			}
 		}
 		
-		private function UnifyStrings( what : Vector.< String > ): void
+		private function UnifyStrings( what : Vector.< String > ) : void
 		{
 			for ( var i1:int = 0; i1 < what.length; ++i1 )
 			{
@@ -211,7 +213,7 @@ package
 			}
 		}
 		
-		private function Clear( list:IList ): void
+		private function Clear( list : IList ) : void
 		{
 			if ( list != null )
 			{
@@ -219,17 +221,17 @@ package
 			}
 		}
 		
-		private function LoadTemplates(): void
+		private function LoadTemplates() : void
 		{
 			_main._templates_table.dataProvider.removeAll();
 			_main._compounds_table.dataProvider.removeAll();
 			
-			for ( var i:int = 0; i < _data._objects.length; ++i )
+			for ( var i : int = 0; i < _data._objects.length; ++i )
 			{
-				var complex:ComplexTemplate = _data._objects[ i ] as ComplexTemplate;
+				var complex : ComplexTemplate = _data._objects[ i ] as ComplexTemplate;
 				if ( complex == null )
 				{
-					var compound:CompoundTemplate = _data._objects[ i ] as CompoundTemplate;
+					var compound : CompoundTemplate = _data._objects[ i ] as CompoundTemplate;
 					_main._compounds_table.dataProvider.addItem( new CompoundTableItem( compound, _main ) );
 				}
 				else
@@ -239,35 +241,35 @@ package
 			}
 		}
 		
-		private function LoadLayers(): void
+		private function LoadLayers() : void
 		{
 			_main._layers_list_data_provider.removeAll();
 			
-			for ( var i:int = 0; i < _data._layers.length; ++i )
+			for ( var i : int = 0; i < _data._layers.length; ++i )
 			{
-				var layer:Layer = _data._layers[ i ];
+				var layer : Layer = _data._layers[ i ];
 				
 				_main._layers_list_data_provider.addItem( new LayerListItem( layer._name, layer, i ) );
 			}
 		}
 		
-		private function LoadMaps(): void
+		private function LoadMaps() : void
 		{
 			_main._maps_list_data_provider.removeAll();
 			
-			for ( var i:int = 0; i < _data._maps.length; ++i )
+			for ( var i : int = 0; i < _data._maps.length; ++i )
 			{
-				var map:Map = _data._maps[ i ];
+				var map : Map = _data._maps[ i ];
 				
 				_main._maps_list_data_provider.addItem( new MapListItem( map._name, map ) );
 			}
 		}
 		
-		private function LoadRegions(): void
+		private function LoadRegions() : void
 		{
 			_main._regions_list.dataProvider.removeAll();
 			
-			for ( var i:int = 0; i < _data._regions.length; ++i )
+			for ( var i : int = 0; i < _data._regions.length; ++i )
 			{
 				var region:Region = _data._regions[ i ];
 				
@@ -275,7 +277,7 @@ package
 			}
 		}
 		
-		private function LoadNextResource( onResult:Function ): void
+		private function LoadNextResource( onResult : Function ) : void
 		{
 			if ( _loadingResourceIndex >= _data._resources.length )
 			{
@@ -283,7 +285,7 @@ package
 			}
 			else
 			{
-				LoadResource( _data._resources[ _loadingResourceIndex ]._path, function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
+				LoadResource( _data._resources[ _loadingResourceIndex ]._path, function( applicationDomain : ApplicationDomain, names : Array, FPS : Number ) : void
 				{
 					_data._resources[ _loadingResourceIndex ].Init( applicationDomain, names, FPS, _main );
 					
@@ -292,7 +294,7 @@ package
 					++_loadingResourceIndex;
 					LoadNextResource( onResult );
 				},
-				function( why:String ): void
+				function( why : String ) : void
 				{
 					_main.PopUp( "Resource \"" + _data._resources[ _loadingResourceIndex ]._path + "\" was not loaded: " + why + ". Skipping it.", Main.POP_UP_WARNING );
 					_data._resources.splice( _loadingResourceIndex, 1 );
@@ -301,36 +303,36 @@ package
 			}
 		}
 		
-		private function Accept_Unsafe( data:ByteArray ): void
+		private function Accept_Unsafe( data : ByteArray ) : void
 		{
 			_data = data.readObject() as ProjectData;
 		}
 		
 		/** Generate data to save appropriate for future accepting.*/
-		public function DataToSave(): ByteArray
+		public function DataToSave() : ByteArray
 		{
 			//avoid saving data which cannot (and not needed) be saved:
-			var temp:Array = [];
-			var i:int = 0;
-			var j:int = 0;
+			var temp : Array = [];
+			var i : int = 0;
+			var j : int = 0;
 			for ( ; i < _data._resources.length; ++i )
 			{
-				var sr:Resource = _data._resources[ i ];
+				var sr : Resource = _data._resources[ i ];
 				
-				temp.push( { ad: sr._applicationDomain, n: sr._names, u: sr._units, F: sr._FPS } );
+				temp.push( { ad : sr._applicationDomain, n: sr._names, u: sr._units, F: sr._FPS } );
 				
 				_data._resources[ i ]._applicationDomain = null;
 				_data._resources[ i ]._names = null;
 				_data._resources[ i ]._units = null;
 			}
 			
-			var byteArray:ByteArray = new ByteArray;
+			var byteArray : ByteArray = new ByteArray;
 			byteArray.writeObject( _data );
 			
 			
 			for ( i = 0; i < _data._resources.length; ++i )
 			{
-				var lr:Resource = _data._resources[ i ];
+				var lr : Resource = _data._resources[ i ];
 				
 				lr._applicationDomain = temp[ i ].ad;
 				lr._names = temp[ i ].n;
@@ -346,9 +348,9 @@ package
 		\param onSuccess function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 		\param onFail function( why:String ): void
 		*/
-		private function LoadResource( path:String, onSuccess:Function, onFail:Function ): void
+		private function LoadResource( path : String, onSuccess : Function, onFail : Function ) : void
 		{
-			var loader:Loader = new Loader;
+			var loader : Loader = new Loader;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function( e:Event ): void
 			{
 				var target:LoaderInfo = e.target as LoaderInfo;
@@ -358,31 +360,31 @@ package
 					target.frameRate
 				);
 			} );
-			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent:IOErrorEvent ): void
+			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent : IOErrorEvent ) : void
 			{
 				onFail( ioErrorEvent.text );
 			} );
-			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent:SecurityErrorEvent ): void
+			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent : SecurityErrorEvent ) : void
 			{
 				onFail( securityErrorEvent.text );
 			} );
 			loader.load( new URLRequest( path ) );
 		}
 		
-		public function AddResource( andDisplay:Boolean = true ): void
+		public function AddResource( andDisplay : Boolean = true ) : void
 		{
-			var thisOne:Project = this;
+			var thisOne : Project = this;
 			
-			var browseToResource:File = new File;
-			browseToResource.addEventListener( Event.SELECT, function( ... args ): void
+			var browseToResource : File = new File;
+			browseToResource.addEventListener( Event.SELECT, function( ... args ) : void
 			{
-				var path:String = new File( File.applicationDirectory.nativePath ).getRelativePath( new File( browseToResource.nativePath ), true );
+				var path : String = new File( File.applicationDirectory.nativePath ).getRelativePath( new File( browseToResource.nativePath ), true );
 				
-				LoadResource( path, function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
+				LoadResource( path, function( applicationDomain : ApplicationDomain, names : Array, FPS : Number ) : void
 				{
 					_main.PopUp( "Resource successfully added", Main.POP_UP_INFO );
 					
-					var resource:Resource = new Resource;
+					var resource : Resource = new Resource;
 					resource._path = path;
 					resource.Init( applicationDomain, names, FPS, _main );
 					
@@ -395,7 +397,7 @@ package
 						_main._resourcesPreview.Display( resource, thisOne );
 					}
 				},
-				function( why:String ): void
+				function( why : String ) : void
 				{
 					_main.PopUp( "Resource adding failed: " + why, Main.POP_UP_ERROR );
 				} );
@@ -434,9 +436,9 @@ package
 			_main._maps_list_data_provider.addItem( new MapListItem( map._name, map ) );
 		}
 		
-		public function FindResource( path:String ): Resource
+		public function FindResource( path : String ) : Resource
 		{
-			for each ( var resource:Resource in _data._resources )
+			for each ( var resource : Resource in _data._resources )
 			{
 				if ( resource._path == path )
 				{
@@ -490,7 +492,7 @@ package
 			return null;
 		}
 		
-		public function ResolveTemplatesDependence( template : ComplexTemplate ): TemplatesDependence
+		public function ResolveTemplatesDependence( template : ComplexTemplate ) : TemplatesDependence
 		{
 			var result : TemplatesDependence = new TemplatesDependence( template );
 			
@@ -540,7 +542,7 @@ package
 			return result;
 		}
 		
-		public function ResolveCompoundsDependence( compound : CompoundTemplate ): CompoundsDependence
+		public function ResolveCompoundsDependence( compound : CompoundTemplate ) : CompoundsDependence
 		{
 			var result : CompoundsDependence = new CompoundsDependence( compound );
 			

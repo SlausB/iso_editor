@@ -37,6 +37,9 @@ package project_data
 		
 		/** Global user's preferences for this project.*/
 		public var _preferences : Preferences = new Preferences;
+		
+		/** All specified animation properties.*/
+		public var _animationProperties : Vector.< AnimationProperties > = new Vector.< AnimationProperties >;
 	}
 
 }

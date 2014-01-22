@@ -1472,6 +1472,9 @@ import view.Projection;
 			//maps:
 			rs.writeUTFBytes( "		public var _maps : Vector.< BliscMapTemplate > = new Vector.< BliscMapTemplate >;\n" );
 			rs.writeUTFBytes( "		\n" );
+			//animation properties:
+			rs.writeUTFBytes( "		public var _animationTemplates : Vector.< BliscAnimationTemplate > = new Vector.< BliscAnimationTemplate >;\n" );
+			rs.writeUTFBytes( "		\n" );
 			//embedding resources:
 			for ( var declaringIndex : int = 0; declaringIndex < _project._data._resources.length; ++declaringIndex )
 			{
@@ -1494,7 +1497,7 @@ import view.Projection;
 			rs.writeUTFBytes( "		\n" );
 			//constructor:
 			rs.writeUTFBytes( "		/** .\n" );
-			rs.writeUTFBytes( "		\param onReady function() : void Called when all resources are loaded.\n" );
+			rs.writeUTFBytes( "		\\param onReady function() : void Called when all resources are loaded.\n" );
 			rs.writeUTFBytes( "		*/\n" );
 			rs.writeUTFBytes( "		public function Resources( onReady : Function )\n" );
 			rs.writeUTFBytes( "		{\n" );
@@ -1519,8 +1522,8 @@ import view.Projection;
 			
 			//graphics resolving function:
 			rs.writeUTFBytes( "		/** Returns any graphical item with specified name within specified SWF or any first (within cache or SWF) if editorsPath is null.\n" );
-			rs.writeUTFBytes( "		\param name MovieClip's name within SWF.\n" );
-			rs.writeUTFBytes( "		\param editorsPath Within which SWF to look or within any if null.*/\n" );
+			rs.writeUTFBytes( "		\\param name MovieClip's name within SWF.\n" );
+			rs.writeUTFBytes( "		\\param editorsPath Within which SWF to look or within any if null.*/\n" );
 			rs.writeUTFBytes( "		public function ResolveGraphics( name : String, editorsPath : String = null, startingFrame : int = 0, endingFrame : int = int.MAX_VALUE ) : BliscAnimation\n" );
 			rs.writeUTFBytes( "		{\n" );
 			rs.writeUTFBytes( "			//trying to find within cache:\n" );

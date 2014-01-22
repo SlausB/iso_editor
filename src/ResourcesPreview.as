@@ -25,19 +25,19 @@ package
 	public class ResourcesPreview extends UIComponent
 	{
 		/** Virtual dimensions of whole resources preview at least part of which is currently displayed.*/
-		private var _width:Number = 0;
-		private var _height:Number = 0;
+		private var _width : Number = 0;
+		private var _height : Number = 0;
 		
-		public static var _resourceTip:IToolTip = null;
+		public static var _resourceTip : IToolTip = null;
 		
-		private var _previews:Vector.< SingleResourcePreview > = new Vector.< SingleResourcePreview >;
+		private var _previews : Vector.< SingleResourcePreview > = new Vector.< SingleResourcePreview >;
 		
 		/** Dimensions of scroller where at least part of everything is displayed.*/
-		private var _scrollerWidth:Number = 0;
-		private var _scrollerHeight:Number = 0;
+		private var _scrollerWidth : Number = 0;
+		private var _scrollerHeight : Number = 0;
 		
 		
-		public static function HideTip(): void
+		public static function HideTip() : void
 		{
 			if ( _resourceTip != null )
 			{
@@ -46,9 +46,9 @@ package
 			}
 		}
 		
-		private function FitBounds(): void
+		private function FitBounds() : void
 		{
-			var bounds:Rectangle = getBounds( this );
+			var bounds : Rectangle = getBounds( this );
 			if ( x < -bounds.left )
 			{
 				x = -bounds.left
@@ -59,22 +59,22 @@ package
 			}
 		}
 		
-		private function Position(): void
+		private function Position() : void
 		{
-			const H_GAP:Number = 60;
-			const V_GAP:Number = 20;
+			const H_GAP : Number = 60;
+			const V_GAP : Number = 20;
 			
 			//upper left corner coordinates of preview which will be added next:
-			var xPos:Number = H_GAP;
-			var yPos:Number = V_GAP;
+			var xPos : Number = H_GAP;
+			var yPos : Number = V_GAP;
 			_width = 0;
 			_height = 0;
 			
 			//height of currently forming row:
-			var curHeight:Number = 0;
+			var curHeight : Number = 0;
 			
 			
-			for each ( var singleResourcePreview:SingleResourcePreview in _previews )
+			for each ( var singleResourcePreview : SingleResourcePreview in _previews )
 			{
 				if ( ( xPos + 40 ) >= _scrollerWidth )
 				{
@@ -100,9 +100,9 @@ package
 			invalidateSize();
 		}
 		
-		public function Display( resource:Resource, project:Project ): void
+		public function Display( resource : Resource, project : Project ) : void
 		{
-			for each ( var singlePreview:SingleResourcePreview in _previews )
+			for each ( var singlePreview : SingleResourcePreview in _previews )
 			{
 				singlePreview.Destroy();
 				if ( singlePreview.parent != null )
