@@ -113,19 +113,19 @@ package
 			_previews.length = 0;
 			Utils.RemoveAllChildren( this );
 			
-			for each ( var className:String in resource._names )
+			for each ( var className : String in resource._names )
 			{
-				var singleResource:SingleResource = new SingleResource;
+				var singleResource : SingleResource = new SingleResource;
 				singleResource.Init( resource._path, className );
 				
-				var view:DisplayObject = singleResource.Display( project );
+				var view : DisplayObject = singleResource.Display( project );
 				if ( view == null )
 				{
 					Cc.warn( "W: ResourcesPreview.Display(): \"" + singleResource._name + "\" is not graphical object. Skipping it." );
 					continue;
 				}
 				
-				var singleResourcePreview:SingleResourcePreview = new SingleResourcePreview( singleResource, project, view );
+				var singleResourcePreview : SingleResourcePreview = new SingleResourcePreview( singleResource, project, view );
 				addChild( singleResourcePreview );
 				_previews.push( singleResourcePreview );
 			}

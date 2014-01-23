@@ -278,6 +278,8 @@
 		<![CDATA[
 import adobe.utils.CustomActions;
 import blisc.core.Blisc;
+import blisc.core.BliscAnimation;
+import blisc.core.BliscSprite;
 import blisc.templates.BliscMapTemplate;
 import blisc.templates.BliscRegion;
 import blisc.templates.BliscUnitView;
@@ -287,6 +289,7 @@ import flash.display.DisplayObjectContainer;
 import flash.display.InteractiveObject;
 import flash.display.Loader;
 import flash.display.LoaderInfo;
+import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.errors.IOError;
 import flash.events.ContextMenuEvent;
@@ -310,6 +313,7 @@ import flash.utils.getQualifiedClassName;
 import ie.ConfirmationWindow;
 import ie.EditingMapWindow;
 import ie.EditingPreferencesWindow;
+import ie.SourcesGenerationResult;
 import list_items.CompoundTableItem;
 import list_items.LayerListItem;
 import list_items.ListItem;
@@ -332,6 +336,7 @@ import mx.events.MenuEvent;
 import mx.managers.DragManager;
 import mx.managers.PopUpManager;
 import org.osmf.media.LoadableElementBase;
+import project_data.AnimationProperties;
 import project_data.ComplexTemplate;
 import project_data.ComplexWithinCompound;
 import project_data.CompoundTemplate;
@@ -342,6 +347,7 @@ import project_data.ObjectTemplate;
 import project_data.Region;
 import project_data.RegionWithinComplex;
 import project_data.Resource;
+import project_data.SingleResource;
 import project_data.UnitProperties;
 import ru.etcs.utils.getDefinitionNames;
 import spark.components.DataGroup;
@@ -1234,20 +1240,20 @@ import view.Projection;
 		
 		
 		
-		public static const POP_UP_INFO:int = 1;
-		public static const POP_UP_WARNING:int = 2;
-		public static const POP_UP_ERROR:int = 3;
+		public static const POP_UP_INFO : int = 1;
+		public static const POP_UP_WARNING : int = 2;
+		public static const POP_UP_ERROR : int = 3;
 		[ Embed( source = "info_icon.png" ) ]
-		private var _infoIconClass:Class;
+		private var _infoIconClass : Class;
 		[ Embed( source = "warning_icon.png" ) ]
-		private var _warningIconClass:Class;
+		private var _warningIconClass : Class;
 		[ Embed( source = "error_icon.png" ) ]
-		private var _errorIconClass:Class;
+		private var _errorIconClass : Class;
 		
-		public function PopUp( message:String, type:int ): void
+		public function PopUp( message : String, type : int ) : void
 		{
-			var iconClass:Class = _infoIconClass;
-			var title:String = "Info";
+			var iconClass : Class = _infoIconClass;
+			var title : String = "Info";
 			switch ( type )
 			{
 				case POP_UP_WARNING:
@@ -1263,9 +1269,9 @@ import view.Projection;
 			Alert.show( message, title, Alert.OK, null, null, iconClass );
 		}
 		
-		public function onMenuItem( e:MenuEvent ): void
+		public function onMenuItem( e : MenuEvent ) : void
 		{
-			var thisOne:Main = this;
+			var thisOne : Main = this;
 			
 			switch ( e.item.@id.toString() )
 			{
@@ -1431,6 +1437,7 @@ import view.Projection;
 			rs.writeUTFBytes( "	import blisc.templates.BliscUnitView;\n" );
 			rs.writeUTFBytes( "	import flash.utils.Timer;\n" );
 			rs.writeUTFBytes( "	import flash.events.TimerEvent;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.FrameDesc;\n" );
 			rs.writeUTFBytes( "	\n" );
 			rs.writeUTFBytes( "	///@endcond\n" );
 			rs.writeUTFBytes( "	\n" );
@@ -1575,7 +1582,23 @@ import view.Projection;
 			rs.writeUTFBytes( "					}\n" );
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "				\n" );
-			rs.writeUTFBytes( "				var resolved : BliscAnimation = BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, name, startingFrame, endingFrame );\n" );
+			rs.writeUTFBytes( "				var resolved : BliscAnimation = null;\n" );
+			rs.writeUTFBytes( "				//looking for animation's predefined display sequence:\n" );
+			rs.writeUTFBytes( "				for each ( var animationTemplate : BliscAnimationTemplate in _animationTemplates )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					if ( animationTemplate._editorsPath == embeddedResource._editorsPath && animationTemplate._name == name )\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						resolved = BliscAnimation.FromSequence( found, embeddedResource._frameRate, animationTemplate._frames, startingFrame, endingFrame, name );\n" );
+			rs.writeUTFBytes( "						break;\n" );
+			rs.writeUTFBytes( "					}\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				//wasn't found within predefined templates:\n" );
+			rs.writeUTFBytes( "				if ( resolved == null )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					resolved = BliscAnimation.FromMovieClip( found, embeddedResource._frameRate, name, startingFrame, endingFrame );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
 			rs.writeUTFBytes( "				_animationsCache.push( new CachedAnimation( resolved, embeddedResource._editorsPath, startingFrame, endingFrame ) );\n" );
 			rs.writeUTFBytes( "				return resolved;\n" );
 			rs.writeUTFBytes( "			}\n" );
@@ -1704,6 +1727,149 @@ import view.Projection;
 			}
 			rs.writeUTFBytes( "			\n" );
 			
+			//initiating animation frames sequencing:
+			rs.writeUTFBytes( "			var timer : Timer = new Timer( 20, 1 );\n" );
+			rs.writeUTFBytes( "			timer.addEventListener( TimerEvent.TIMER_COMPLETE, function( ... args ) : void\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				SequenceFrames();\n" );
+			rs.writeUTFBytes( "			} );\n" );
+			rs.writeUTFBytes( "			timer.start();\n" );
+			rs.writeUTFBytes( "		}\n" );
+			rs.writeUTFBytes( "		\n" );
+			
+			var animationsOptimizedDueToRequest : int = 0;
+			var framesSkippedDueToRequest : int = 0;
+			var animationsOptimizedDueToSimilarity : int = 0;
+			var framesSkippedDueToSimilarity : int = 0;
+			var totalAnimationsOptimized : int = 0;
+			var totalFramesSkipped : int = 0;
+			
+			//animation frames sequencing:
+			rs.writeUTFBytes( "		SequenceFrames() : void\n" );
+			rs.writeUTFBytes( "		{\n" );
+			for each ( var sequencingResource : Resource in _project._data._resources )
+			{
+				for each ( var sequencingName : String in sequencingResource._names )
+				{
+					//checking if player specified frame skipping for current animation:
+					var foundAnimationProperties : AnimationProperties = null;
+					for each ( var sap : AnimationProperties in _project._data._animationProperties )
+					{
+						if ( sap._editorsPath == sequencingResource._path && sap._animationName == sequencingName )
+						{
+							if ( sap._eachFrame > 1 )
+							{
+								foundAnimationProperties = sap;
+							}
+							break;
+						}
+					}
+					
+					//animation can be optimized here even better: checking for similarity regardless white-space, but not for now...
+					
+					var ssr : SingleResource = new SingleResource;
+					ssr.Init( sequencingResource._path, sequencingName );
+					
+					var sequencingAnimation : MovieClip = ssr.Display( _project ) as MovieClip;
+					//animations consisting from just 1 frame are fine:
+					if ( sequencingAnimation == null || sequencingAnimation.totalFrames < 2 )
+					{
+						continue;
+					}
+					
+					var requestOptimizationMentioned : Boolean = false;
+					var similarityOptimizationMentioned : Boolean = false;
+					var totalOmpimizationMentioned : Boolean = false;
+					
+					//prepare temp array first and write it only you're sure something was skipped:
+					
+					//here we're already sure some data must be written for current animation:
+					rs.writeUTFBytes( "			_animationTemplates.push( new BliscAnimationTemplate( \"" + sequencingResource._path + "\", \"" + sequencingName + "\", new < int >[ 1" );
+					
+					//last frame to compare with:
+					var sequencingFrame : BliscSprite = BliscAnimation.RenderFrame( sequencingAnimation, sequencingName );
+					for ( var sequencingIndex : int = 2; sequencingIndex <= sequencingAnimation.totalFrames; ++sequencingIndex )
+					{
+						BliscAnimation.NextFrame( sequencingAnimation );
+						
+						if ( foundAnimationProperties != null && sequencingIndex % foundAnimationProperties._eachFrame != 1 )
+						{
+							++framesSkippedDueToRequest;
+							++totalFramesSkipped;
+							
+							if ( requestOptimizationMentioned == false )
+							{
+								++animationsOptimizedDueToRequest;
+								requestOptimizationMentioned = true;
+							}
+							
+							if ( totalOmpimizationMentioned == false )
+							{
+								++totalAnimationsOptimized;
+								totalOmpimizationMentioned = true;
+							}
+							
+							continue;
+						}
+						
+						var nextSequencingFrame : BliscSprite = BliscAnimation.RenderFrame( sequencingAnimation );
+						
+						var differ : Boolean = false;
+						if (	nextSequencingFrame._source.width != sequencingFrame._source.width ||
+								nextSequencingFrame._source.height != sequencingFrame._source.height )
+						{
+							differ = true;
+						}
+						else
+						{
+							for ( var row : int = 0; row < nextSequencingFrame._source.height; ++row )
+							{
+								for ( var column : int = 0; column < nextSequencingFrame._source.width; ++column )
+								{
+									if ( nextSequencingFrame._source.getPixel32( column, row ) != sequencingFrame._source.getPixel32( column, row ) )
+									{
+										differ = true;
+										break;
+									}
+								}
+								
+								if ( differ )
+								{
+									break;
+								}
+							}
+						}
+						
+						if ( differ )
+						{
+							sequencingFrame = nextSequencingFrame;
+							rs.writeUTFBytes( ", " + sequencingIndex.toString() );
+						}
+						else
+						{
+							++framesSkippedDueToSimilarity;
+							++totalFramesSkipped;
+							
+							if ( similarityOptimizationMentioned == false )
+							{
+								++animationsOptimizedDueToSimilarity;
+								similarityOptimizationMentioned = true;
+							}
+							
+							if ( totalOmpimizationMentioned == false )
+							{
+								++totalAnimationsOptimized;
+								totalOmpimizationMentioned = true;
+							}
+						}
+					}
+					
+					//finishing code generation:
+					rs.writeUTFBytes( " ] ) );\n" );
+				}
+			}
+			rs.writeUTFBytes( "			\n" );
+			
 			//initiating step-by-step objects initialization:
 			rs.writeUTFBytes( "			ResolveObjects( 0 );\n" );
 			rs.writeUTFBytes( "		}\n" );
@@ -1750,7 +1916,7 @@ import view.Projection;
 			rs.writeUTFBytes( "				}\n" );
 			rs.writeUTFBytes( "			}\n" );
 			rs.writeUTFBytes( "			\n" );
-			rs.writeUTFBytes( "			var timer : Timer = new Timer( 120, 1 );\n" );
+			rs.writeUTFBytes( "			var timer : Timer = new Timer( 20, 1 );\n" );
 			rs.writeUTFBytes( "			timer.addEventListener( TimerEvent.TIMER_COMPLETE, function( ... args ) : void\n" );
 			rs.writeUTFBytes( "			{\n" );
 			rs.writeUTFBytes( "				toCall();\n" );
@@ -2060,11 +2226,20 @@ import view.Projection;
 			
 			if ( wasError == false )
 			{
-				PopUp( "Resources successfully generated.", POP_UP_INFO );
+				var sgr : SourcesGenerationResult = PopUpManager.createPopUp( this, SourcesGenerationResult, true ) as SourcesGenerationResult;
+				sgr.Init(
+					animationsOptimizedDueToRequest,
+					framesSkippedDueToRequest,
+					animationsOptimizedDueToSimilarity,
+					framesSkippedDueToSimilarity,
+					totalAnimationsOptimized,
+					totalFramesSkipped
+				);
+				PopUpManager.centerPopUp( sgr );
 			}
 		}
 		
-		private function set projectPath( value:String ): void
+		private function set projectPath( value : String ) : void
 		{
 			_menuBar.getMenuAt( 0 ).dataProvider[ 1 ].@enabled = true;
 			
@@ -2240,7 +2415,7 @@ import view.Projection;
 				_regionContextMenu = null;
 			}
 			
-			var menuData:Array = [ { label:"Add region...", id:"add_region" } ];
+			var menuData:Array = [ { label : "Add region...", id : "add_region" } ];
 			var regionListItem:RegionListItem = FindListItem( e, RegionListItem ) as RegionListItem;
 			if ( regionListItem != null )
 			{
@@ -2258,7 +2433,7 @@ import view.Projection;
 						break;
 					
 					case "edit":
-						var editingRegionWindow:EditingRegionWindow = PopUpManager.createPopUp( thisOne, EditingRegionWindow, false ) as EditingRegionWindow;
+						var editingRegionWindow : EditingRegionWindow = PopUpManager.createPopUp( thisOne, EditingRegionWindow, false ) as EditingRegionWindow;
 						editingRegionWindow.Init( _project, menuEvent.item.region, thisOne );
 						PopUpManager.centerPopUp( editingRegionWindow );
 						break;
@@ -2268,7 +2443,7 @@ import view.Projection;
 		}
 		
 		
-		private function onDrawBorderFlagChange( ... args ): void
+		private function onDrawBorderFlagChange( ... args ) : void
 		{
 			if ( _isometry.displaying == null )
 			{
