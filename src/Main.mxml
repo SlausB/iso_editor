@@ -1417,27 +1417,27 @@ import view.Projection;
 			rs.writeUTFBytes( "///@cond\n" );
 			rs.writeUTFBytes( "package\n" );
 			rs.writeUTFBytes( "{\n" );
+			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
+			rs.writeUTFBytes( "	import flash.geom.Point;\n" );
 			rs.writeUTFBytes( "	import flash.display.DisplayObject;\n" );
 			rs.writeUTFBytes( "	import flash.display.Loader;\n" );
 			rs.writeUTFBytes( "	import flash.display.LoaderInfo;\n" );
+			rs.writeUTFBytes( "	import flash.display.MovieClip;\n" );
+			rs.writeUTFBytes( "	import flash.utils.Timer;\n" );
+			rs.writeUTFBytes( "	import flash.events.TimerEvent;\n" );
+			rs.writeUTFBytes( "	import blisc.core.BliscAnimation;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscLayerTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscRegion;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscObjectTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscMapTemplate;\n" );
-			rs.writeUTFBytes( "	import flash.geom.Point;\n" );
-			rs.writeUTFBytes( "	import flash.display.MovieClip;\n" );
-			rs.writeUTFBytes( "	import blisc.core.BliscAnimation;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscComplexTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscRegionWithinComplex;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscCompoundTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscComplexWithinCompoundTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscUnitTemplate;\n" );
-			rs.writeUTFBytes( "	import com.junkbyte.console.Cc;\n" );
+			rs.writeUTFBytes( "	import blisc.templates.BliscAnimationTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscObjectInstanceTemplate;\n" );
 			rs.writeUTFBytes( "	import blisc.templates.BliscUnitView;\n" );
-			rs.writeUTFBytes( "	import flash.utils.Timer;\n" );
-			rs.writeUTFBytes( "	import flash.events.TimerEvent;\n" );
-			rs.writeUTFBytes( "	import blisc.templates.FrameDesc;\n" );
 			rs.writeUTFBytes( "	\n" );
 			rs.writeUTFBytes( "	///@endcond\n" );
 			rs.writeUTFBytes( "	\n" );
@@ -1745,7 +1745,7 @@ import view.Projection;
 			var totalFramesSkipped : int = 0;
 			
 			//animation frames sequencing:
-			rs.writeUTFBytes( "		SequenceFrames() : void\n" );
+			rs.writeUTFBytes( "		private function SequenceFrames() : void\n" );
 			rs.writeUTFBytes( "		{\n" );
 			for each ( var sequencingResource : Resource in _project._data._resources )
 			{
@@ -1782,9 +1782,7 @@ import view.Projection;
 					var totalOmpimizationMentioned : Boolean = false;
 					
 					//prepare temp array first and write it only you're sure something was skipped:
-					
-					//here we're already sure some data must be written for current animation:
-					rs.writeUTFBytes( "			_animationTemplates.push( new BliscAnimationTemplate( \"" + sequencingResource._path + "\", \"" + sequencingName + "\", new < int >[ 1" );
+					var resultingFrames : Vector.< int > = new < int >[ 1 ];
 					
 					//last frame to compare with:
 					var sequencingFrame : BliscSprite = BliscAnimation.RenderFrame( sequencingAnimation, sequencingName );
@@ -1843,7 +1841,7 @@ import view.Projection;
 						if ( differ )
 						{
 							sequencingFrame = nextSequencingFrame;
-							rs.writeUTFBytes( ", " + sequencingIndex.toString() );
+							resultingFrames.push( sequencingIndex );
 						}
 						else
 						{
@@ -1864,8 +1862,19 @@ import view.Projection;
 						}
 					}
 					
-					//finishing code generation:
-					rs.writeUTFBytes( " ] ) );\n" );
+					//writing result if something changed:
+					if ( resultingFrames.length != sequencingAnimation.totalFrames )
+					{
+						rs.writeUTFBytes( "			_animationTemplates.push( new BliscAnimationTemplate( \"" + sequencingResource._path + "\", \"" + sequencingName + "\", new < int >[ 1" );
+						
+						for ( var writingResultFrameIndex : int = 1; writingResultFrameIndex < resultingFrames.length; ++writingResultFrameIndex )
+						{
+							rs.writeUTFBytes( ", " + resultingFrames[ writingResultFrameIndex ].toString() );
+						}
+						
+						//finishing code generation:
+						rs.writeUTFBytes( " ] ) );\n" );
+					}
 				}
 			}
 			rs.writeUTFBytes( "			\n" );

@@ -3,32 +3,29 @@
                xmlns:s="library://ns.adobe.com/flex/spark" 
                xmlns:mx="library://ns.adobe.com/flex/mx"
 			   minWidth="320"
-			   minHeight="200"
-			   title="Sources generation result"
+			   minHeight="300"
+			   title="Sources successfully generated"
 			   >
 	
+	<s:Label text="Animations optimized due to request:" x="10" y="37" />
+	<s:Label id="_animationsOptimizedDueToRequest" x="222" y="37" />
 	
-	<s:Label text="Sources successfully generated" x="40" y="16" />
+	<s:Label text="Frames skipped due to request:" x="10" y="61" />
+	<s:Label id="_framesSkippedDueToRequest" x="194" y="61" />
 	
-	<s:Label text="Animations optimized due to request:" x="10" y="36" />
-	<s:Label id="_animationsOptimizedDueToRequest" x="100" y="36" />
+	<s:Label text="Animations optimized due to similarity:" x="10" y="99" />
+	<s:Label id="_animationsOptimizedDueToSimilarity" x="230" y="99" />
 	
-	<s:Label text="Frames skipped due to request:" x="10" y="66" />
-	<s:Label id="_framesSkippedDueToRequest" x="100" y="66" />
+	<s:Label text="Frames skipped due to similarity:" x="10" y="123" />
+	<s:Label id="_framesSkippedDueToSimilarity" x="204" y="123" />
 	
-	<s:Label text="Animations optimized due to similarity:" x="10" y="96" />
-	<s:Label id="_animationsOptimizedDueToSimilarity" x="100" y="96" />
+	<s:Label text="Animations optimized total:" x="10" y="159" />
+	<s:Label id="_animationsOptimizedTotal" x="166" y="159" />
 	
-	<s:Label text="Frames skipped due to similarity:" x="10" y="126" />
-	<s:Label id="_framesSkippedDueToSimilarity" x="100" y="126" />
+	<s:Label text="Frames skipped total:" x="10" y="183" />
+	<s:Label id="_framesSkippedTotal" x="140" y="183" />
 	
-	<s:Label text="Animations optimized total:" x="10" y="156" />
-	<s:Label id="_animationsOptimizedTotal" x="100" y="156" />
-	
-	<s:Label text="Frames skipped total:" x="10" y="186" />
-	<s:Label id="_framesSkippedTotal" x="100" y="186" />
-	
-	<s:Button label="Ok" x="250" y="134" click="onOk(event)" />
+	<s:Button label="Ok" x="240" y="240" click="onOk(event)" />
 	
 	<fx:Script>
 		<![CDATA[
