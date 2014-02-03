@@ -9,17 +9,19 @@ package project_data
 	/** Concrete object specified within some location.*/
 	public class ObjectInstance
 	{
-		public var _template:ObjectTemplate;
+		public var _template : ObjectTemplate;
 		
 		/** Tile (not physical) isometric coordinates. Other coordinates (screen or physical) are resolved using it.*/
-		public var _tileCoords:Point = new Point;
+		public var _tileCoords : Point = new Point;
 		
 		
-		public function Init( template:ObjectTemplate ): void
+		public function Init( template : ObjectTemplate ) : void
 		{
 			_template = template;
 		}
 	}
 
 }
+
+
 
