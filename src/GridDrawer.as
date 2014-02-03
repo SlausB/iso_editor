@@ -44,10 +44,22 @@ package
 			_height = _map._down * 2;
 			_roundGlobal.x = -_map._right;
 			_roundGlobal.y = -_map._down;
-			_sprite = new BliscSprite( new BitmapData( 1, 1 ), new Rectangle( 0, 0, 1, 1 ), new Point );
+			_sprite = new BliscSprite(
+				new BitmapData( 1, 1 ),
+				1,
+				1,
+				new Point
+			);
 		}
 		
-		override public function draw( canvas : BitmapData, cameraX : Number, cameraY : Number, zoom : Number, dispX : Number = 0, dispY : Number = 0 ) : void
+		override public function draw(
+			cameraX : Number,
+			cameraY : Number,
+			zoom : Number,
+			dispX : Number = 0,
+			dispY : Number = 0,
+			invalidated : Boolean = false
+		) : void
 		{
 			if ( _viewportWidth == 0 || _viewportHeight == 0 )
 			{
@@ -172,7 +184,8 @@ package
 			}
 			
 			
-			canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ), null, null, true );
+			//oops, canvas as BitmapData should be used here, but I reworked the Blisc so there are no such anymore:
+			//canvas.copyPixels( _bitmapData, _bitmapData.rect, new Point( 0, 0 ), null, null, true );
 		}
 		
 		public function SetViewport( width : Number, height : Number ) : void

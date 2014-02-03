@@ -451,6 +451,7 @@ import view.Projection;
 			_blisc.AddLayer( new BliscLayerTemplate( GRID_DRAWER_LAYER_NAME, false, false ) );
 			var drawerComplexTemplate : BliscComplexTemplate = new BliscComplexTemplate(
 				"grid_drawer",
+				-1,
 				null,
 				new Point,
 				new Point,

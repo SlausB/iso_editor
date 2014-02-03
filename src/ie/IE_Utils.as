@@ -97,6 +97,7 @@ package ie
 			
 			return new BliscComplexTemplate(
 				complex._name,
+				-1,
 				CreateAnimation( complex._singleResource, project ),
 				complex._disp,
 				complex._center,

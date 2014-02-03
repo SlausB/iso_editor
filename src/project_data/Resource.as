@@ -106,7 +106,7 @@ package project_data
 					unitDesc._orientations.push( new UnitOrientation( frameLabel.frame, endingFrame, orientation ) );
 					
 					var bliscAnimation : BliscAnimation = BliscAnimation.FromMovieClip( unitGraphics, _FPS, name, frameLabel.frame, endingFrame );
-					unitDesc._template._views.push( new BliscUnitView( orientation, bliscAnimation ) );
+					unitDesc._template._views.push( new BliscUnitView( orientation, -1, bliscAnimation ) );
 				}
 			}
 		}

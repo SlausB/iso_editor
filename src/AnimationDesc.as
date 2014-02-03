@@ -12,7 +12,6 @@ package
 		public var _id : int;
 		
 		public var _name : String;
-		
 		public var _editorsPath : String;
 		
 		public var _startingFrame : int;
@@ -24,7 +23,6 @@ package
 			_id = id;
 			
 			_name = name;
-			
 			_editorsPath = editorsPath;
 			
 			_startingFrame = startingFrame;
