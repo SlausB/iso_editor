@@ -1688,7 +1688,12 @@ import view.Projection;
 			rs.writeUTFBytes( "			\n" );
 			
 			var animationDescs : Vector.< AnimationDesc > = new Vector.< AnimationDesc >;
-			function ResolveAnimationId( name : String, editorsPath : String, startingFrame : int, endingFrame : int ) : int
+			function ResolveAnimationId(
+				name : String,
+				editorsPath : String,
+				startingFrame : int = 1,
+				endingFrame : int = int.MAX_VALUE
+			) : int
 			{
 				for each ( var lookingAnimationDesc : AnimationDesc in animationDescs )
 				{
@@ -1944,6 +1949,165 @@ import view.Projection;
 				}
 			}
 			rs.writeUTFBytes( "			\n" );
+			
+			//counting templates for future steps:
+			var complexesCount : int = 0;
+			var compoundsCount : int = 0;
+			for each ( var object : ObjectTemplate in _project._data._objects )
+			{
+				if ( object is ComplexTemplate )
+				{
+					++complexesCount;
+				}
+				else if ( object is CompoundTemplate )
+				{
+					++compoundsCount;
+				}
+			}
+			
+			//writing objects into binary file:
+			//complexes data:
+			var xd : ByteArray = new ByteArray;
+			xd.writeInt( complexesCount );
+			var complexesInited : int = 0;
+			//compounds data:
+			var nd : ByteArray = new ByteArray;
+			nd.writeInt( compoundsCount );
+			//writing both but into different streams so streams will be written instead later:
+			for ( var objectIndex : int = 0; objectIndex < _project._data._objects.length; ++objectIndex )
+			{
+				var complex : ComplexTemplate = _project._data._objects[ objectIndex ] as ComplexTemplate;
+				var compound : CompoundTemplate = _project._data._objects[ objectIndex ] as CompoundTemplate;
+				
+				//if still complexes initing process:
+				if ( complexesInited < complexesCount )
+				{
+					if ( complex == null )
+					{
+						continue;
+					}
+				}
+				else
+				{
+					if ( compound == null )
+					{
+						continue;
+					}
+				}
+				
+				if ( complex != null )
+				{
+					xd.writeInt( objectIndex );
+					
+					//regions:
+					xd.writeInt( complex._regions.length );
+					for ( var regionWithinComplexIndex : int = 0; regionWithinComplexIndex < complex._regions.length; ++regionWithinComplexIndex )
+					{
+						var regionWithinComplex : RegionWithinComplex = complex._regions[ regionWithinComplexIndex ];
+						
+						//tiles which current region occupies:
+						xd.writeInt( regionWithinComplex._tiles.length );
+						for ( var tileWithinRegionIndex : int = 0; tileWithinRegionIndex < regionWithinComplex._tiles.length; ++tileWithinRegionIndex )
+						{
+							xd.writeFloat( regionWithinComplex._tiles[ tileWithinRegionIndex ].x, regionWithinComplex._tiles[ tileWithinRegionIndex ].y );
+						}
+						
+						//region index:
+						xd.writeInt( _project._data._regions.indexOf( regionWithinComplex._region ) );
+					}
+					
+					xd.writeUTFBytes( complex._name );
+					
+					//animation index:
+					xd.writeInt( ResolveAnimationId( 
+						complex._singleResource._name,
+						complex._singleResource._resourcePath
+					) );
+					
+					xd.writeFloat( complex._disp.x );
+					xd.writeFloat( complex._disp.y );
+					
+					xd.writeFloat( complex._center.x );
+					xd.writeFloat( complex._center.y );
+					
+					xd.writeUTFBytes( complex._layer._name );
+					
+					xd.writeBoolean( complex._interactive );
+					
+					++complexesInited;
+				}
+				else if ( compound != null )
+				{
+					nd.writeInt( objectIndex );
+					
+					var compoundConsistingString : String = "new < BliscComplexWithinCompoundTemplate >[ ";
+					nd.writeInt( compound._consisting.length );
+					for ( var compoundConsistingIndex : int = 0; compoundConsistingIndex < compound._consisting.length; ++compoundConsistingIndex )
+					{
+						var compoundConsisting : ComplexWithinCompound = compound._consisting[ compoundConsistingIndex ];
+						
+						bs.writeInt( _project._data._objects.indexOf( compoundConsisting._complex ) );
+						
+						bs.writeFloat( compoundConsisting._tileDispX );
+						bs.writeFloat( compoundConsisting._tileDispY );
+						
+						compoundConsistingString = compoundConsistingString + "new BliscComplexWithinCompoundTemplate( _objects[ " + _project._data._objects.indexOf( compoundConsisting._complex ).toString() + " ] as BliscComplexTemplate, new Point( " + compoundConsisting._tileDispX.toString() + ", " + compoundConsisting._tileDispY.toString() + " ) )";
+					}
+					
+					nd.writeUTFBytes( compound._name );
+					
+					rs.writeUTFBytes( "			_objects[ " + objectIndex + " ] = new BliscCompoundTemplate( \"" + compound._name + "\", " + compoundConsistingString + " );\n" );
+				}
+				else
+				{
+					PopUp( "Undefined object type", POP_UP_ERROR );
+				}
+			}
+			//writing rendered data in an order it will be read:
+			bs.writeBytes( xd );
+			bs.writeBytes( nd );
+			
+			//complexes reading code:
+			rs.writeUTFBytes( "			const complexesCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "			for ( var complexIndex : int = 0; complexIndex < complexesCount; ++complexIndex )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				const complexArrayIndex : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				//regions:\n" );
+			rs.writeUTFBytes( "				const regionsCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				var regions : Vector.< BliscRegionWithinComplex > = new Vector.< BliscRegionWithinComplex >( regionsCount, true );\n" );
+			rs.writeUTFBytes( "				for ( var regionIndex : int = 0; regionIndex < regionsCount; ++regionIndex )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					const tilesCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "					var tiles : Vector.< Point > = new Vector.< Point >( tilesCount, true );\n" );
+			rs.writeUTFBytes( "					for ( var tileIndex : int = 0; tileIndex < tilesCount; ++tileIndex )\n" );
+			rs.writeUTFBytes( "					{\n" );
+			rs.writeUTFBytes( "						tiles[ tileIndex ] = new Point( bs.readFloat(), bs.readFloat() );\n" );
+			rs.writeUTFBytes( "					}\n" );
+			rs.writeUTFBytes( "					\n" );
+			rs.writeUTFBytes( "					regions[ regionIndex ] = new BliscRegionWithinComplex( _regions[ bs.readInt() ], tiles );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				_objects[ complexArrayIndex ] = new BliscComplexTemplate( bs.readUTFBytes(), bs.readInt(), null, new Point( bs.readFloat(), bs.readFloat() ), new Point( bs.readFloat(), bs.readFloat() ), bs.readUTFBytes(), regions, bs.readBoolean );\n" );
+			rs.writeUTFBytes( "			}\n" );
+			
+			//compounds reading code:
+			rs.writeUTFBytes( "			\n" );
+			rs.writeUTFBytes( "			const compoundsCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "			for ( var compoundIndex : int = 0; compoundIndex < compoundsCount; ++compoundIndex )\n" );
+			rs.writeUTFBytes( "			{\n" );
+			rs.writeUTFBytes( "				const compoundArrayIndex : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				//consisting complexes:\n" );
+			rs.writeUTFBytes( "				const consistingComplexesCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				var consistingComplexes : Vector.< BliscComplexWithinCompoundTemplate > = new Vector.< BliscComplexWithinCompoundTemplate >( consistingComplexesCount, true );\n" );
+			rs.writeUTFBytes( "				for ( var consistingComplexIndex : int = 0; consistingComplexIndex < consistingComplexesCount; ++consistingComplexIndex )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					consistingComplexes[ consistingComplexIndex ] = new BliscComplexWithinCompoundTemplate( _objects[ bs.readInt() ], new Point( bs.readFloat(), bs.readFloat() ) );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				_objects[ compoundArrayIndex ] = new BliscCompoundTemplate( bs.readUTFBytes(), consistingComplexes );\n" );
+			rs.writeUTFBytes( "			}\n" );
 			
 			//initiating step-by-step objects initialization:
 			rs.writeUTFBytes( "			ResolveObjects( 0 );\n" );
