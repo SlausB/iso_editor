@@ -310,6 +310,7 @@ import flash.system.ApplicationDomain;
 import flash.ui.ContextMenu;
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
+import fos.FosUtils;
 import ie.ConfirmationWindow;
 import ie.EditingMapWindow;
 import ie.EditingPreferencesWindow;
@@ -1216,16 +1217,16 @@ import view.Projection;
 		}
 		
 		
-		public static function StartDrag( e:MouseEvent, data:Object, format:String, imageClass:Class ): void
+		public static function StartDrag( e : MouseEvent, data : Object, format : String, imageClass : Class ) : void
 		{
-			var uiComponent:UIComponent = Utils.FindParentByType( e.target as DisplayObject, UIComponent ) as UIComponent;
+			var uiComponent : UIComponent = Utils.FindParentByType( e.target as DisplayObject, UIComponent ) as UIComponent;
 			if ( uiComponent == null )
 			{
 				Cc.error( "E: Main.StartDrag(): failed to accomplish drag/drop quest." );
 			}
 			else
 			{
-				var dragSource:DragSource = new DragSource;
+				var dragSource : DragSource = new DragSource;
 				dragSource.addData( data, format );
 				
 				var proxy:mx.controls.Image = new mx.controls.Image;
@@ -1414,6 +1415,21 @@ import view.Projection;
 			var rs : FileStream = new FileStream;
 			rs.open( resourcesFile, FileMode.WRITE );
 			
+			var binaryFile : File = directory.resolvePath( "resources_data.brd" );
+			var bs : FileStream = new FileStream;
+			bs.open( binaryFile, FileMode.WRITE );
+			
+			var animationsFile : File = directory.resolvePath( "animations_data.bad" );
+			var ns : FileStream = new FileStream;
+			ns.open( animationsFile, FileMode.WRITE );
+			
+			//counting amount of units to predefine array length:
+			var unitsCount : int = 0;
+			for each ( var countingUnitsResource : Resource in _project._data._resources )
+			{
+				unitsCount += countingUnitsResource._units.length;
+			}
+			
 			rs.writeUTFBytes( "///@cond\n" );
 			rs.writeUTFBytes( "package\n" );
 			rs.writeUTFBytes( "{\n" );
@@ -1474,7 +1490,7 @@ import view.Projection;
 			rs.writeUTFBytes( "		public var _objects : Vector.< BliscObjectTemplate > = new Vector.< BliscObjectTemplate >( " + _project._data._objects.length + ", true );\n" );
 			rs.writeUTFBytes( "		\n" );
 			//units:
-			rs.writeUTFBytes( "		public var _units : Vector.< BliscUnitTemplate > = new Vector.< BliscUnitTemplate >;\n" );
+			rs.writeUTFBytes( "		public var _units : Vector.< BliscUnitTemplate >;\n" );
 			rs.writeUTFBytes( "		\n" );
 			//maps:
 			rs.writeUTFBytes( "		public var _maps : Vector.< BliscMapTemplate > = new Vector.< BliscMapTemplate >;\n" );
@@ -1671,71 +1687,121 @@ import view.Projection;
 			}
 			rs.writeUTFBytes( "			\n" );
 			
-			//units:
+			var animationDescs : Vector.< AnimationDesc > = new Vector.< AnimationDesc >;
+			function ResolveAnimationId( name : String, editorsPath : String, startingFrame : int, endingFrame : int ) : int
+			{
+				for each ( var lookingAnimationDesc : AnimationDesc in animationDescs )
+				{
+					if (
+						lookingAnimationDesc._name == name &&
+						lookingAnimationDesc._editorsPath == editorsPath &&
+						lookingAnimationDesc._startingFrame == startingFrame &&
+						lookingAnimationDesc._endingFrame == endingFrame
+					)
+					{
+						return lookingAnimationDesc._id;
+					}
+				}
+				
+				var newAnimationDesc : AnimationDesc = new AnimationDesc(
+					animationDescs.length + 1,
+					name,
+					editorsPath,
+					startingFrame,
+					endingFrame
+				);
+				
+				animationDescs.push( newAnimationDesc );
+				
+				return animationDescs.id;
+			};
+			
+			//writing units into binary file:
+			//units descs amount:
+			bs.writeInt( unitsCount );
+			//units itself:
 			for each ( var resourceWithUnits : Resource in _project._data._resources )
 			{
 				for each ( var unitDesc : UnitDesc in resourceWithUnits._units )
 				{
 					var unitProperties : UnitProperties = _project.FindUnitProperties( unitDesc, true );
 					
-					var unitSurfacesString : String = "new < BliscRegion >[ ";
+					//surfaces:
+					//surfaces amount:
+					bs.writeInt( unitProperties._surfaces.length );
+					//surfaces itself:
 					for ( var surfaceWithinUnitIndex : int = 0; surfaceWithinUnitIndex < unitProperties._surfaces.length; ++surfaceWithinUnitIndex )
 					{
 						var surfaceWithinUnit : Region = unitProperties._surfaces[ surfaceWithinUnitIndex ];
 						
-						if ( surfaceWithinUnitIndex > 0 )
-						{
-							unitSurfacesString = unitSurfacesString + ", ";
-						}
-						
-						//regions must be written in the same order as they are presented:
-						unitSurfacesString = unitSurfacesString + "_regions[ " + _project._data._regions.indexOf( surfaceWithinUnit ).toString() + " ]";
+						bs.writeInt( _project._data._regions.indexOf( surfaceWithinUnit ) );
 					}
-					unitSurfacesString = unitSurfacesString + " ]";
 					
-					var unitViewsString : String = "new < BliscUnitView >[ ";
+					//unit views:
+					//views amount:
+					bs.writeInt( unitDesc._template._views.length );
+					//views itself:
 					for ( var unitViewIndex : int = 0; unitViewIndex < unitDesc._template._views.length; ++unitViewIndex )
 					{
 						var unitView : BliscUnitView = unitDesc._template._views[ unitViewIndex ];
 						var unitViewOrientation : UnitOrientation = unitDesc._orientations[ unitViewIndex ];
 						
-						if ( unitViewIndex > 0 )
-						{
-							unitViewsString = unitViewsString + ", ";
-						}
-						
-						unitViewsString = unitViewsString + "new BliscUnitView( " + unitViewOrientation._orientation.toString() + ", ResolveGraphics( \"" + unitDesc._singleResource._name + "\", \"" + unitDesc._singleResource._resourcePath + "\", " + unitViewOrientation._startingFrame.toString() + ", " + unitViewOrientation._endingFrame.toString() + " ) )";
+						bs.writeInt( unitViewOrientation._orientation );
+						bs.writeInt( ResolveAnimationId(
+							unitDesc._singleResource._name,
+							unitDesc._singleResource._resourcePath,
+							unitViewOrientation._startingFrame,
+							unitViewOrientation._endingFrame
+						) );
 					}
-					unitViewsString = unitViewsString + " ]";
 					
-					var refusedDirectionsString : String = "new < int >[ ";
+					//refused redirections:
+					bs.writeInt( unitProperties._refusedDirections.length );
 					for ( var refusedDirectionIndex : int = 0; refusedDirectionIndex < unitProperties._refusedDirections.length; ++refusedDirectionIndex )
 					{
-						var refusedDirection : int = unitProperties._refusedDirections[ refusedDirectionIndex ];
-						
-						if ( refusedDirectionIndex > 0 )
-						{
-							refusedDirectionsString = refusedDirectionsString + ", ";
-						}
-						
-						refusedDirectionsString = refusedDirectionsString + refusedDirection.toString();
+						bs.writeInt( unitProperties._refusedDirections[ refusedDirectionIndex ] );
 					}
-					refusedDirectionsString = refusedDirectionsString + " ]";
 					
-					rs.writeUTFBytes( "			_units.push( new BliscUnitTemplate( \"" + unitDesc._template._name + "\", \"" + unitDesc._template._animation + "\", " + unitSurfacesString + ", " + unitViewsString + ", " + refusedDirectionsString + " ) );\n" );
+					//unit name:
+					bs.writeUTFBytes( unitDesc._template._name );
+					
+					//unit animation name:
+					bs.writeUTFBytes( unitDesc._template._animation );
 				}
 			}
-			rs.writeUTFBytes( "			\n" );
 			
-			//initiating animation frames sequencing:
-			rs.writeUTFBytes( "			var timer : Timer = new Timer( 20, 1 );\n" );
-			rs.writeUTFBytes( "			timer.addEventListener( TimerEvent.TIMER_COMPLETE, function( ... args ) : void\n" );
+			//units reading code:
+			rs.writeUTFBytes( "			//reading units:\n" );
+			rs.writeUTFBytes( "			const unitsCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "			_units = new Vector.< BliscUnitTemplate >;\n" );
+			rs.writeUTFBytes( "			for ( var readingUnitIndex : int = 0; readingUnitIndex < unitsCount; ++readingUnitIndex )\n" );
 			rs.writeUTFBytes( "			{\n" );
-			rs.writeUTFBytes( "				SequenceFrames();\n" );
-			rs.writeUTFBytes( "			} );\n" );
-			rs.writeUTFBytes( "			timer.start();\n" );
-			rs.writeUTFBytes( "		}\n" );
-			rs.writeUTFBytes( "		\n" );
+			rs.writeUTFBytes( "				//surfaces:\n" );
+			rs.writeUTFBytes( "				const surfacesCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				var surfaces : Vector.< BliscRegion > = new Vector.< BliscRegion >( surfacesCount, true );\n" );
+			rs.writeUTFBytes( "				for ( var surfaceIndex : int = 0; surfaceIndex < surfacesCount; ++surfaceIndex )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					surfaces[ surfaceIndex ] = _regions[ bs.readInt() ];\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				//views:\n" );
+			rs.writeUTFBytes( "				const viewsCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				var views : Vector.< BliscUnitView > = new Vector.< BliscUnitView >( viewsCount, true );\n" );
+			rs.writeUTFBytes( "				for ( var viewIndex : int = 0; viewIndex < viewsCount; ++viewIndex )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					views[ viewIndex ] = new BliscUnitView( bs.readInt(), bs.readInt() );\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				//refused redirections:\n" );
+			rs.writeUTFBytes( "				const refusedRedirectionsCount : int = bs.readInt();\n" );
+			rs.writeUTFBytes( "				var refusedRedirections : Vector.< int > = new Vector.< int >( refusedRedirectionsCount, true );\n" );
+			rs.writeUTFBytes( "				for ( var refusedRedirectionIndex : int = 0; refusedRedirectionIndex < refusedRedirectionsCount; ++refusedRedirectionIndex )\n" );
+			rs.writeUTFBytes( "				{\n" );
+			rs.writeUTFBytes( "					refusedRedirections[ refusedRedirectionIndex ] = bs.readInt();\n" );
+			rs.writeUTFBytes( "				}\n" );
+			rs.writeUTFBytes( "				\n" );
+			rs.writeUTFBytes( "				_units[ readingUnitIndex ] = new BliscUnitTemplate( bs.readUTFBytes(), bs.readUTFBytes(), surfaces, views, refusedRedirections );\n" );
+			rs.writeUTFBytes( "			}\n" );
 			
 			var animationsOptimizedDueToRequest : int = 0;
 			var framesSkippedDueToRequest : int = 0;
