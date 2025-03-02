@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<flex-config>
+  <target-player>18.0</target-player>
+  <benchmark>false</benchmark>
+  <static-link-runtime-shared-libraries>true</static-link-runtime-shared-libraries>
+  <compiler>
+    <verbose-stacktraces>true</verbose-stacktraces>
+
+    <source-path append="true">
+        <path-element>./src</path-element>
+        <path-element>./flash_libs/utils</path-element>
+        <path-element>./flash_libs/fos</path-element>
+        <path-element>./blisc</path-element>
+    </source-path>
+    
+    <define append="true">
+      <name>DEBUG::profiling</name>
+      <value>false</value>
+    </define>
+    
+    <define append="true">
+      <name>CONFIG::stage3d</name>
+      <value>false</value>
+    </define>
+
+    <library-path append="true">
+        <path-element>./flexair/frameworks/libs/mx/mx.swc</path-element>
+        <path-element>./flexair/frameworks/libs/framework.swc</path-element>
+        <path-element>./flexair/frameworks/libs/air/airframework.swc</path-element>
+        <path-element>./flexair/frameworks/libs/air/airspark.swc</path-element>
+        <path-element>./flexair/frameworks/libs/air/airglobal.swc</path-element>
+        <path-element>./flexair/frameworks/libs/advancedgrids.swc</path-element>
+        <path-element>./flexair/frameworks/libs/apache.swc</path-element>
+        <path-element>./flexair/frameworks/libs/authoringsupport.swc</path-element>
+        <path-element>./flexair/frameworks/libs/charts.swc</path-element>
+        <path-element>./flexair/frameworks/libs/core.swc</path-element>
+        <path-element>./flexair/frameworks/libs/experimental.swc</path-element>
+        <path-element>./flexair/frameworks/libs/experimental_mobile.swc</path-element>
+        <path-element>./flexair/frameworks/libs/flash-integration.swc</path-element>
+        <path-element>./flexair/frameworks/libs/flatspark.swc</path-element>
+        <path-element>./flexair/frameworks/libs/rpc.swc</path-element>
+        <path-element>./flexair/frameworks/libs/spark.swc</path-element>
+        <path-element>./flexair/frameworks/libs/spark_dmv.swc</path-element>
+        <path-element>./flexair/frameworks/libs/sparkskins.swc</path-element>
+        <path-element>./flexair/frameworks/libs/textLayout.swc</path-element>
+        
+        <path-element>./flexair/frameworks/locale/en_US/advancedgrids_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/airframework_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/airspark_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/apache_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/automation_agent_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/automation_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/charts_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/experimental_mobile_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/experimental_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/flash-integration_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/framework_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/mobilecomponents_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/mx_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/playerglobal_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/rpc_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/spark_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/textLayout_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/en_US/tool_air_rb.swc</path-element>
+        
+        <path-element>./flexair/frameworks/locale/ru_RU/advancedgrids_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/airframework_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/airspark_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/apache_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/automation_agent_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/automation_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/charts_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/experimental_mobile_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/experimental_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/flash-integration_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/framework_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/mobilecomponents_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/mx_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/playerglobal_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/rpc_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/spark_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/textLayout_rb.swc</path-element>
+        <path-element>./flexair/frameworks/locale/ru_RU/tool_air_rb.swc</path-element>
+    </library-path>
+
+    <external-library-path>
+    </external-library-path>
+
+  </compiler>
+  <file-specs>
+  </file-specs>
+  <default-background-color>#FFFFFF</default-background-color>
+  <default-frame-rate>60</default-frame-rate>
+  <default-size>
+    <width>1920</width>
+    <height>1080</height>
+  </default-size>
+</flex-config>

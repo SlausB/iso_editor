@@ -9,6 +9,7 @@ package project_data
 	import flash.display.MovieClip;
 	import flash.geom.Point;
 	import flash.system.ApplicationDomain;
+	import ie.PopUp;
 	import iso.orient.Orientation;
 	///@endcond
 	
@@ -44,7 +45,11 @@ package project_data
 			
 			_FPS = FPS;
 			
-			//recognizing units:
+			discover_units();
+		}
+
+		function discover_units() : void
+		{
 			for each ( var name : String in _names )
 			{
 				var parts : Array = name.split( "_" );
@@ -75,7 +80,7 @@ package project_data
 				
 				if ( currentLabels.length <= 0 )
 				{
-					main.PopUp( "Not a single orientation was specified for unit \"" + name + "\". It will not be displayed within \"Units\" list.", Main.POP_UP_WARNING );
+					PopUp.Show( "Not a single orientation was specified for unit \"" + name + "\". It will not be displayed within \"Units\" list.", PopUp.POP_UP_WARNING );
 					continue;
 				}
 				

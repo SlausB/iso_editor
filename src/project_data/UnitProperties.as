@@ -8,7 +8,7 @@ package project_data
 	/** Properties designer managed to specify for that unit.*/
 	public class UnitProperties
 	{
-		/** Unit's resource name. Yes - multiple units can have similar name - designer's drawback.*/
+		/** Unit's resource name. Yes - multiple units can have similar names - design flaw.*/
 		public var _unit : String;
 		
 		/** Archaic field to avoid AMF loading errors/warning. Used to store chosen default region. Null if wasn't yet.*/

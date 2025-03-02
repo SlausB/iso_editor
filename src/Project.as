@@ -13,6 +13,7 @@ package
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
 	import flash.utils.ByteArray;
+	import ie.PopUp;
 	import ie.ResourceMissingWindow;
 	import list_items.CompoundTableItem;
 	import list_items.LayerListItem;
@@ -89,6 +90,7 @@ package
 			try
 			{
 				Accept_Unsafe( data );
+				Cc.info( "Loaded project:", _data );
 			}
 			catch ( e:Error )
 			{
@@ -296,7 +298,7 @@ package
 				},
 				function( why : String ) : void
 				{
-					_main.PopUp( "Resource \"" + _data._resources[ _loadingResourceIndex ]._path + "\" was not loaded: " + why + ". Skipping it.", Main.POP_UP_WARNING );
+					PopUp.Show( "Resource \"" + _data._resources[ _loadingResourceIndex ]._path + "\" was not loaded: " + why + ". Skipping it.", PopUp.POP_UP_WARNING );
 					_data._resources.splice( _loadingResourceIndex, 1 );
 					LoadNextResource( onResult );
 				} );
@@ -348,7 +350,11 @@ package
 		\param onSuccess function( applicationDomain:ApplicationDomain, names:Array, FPS:Number ): void
 		\param onFail function( why:String ): void
 		*/
-		private function LoadResource( path : String, onSuccess : Function, onFail : Function ) : void
+		private function LoadResource(
+			path : String,
+			onSuccess : Function,
+			onFail : Function
+		) : void
 		{
 			var loader : Loader = new Loader;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function( e:Event ): void
@@ -382,7 +388,7 @@ package
 				
 				LoadResource( path, function( applicationDomain : ApplicationDomain, names : Array, FPS : Number ) : void
 				{
-					_main.PopUp( "Resource successfully added", Main.POP_UP_INFO );
+					PopUp.Show( "Resource successfully added", PopUp.POP_UP_INFO );
 					
 					var resource : Resource = new Resource;
 					resource._path = path;
@@ -399,7 +405,7 @@ package
 				},
 				function( why : String ) : void
 				{
-					_main.PopUp( "Resource adding failed: " + why, Main.POP_UP_ERROR );
+					PopUp.Show( "Resource adding failed: " + why, PopUp.POP_UP_ERROR );
 				} );
 			} );
 			browseToResource.browse();
@@ -450,7 +456,7 @@ package
 		
 		public function get side(): Number
 		{
-			return _data._tileSize * Utils.TILE_SIDE;
+            return _data.side;
 		}
 		
 		public function ResolveLayerIndex( layer : Layer ): int
@@ -464,32 +470,6 @@ package
 			}
 			Cc.error( "E: Project.ResolveLayerIndex(): wasn't found." );
 			return 0;
-		}
-		
-		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.
-		\param create True if need to create and add new one if wasn't found.
-		*/
-		public function FindUnitProperties( unitDesc : UnitDesc, create : Boolean ) : UnitProperties
-		{
-			for each ( var unitProperties : UnitProperties in _data._unitProperties )
-			{
-				if ( unitProperties._unit == unitDesc._template.MakeFullName() )
-				{
-					return unitProperties;
-				}
-			}
-			
-			if ( create )
-			{
-				var creating : UnitProperties = new UnitProperties;
-				creating.Init( unitDesc._template.MakeFullName() );
-				
-				_data._unitProperties.push( creating );
-				
-				return creating;
-			}
-			
-			return null;
 		}
 		
 		public function ResolveTemplatesDependence( template : ComplexTemplate ) : TemplatesDependence

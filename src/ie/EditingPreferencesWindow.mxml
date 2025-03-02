@@ -81,7 +81,7 @@ import utils.Utils;
 			}
 			else
 			{
-				_project._main.PopUp( "Chosen unrecognized moving way. Choose some other please.", Main.POP_UP_ERROR );
+				PopUp.Show( "Chosen unrecognized moving way. Choose some other please.", PopUp.POP_UP_ERROR );
 				return;
 			}
 			

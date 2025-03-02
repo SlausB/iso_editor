@@ -132,7 +132,7 @@ import utils.Utils;
 			
 			_name.text = unit._singleResource._name;
 			
-			_unitProperties = project.FindUnitProperties( unit, true );
+			_unitProperties = project._data.FindUnitProperties( unit, true );
 			
 			var y : Number = 0;
 			const STEP : Number = 30;

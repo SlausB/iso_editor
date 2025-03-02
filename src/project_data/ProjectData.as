@@ -1,6 +1,7 @@
 ///@cond
 package project_data
 {
+	import utils.Utils;
 	
 	///@endcond
 	
@@ -40,6 +41,41 @@ package project_data
 		
 		/** All specified animation properties.*/
 		public var _animationProperties : Vector.< AnimationProperties > = new Vector.< AnimationProperties >;
+		
+		/** Is it need to check if frames differ doing per-pixel check.*/
+		public var _performPerPixelAnimationsCheck : Boolean = true;
+		
+		
+		/** Returns any provided information for specified automatically generated unit. Null if no information was given for that unit.
+		\param create True if need to create and add new one if wasn't found.
+		*/
+		public function FindUnitProperties( unitDesc : UnitDesc, create : Boolean ) : UnitProperties
+		{
+			for each ( var unitProperties : UnitProperties in _unitProperties )
+			{
+				if ( unitProperties._unit == unitDesc._template.MakeFullName() )
+				{
+					return unitProperties;
+				}
+			}
+			
+			if ( create )
+			{
+				var creating : UnitProperties = new UnitProperties;
+				creating.Init( unitDesc._template.MakeFullName() );
+				
+				_unitProperties.push( creating );
+				
+				return creating;
+			}
+			
+			return null;
+		}
+		
+		public function get side(): Number
+		{
+            return _tileSize * Utils.TILE_SIDE;
+		}
 	}
 
 }
