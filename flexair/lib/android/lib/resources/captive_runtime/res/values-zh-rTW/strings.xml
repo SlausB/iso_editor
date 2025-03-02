@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<resources>
+   <string name="application_name">Adobe AIR</string>
+   <string name="flash_browser_plugin">Flash 外掛程式</string>
+   <string name="button_cancel">取消</string>
+   <string name="button_continue">繼續</string>
+   <string name="button_yes">是</string>
+   <string name="button_no">否</string>
+   <string name="app_name">安全性警告</string>
+   <string name="IDA_APP_WAITING_DEBUGGER_TITLE"><u>Adobe AIR: 等待連線</u></string>
+   <string name="IDA_APP_UNABLE_LISTEN_ERROR"><u>Adobe AIR: 偵聽連接埠</u></string>
+   <string name="IDA_APP_WAITING_DEBUGGER_WARNING"><u>AIR 應用程式正在等待除錯程式進行連線。這最多需要 %d 秒鐘。</u></string>
+   <string name="IDA_APP_DEBUGGER_TIMEOUT_INFO">無法連線至除錯程式。<u></u></string>
+</resources>

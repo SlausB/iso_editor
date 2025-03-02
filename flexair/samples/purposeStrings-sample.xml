@@ -1,0 +1,20 @@
+<purposeString>  
+    <iPhone>
+     <text xml:lang="da">               
+       <string key = "NSPhotoLibraryUsageDescription" > Formålstreng til fotobibliotek på dansk</string>
+       <string key = "NSCameraUsageDescription" > Formålstreng til kamera på dansk </string>
+    </text>
+     <text xml:lang="de">               
+       <string key = "NSPhotoLibraryUsageDescription" > Zweck String für Foto-Bibliothek in deutscher Sprache </string>
+       <string key = "NSCameraUsageDescription" > Zweck String für Kamera in Deutsch  </string>
+    </text>
+    <text xml:lang="en">               
+       <string key = "NSPhotoLibraryUsageDescription" > Purpose string for photo library in English </string>
+       <string key = "NSCameraUsageDescription" > Purpose string for camera in English </string>
+    </text>
+    <text xml:lang="fr">               
+       <string key = "NSPhotoLibraryUsageDescription" > Chaîne de but pour la photothèque en français </string>
+       <string key = "NSCameraUsageDescription" > But chaîne pour caméra en français  </string>
+    </text>
+  </iPhone>
+</purposeString>

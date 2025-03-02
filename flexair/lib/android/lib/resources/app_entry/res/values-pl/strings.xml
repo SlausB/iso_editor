@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<resources>
+   <string name="app_name">APP_NAME</string>
+   <string name="app_version">APP_VERSION</string>
+   <string name="button_install">Kontynuuj</string>
+   <string name="button_exit">Zakończ</string>
+   <string name="file_save_as">Zapisz jako:</string>
+   <string name="file_download">Pobieranie</string>
+   <string name="file_upload">Wysyłanie</string>
+   <string name="audio_files">Pliki audio</string>
+   <string name="image_files">Pliki obrazów</string>
+   <string name="video_files">Pliki wideo</string>
+   <string name="button_ok">OK</string>
+   <string name="empty_file_list">Nie znaleziono żadnych plików.</string>
+   <string name="title_adobe_air"><b>Adobe AIR</b></string>
+   <string name="text_runtime_required">"Ta aplikacja wymaga środowiska Adobe AIR.\n\n"</string>
+   <string name="text_install_runtime">"Aby kontynuować, zainstaluj środowisko AIR na tym urządzeniu."</string>
+   <string name="text_runtime_on_external_storage">"Aby kontynuować, albo zainstaluj środowisko Adobe AIR na tym urządzeniu, albo zamknij tę aplikację i przed ponownym uruchomieniem podłącz kartę SD zawierającą środowisko Adobe AIR."</string>
+   <!-- following strings are required by game preview feature -->
+   <string name="text_gamepreview_loading">Wczytywanie...</string>
+   <string name="text_gamepreview_loading_error">Nie można wczytać gry.</string>
+   <string name="text_install_gamepreview_app">Zainstaluj teraz</string>
+   <string name="text_air_missing_header">Wymagana aplikacja Adobe AIR</string>
+   <string name="text_air_missing_text">Do korzystania z podglądu gry wymagane jest zainstalowanie aplikacji Adobe AIR.</string>
+   <string name="button_install_air_from_playstore">Zainstaluj z Play Store.</string>
+   <string name="button_cancel">Anuluj</string>
+   <string name="text_dont_show_again">Nie pokazuj ponownie tego komunikatu.</string>
+   <string name="IDA_CURL_SSL_SECURITY_WARNING">Ostrzeżenie dotyczące bezpieczeństwa</string>
+   <string name="IDA_CURL_INTERFACE_THISSESS">Zaufaj sesji</string>
+   <string name="IDA_CURL_INTERFACE_NOSESS">Anuluj</string>
+   <string name="IDA_CURL_INTERFACE_OK">OK</string>
+   <string name="IDA_CURL_INTERFACE_UNVERSER_2">Serwer, z którym aplikacja nawiązuje połączenie, jest niezweryfikowany.</string>
+   <string name="IDA_CURL_INTERFACE_ALLSESS">Ufaj zawsze</string>
+   <string name="IDA_CURL_INTERFACE_SERVER"><b>Serwer:</b></string>
+   <string name="IDA_CURL_INTERFACE_TRUSTSER">Czy chcesz ufać temu serwerowi i nawiązać połączenie?</string>
+   <string name="IDA_CURL_INTERFACE_CNAME_MSG">Nazwa serwera (%1$s) jest inna niż nazwa podana w certyfikacje (%2$s). Czy zaufać temu serwerowi i kontynuować?</string>
+   <string name="IDA_CURL_INTERFACE_VIEW_CERT"><u>Wyświetl certyfikat</u></string>
+   <string name="IDA_CURL_INTERFACE_CERTIFICATE_DETAILS_TITLE"><u>Szczegóły certyfikatu</u></string>
+   <string name="IDA_CERTIFICATE_DETAILS"><b>Certyfikat:</b>\n
+               \n
+                  <b><u>Wystawiony dla:</u></b>\n
+                  Nazwa ogólna:\n
+                  %1$s\n
+                  \n
+                  Organizacja:\n
+                  %2$s\n
+                  \n
+                  Jednostka organizacyjna:\n
+                  %3$s\n
+                  \n
+                  <b><u>Wystawiony przez:</u></b>\n
+                  Nazwa ogólna:\n
+                  %4$s\n
+                  \n
+                  Organizacja:\n
+                  %5$s\n
+                  \n
+                  Jednostka organizacyjna:\n
+                  %6$s\n
+                  \n
+                  <b><u>Ważność:</u></b>\n 
+                  Data wystawienia:\n
+                  %7$s\n
+                  \n
+                  Termin ważności:\n
+                  %8$s
+   </string>
+</resources>

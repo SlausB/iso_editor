@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<resources>
+   <string name="application_name">Adobe AIR</string>
+   <string name="flash_browser_plugin">Flash 플러그인</string>
+   <string name="button_cancel">취소</string>
+   <string name="button_continue">계속</string>
+   <string name="button_yes">예</string>
+   <string name="button_no">아니요</string>
+   <string name="app_name">보안 경고</string>
+   <string name="IDA_APP_WAITING_DEBUGGER_TITLE"><u>Adobe AIR: 연결 대기 중</u></string>
+   <string name="IDA_APP_UNABLE_LISTEN_ERROR"><u>Adobe AIR: 포트에서 수신 대기 중</u></string>
+   <string name="IDA_APP_WAITING_DEBUGGER_WARNING"><u>AIR 응용 프로그램에서 디버거가 연결을 설정하기를 기다리고 있습니다. 연결하는 데 최대 %d초가 소요될 수 있습니다.</u></string>
+   <string name="IDA_APP_DEBUGGER_TIMEOUT_INFO">디버거에 연결할 수 없습니다.<u></u></string>
+</resources>

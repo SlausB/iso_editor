@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2009 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<resources>
+   <string name="application_name">Adobe AIR</string>
+   <string name="flash_browser_plugin">Подключаемый модуль Flash</string>
+   <string name="button_cancel">Отмена</string>
+   <string name="button_continue">Продолжить</string>
+   <string name="button_yes">Да</string>
+   <string name="button_no">Нет</string>
+   <string name="app_name">Предупреждение системы безопасности</string>
+   <string name="IDA_APP_WAITING_DEBUGGER_TITLE"><u>Adobe AIR: ожидание подключения</u></string>
+   <string name="IDA_APP_UNABLE_LISTEN_ERROR"><u>Adobe AIR: прослушивание порта</u></string>
+   <string name="IDA_APP_WAITING_DEBUGGER_WARNING"><u>Приложение AIR ожидает подключения отладчика. Это может занять до %d с.</u></string>
+   <string name="IDA_APP_DEBUGGER_TIMEOUT_INFO">Не удается подключиться к отладчику.<u></u></string>
+</resources>
