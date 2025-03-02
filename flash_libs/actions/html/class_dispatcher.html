@@ -1,0 +1,1008 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Класс Dispatcher</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li><a href="pages.html"><span>Описания</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="classes.html"><span>Алфавитный&#160;указатель&#160;классов</span></a></li>
+      <li><a href="inherits.html"><span>Иерархия&#160;классов</span></a></li>
+      <li><a href="functions.html"><span>Члены&#160;классов</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Открытые члены</a> &#124;
+<a href="#pub-static-methods">Открытые статические члены</a> &#124;
+<a href="#pub-attribs">Открытые атрибуты</a> &#124;
+<a href="#pri-methods">Закрытые члены</a> &#124;
+<a href="#pri-attribs">Закрытые данные</a>  </div>
+  <div class="headertitle">
+<h1>Класс Dispatcher</h1>  </div>
+</div>
+<div class="contents">
+<!-- doxytag: class="Dispatcher" -->
+<p>Хранит очереди. Вызывает выполнение их действий.  
+<a href="#_details">Подробнее...</a></p>
+
+<p><a href="class_dispatcher-members.html">Полный список членов класса</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Открытые члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ac01cf2bcaf244beaccda06c749f2130b">Dispatcher</a> (output:Output)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4">Live</a> (elapsedSeconds:Number=0.020, thread:int=0)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Выполнение текущих действий в очередях.  <a href="#acf8f1f43617c22280960f9d1c80733d4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a1f69c545a08d8836d54c5a12514a588c">Clear</a> (queueId:int=-1, resetIgnoring:Boolean=false,...exceptions)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Удаление очереди с указанным идентификатором.  <a href="#a1f69c545a08d8836d54c5a12514a588c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a66b1903dc4fc1688e2f44b4d4246fb45">ClearQueue</a> (queueId:int, resetIgnoring:Boolean=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Очистка указанной очереди.  <a href="#a66b1903dc4fc1688e2f44b4d4246fb45"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ac58b490fe4785de278379c8b433c0c4d">IgnoreThread</a> (thread:int=-1)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Игнорирование указанного потока.  <a href="#ac58b490fe4785de278379c8b433c0c4d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#af678dc0e1927554c1c96c8825878edfb">ResetThreadIgnoring</a> (thread:int=-1)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Сброс игнорирования потока.  <a href="#af678dc0e1927554c1c96c8825878edfb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a5c3e2fcaf3714fda5b05ef1b386d9477">IsThreadIgnoring</a> (thread:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Игнорируется ли указанный поток.  <a href="#a5c3e2fcaf3714fda5b05ef1b386d9477"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a27de11303d77c1d22962eccd6ffec1da">IgnoreQueue</a> (queueId:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Игнорирование указанной очереди.  <a href="#a27de11303d77c1d22962eccd6ffec1da"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a9a1ea13d0d45be3c7ae805c64e5f7fc9">ResetQueueIgnoring</a> (queueId:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Сброс игнорирования очереди.  <a href="#a9a1ea13d0d45be3c7ae805c64e5f7fc9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ae31a2cae1291b36c5f98503fe8d10e73">IsQueueIgnoring</a> (queueId:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Игнорируется ли указанная очередь.  <a href="#ae31a2cae1291b36c5f98503fe8d10e73"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ad4728212c48d5c2947a4fc3ae2fffff3">CreateAction</a> (queueId:int, actionDesc:ActionDesc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Создание и добавление нового действия в указанную очередь.  <a href="#ad4728212c48d5c2947a4fc3ae2fffff3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a357d20dea7bb51004e413c946d74fe08">GoToAction</a> (queueId:int, actionIndex:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Переход на указанное действие в указанной очереди.  <a href="#a357d20dea7bb51004e413c946d74fe08"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a7e8589b8500658ddedd569aab14ac5a7">ActionsCount</a> (queueId:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Какое количество действий находится внутри указанной очереди.  <a href="#a7e8589b8500658ddedd569aab14ac5a7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a499b2e8100a800c16abb095c32ef8e16">IsActionsEnded</a> (...<a class="el" href="class_dispatcher.html#a36e140b2fbe14d6a4c65ff969094e5be">queues</a>)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Закончились ли действия в указанных очередях. Если ни одна очередь не указана, то будет проверяться во всех очередях.  <a href="#a499b2e8100a800c16abb095c32ef8e16"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a42ecf8368c5294adca29288ce94abbd8">GetQueue</a> (id:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение очереди с указанным идентификатором.  <a href="#a42ecf8368c5294adca29288ce94abbd8"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Открытые статические члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a45ff3b6d4d29ebd9a2b8e62c6cd3c04d">Task_Default</a> (param:Param)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a4f7449245ac186e3798c104cbfee98f4">CheckArguments</a> (context:String, param:Param, count:int)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ab710f406ff0726bf12850d3bca0ff1c2">InitData</a> (param:Param, count:int)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a6024d983f407d27a44f9aadaee1ab6e9">CastTo</a> (context:String, param:Param, which:int, type:Class)</td></tr>
+<tr><td colspan="2"><h2><a name="pub-attribs"></a>
+Открытые атрибуты</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a0ec796574ced8b4ededca38f67a4a58e">queueOfCurrentAction</a>:<a class="el" href="class_queue.html">Queue</a> = null</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Очередь, в которой выполняется текущее действие. Имеет смысл использовать только внутри какого-либо действия.  <a href="#a0ec796574ced8b4ededca38f67a4a58e"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Закрытые члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#acf72c84e3b1e64b3f745360156727dc0">QueueIndexFromId</a> (id:int, silent:Boolean=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение позиции очереди в векторе по идентификатору.  <a href="#acf72c84e3b1e64b3f745360156727dc0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a7033253e70a97f1ed7835d06edb61645">QueueIdFromIndex</a> (index:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение идентификатора очереди по позиции в векторе (индексу).  <a href="#a7033253e70a97f1ed7835d06edb61645"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a217c0c17300ffc34e132e9a7aeb79940">AppendRedirection</a> (id:int, queue:Queue)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Добавление новой очереди.  <a href="#a217c0c17300ffc34e132e9a7aeb79940"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a323f886e653885b568cd2dcfabe505b1">ResortRedirections</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Сортировка перенаправлений по возрастанию идентификаторов.  <a href="#a323f886e653885b568cd2dcfabe505b1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#aad8e46b2fba81e3fd98fb5a182d113c1">GetFreeId</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение свободного идентификатора.  <a href="#aad8e46b2fba81e3fd98fb5a182d113c1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ae9369329c2a8e0add43949072f804918">AddAction</a> (queueId:int, actionDesc:ActionDesc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Добавление нового действия в указанную очередь.  <a href="#ae9369329c2a8e0add43949072f804918"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Закрытые данные</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a444be279c8e063c48172de555641078e">output</a>:Output</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#ac9e433b4f69da64fa2390fd87e626192">ignoringQueues</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Очереди, которые в данный момент игнорируются.  <a href="#ac9e433b4f69da64fa2390fd87e626192"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a47926a4469c2cd78f9c691087f116a66">ignoringThreads</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Потоки вызовов функции <a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4" title="Выполнение текущих действий в очередях.">Live()</a>, которые в данный момент игнорируются.  <a href="#a47926a4469c2cd78f9c691087f116a66"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#a36e140b2fbe14d6a4c65ff969094e5be">queues</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Массив очередей.  <a href="#a36e140b2fbe14d6a4c65ff969094e5be"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dispatcher.html#abc271fb846a89472d4b89274b14c248b">redirections</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Перенаправление на индекс по идентификатору для каждой очереди.  <a href="#abc271fb846a89472d4b89274b14c248b"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Подробное описание</h2>
+<div class="textblock"><p>Хранит очереди. Вызывает выполнение их действий. </p>
+</div><hr/><h2>Конструктор(ы)</h2>
+<a class="anchor" id="ac01cf2bcaf244beaccda06c749f2130b"></a><!-- doxytag: member="Dispatcher::Dispatcher" ref="ac01cf2bcaf244beaccda06c749f2130b" args="(output:Output)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.Dispatcher </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>output:Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Конструктор. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">output</td><td>Куда будет выводиться вся информация о ходе выполнения действий и прочем. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/><h2>Методы</h2>
+<a class="anchor" id="a7e8589b8500658ddedd569aab14ac5a7"></a><!-- doxytag: member="Dispatcher::ActionsCount" ref="a7e8589b8500658ddedd569aab14ac5a7" args="(queueId:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.ActionsCount </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Какое количество действий находится внутри указанной очереди. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, количество действий внутри которой необходимо определить. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Количество действий в указанной очереди. Возвращает ноль если очереди с таким идентификатором не существует. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ae9369329c2a8e0add43949072f804918"></a><!-- doxytag: member="Dispatcher::AddAction" ref="ae9369329c2a8e0add43949072f804918" args="(queueId:int, actionDesc:ActionDesc)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.AddAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actionDesc:ActionDesc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Добавление нового действия в указанную очередь. </p>
+<p>Указанное действие добавляется в конец очереди.<br/>
+ Если номер очереди == -1, то к списку очередей будет добавлена новая очередь и действие добавится в неё. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, в конец которой будет добавлено действие. </td></tr>
+    <tr><td class="paramname">action</td><td>Первый элемент - номер действия. Остальные - параметры. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Идентификатор очереди, в которую было добавлено действие. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a217c0c17300ffc34e132e9a7aeb79940"></a><!-- doxytag: member="Dispatcher::AppendRedirection" ref="a217c0c17300ffc34e132e9a7aeb79940" args="(id:int, queue:Queue)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.AppendRedirection </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>id:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queue:Queue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Добавление новой очереди. </p>
+<p>Если id указан неверно, то очередь добавлена не будет, поэтому, чтобы не было утечек памяти, queue нужно удалить извне (везёт если в языке программирования не бывает утечек памяти). </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Идентификатор добавляемой очереди. </td></tr>
+    <tr><td class="paramname">queue</td><td>Указатель на очередь, которую нужно добавить. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Идентификатор добавленной очереди - отличается от id только если id == -1. -1 - очередь НЕ была добавлена: неверный id . </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6024d983f407d27a44f9aadaee1ab6e9"></a><!-- doxytag: member="Dispatcher::CastTo" ref="a6024d983f407d27a44f9aadaee1ab6e9" args="(context:String, param:Param, which:int, type:Class)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.CastTo </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>context:String</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>param:Param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>which:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>type:Class</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Проверяем что указанный параметр указанного типа. </p>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>true если произошла какая-либо ошибка. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4f7449245ac186e3798c104cbfee98f4"></a><!-- doxytag: member="Dispatcher::CheckArguments" ref="a4f7449245ac186e3798c104cbfee98f4" args="(context:String, param:Param, count:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.CheckArguments </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>context:String</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>param:Param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>count:int</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Проверяет наличие указанного количества аргументов в действии. </p>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>true если какая-либо ошибка. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1f69c545a08d8836d54c5a12514a588c"></a><!-- doxytag: member="Dispatcher::Clear" ref="a1f69c545a08d8836d54c5a12514a588c" args="(queueId:int=&#45;1, resetIgnoring:Boolean=false,...exceptions)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.Clear </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>resetIgnoring:Boolean</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>exceptions</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Удаление очереди с указанным идентификатором. </p>
+<p>По-умолчанию будут удалены все очереди. Если указать какую-то конкретную очередь, то очередь будет очищена.<br/>
+ Исключения удаления очередей влияют на удаление только если указано удалить все очереди (первый параметр = -1, что по-умолчанию). </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, которую нужно очистить. По-умолчанию будут удаляться все очереди. </td></tr>
+    <tr><td class="paramname">resetIgnoring</td><td>true - игнорирование очереди будет отменено. По-умолчанию = false. </td></tr>
+    <tr><td class="paramname">exceptions</td><td>Перечисленные очереди, которые НЕ нужно удалять. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a66b1903dc4fc1688e2f44b4d4246fb45"></a><!-- doxytag: member="Dispatcher::ClearQueue" ref="a66b1903dc4fc1688e2f44b4d4246fb45" args="(queueId:int, resetIgnoring:Boolean=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.ClearQueue </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>resetIgnoring:Boolean</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Очистка указанной очереди. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, которую нужно очистить. </td></tr>
+    <tr><td class="paramname">resetIgnoring</td><td>true - игнорирование очереди будет отменено. По-умолчанию = false. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ad4728212c48d5c2947a4fc3ae2fffff3"></a><!-- doxytag: member="Dispatcher::CreateAction" ref="ad4728212c48d5c2947a4fc3ae2fffff3" args="(queueId:int, actionDesc:ActionDesc)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.CreateAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actionDesc:ActionDesc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Создание и добавление нового действия в указанную очередь. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, в которую нужно добавить очередь. Идентификатор может быть любым числом &gt;= 0. Если -1, то будет создана очередь с первым найденным свободным идентификатором и действие будет добавлено в неё. Действия будут выполняться в порядке возрастания идентификаторов. </td></tr>
+    <tr><td class="paramname">actionDesc</td><td>Описание добавляемого действия. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Идентификатор очереди, в которую было добавлено действие. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aad8e46b2fba81e3fd98fb5a182d113c1"></a><!-- doxytag: member="Dispatcher::GetFreeId" ref="aad8e46b2fba81e3fd98fb5a182d113c1" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.GetFreeId </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение свободного идентификатора. </p>
+
+</div>
+</div>
+<a class="anchor" id="a42ecf8368c5294adca29288ce94abbd8"></a><!-- doxytag: member="Dispatcher::GetQueue" ref="a42ecf8368c5294adca29288ce94abbd8" args="(id:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.GetQueue </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>id:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение очереди с указанным идентификатором. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Идентификатор очереди, которую нужно получить.<br/>
+ Полученная очередь может удалить в другом потоке, поэтому нужно быть осторожным при её использовании. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Очередь, имеющий идентификатор. Если очереди с таким идентификатором нет, то будет возвращен null. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a357d20dea7bb51004e413c946d74fe08"></a><!-- doxytag: member="Dispatcher::GoToAction" ref="a357d20dea7bb51004e413c946d74fe08" args="(queueId:int, actionIndex:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.GoToAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actionIndex:int</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Переход на указанное действие в указанной очереди. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, внутри которой нужно совершить переход. </td></tr>
+    <tr><td class="paramname">actionIndex</td><td>Индекс действия, на которое нужно совершить переход. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a27de11303d77c1d22962eccd6ffec1da"></a><!-- doxytag: member="Dispatcher::IgnoreQueue" ref="a27de11303d77c1d22962eccd6ffec1da" args="(queueId:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.IgnoreQueue </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Игнорирование указанной очереди. </p>
+<p>Состояние действий в очереди останется прежним, но они перестанут выполняться.<br/>
+ После отмены игнорирования выполнения продолжиться с остановленного места. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, которая должна игнорироваться. Если == -1, то будут игнорироваться все очереди. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac58b490fe4785de278379c8b433c0c4d"></a><!-- doxytag: member="Dispatcher::IgnoreThread" ref="ac58b490fe4785de278379c8b433c0c4d" args="(thread:int=&#45;1)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.IgnoreThread </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thread:int</em> = <code>-1</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Игнорирование указанного потока. </p>
+<p>Если поток проигнорирован, то все вызовы функции <a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4" title="Выполнение текущих действий в очередях.">Live()</a> с этим потоком будут игнорироваться.<br/>
+ Идентификаторы потоков могут быть <b>только</b> положительными. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread</td><td>Поток, который нужно игнорировать. Если = -1, что по-умолчанию, то будут игнорироваться <b>все</b> потоки. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab710f406ff0726bf12850d3bca0ff1c2"></a><!-- doxytag: member="Dispatcher::InitData" ref="ab710f406ff0726bf12850d3bca0ff1c2" args="(param:Param, count:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.InitData </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>param:Param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>count:int</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Устанавливает данные действия в нулевое значение. </p>
+
+</div>
+</div>
+<a class="anchor" id="a499b2e8100a800c16abb095c32ef8e16"></a><!-- doxytag: member="Dispatcher::IsActionsEnded" ref="a499b2e8100a800c16abb095c32ef8e16" args="(...queues)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.IsActionsEnded </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queues</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Закончились ли действия в указанных очередях. Если ни одна очередь не указана, то будет проверяться во всех очередях. </p>
+<div class="fragment"><pre class="fragment">                <span class="comment">//закончились ли действия в очередях с идентификаторами 14 и 126:</span>
+                dispatcher.IsActionsEnded(14, 126);
+</pre></div> <dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queues</td><td>Перечисление очередей, завершение действий в которых нужно проверять. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae31a2cae1291b36c5f98503fe8d10e73"></a><!-- doxytag: member="Dispatcher::IsQueueIgnoring" ref="ae31a2cae1291b36c5f98503fe8d10e73" args="(queueId:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.IsQueueIgnoring </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Игнорируется ли указанная очередь. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5c3e2fcaf3714fda5b05ef1b386d9477"></a><!-- doxytag: member="Dispatcher::IsThreadIgnoring" ref="a5c3e2fcaf3714fda5b05ef1b386d9477" args="(thread:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.IsThreadIgnoring </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thread:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Игнорируется ли указанный поток. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread</td><td>Номер потока, игнорирование которого нужно узнать. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>true - указанный поток игнорируется. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="acf8f1f43617c22280960f9d1c80733d4"></a><!-- doxytag: member="Dispatcher::Live" ref="acf8f1f43617c22280960f9d1c80733d4" args="(elapsedSeconds:Number=0.020, thread:int=0)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.Live </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>elapsedSeconds:Number</em> = <code>0.020</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thread:int</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Выполнение текущих действий в очередях. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">elapsedSeconds</td><td>Сколько секунд прошло с момента прошлого вызова <a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4" title="Выполнение текущих действий в очередях.">Live()</a> . Это время, на которое текущие действия (в разных очередях) могут продвинуться в выполнении. </td></tr>
+    <tr><td class="paramname">thread</td><td>Идентификатор потока в котором вызывается функция.<br/>
+ Каждый определённый поток можно игнорировать функцией <a class="el" href="class_dispatcher.html#ac58b490fe4785de278379c8b433c0c4d" title="Игнорирование указанного потока.">Dispatcher.IgnoreThread()</a> .<br/>
+ По умолчанию = 0. Идентификаторы потоков могут быть <b>только</b> положительными. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a7033253e70a97f1ed7835d06edb61645"></a><!-- doxytag: member="Dispatcher::QueueIdFromIndex" ref="a7033253e70a97f1ed7835d06edb61645" args="(index:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.QueueIdFromIndex </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>index:int</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение идентификатора очереди по позиции в векторе (индексу). </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>Позиция очереди в векторе. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Идентификатор очереди. -1, если очередь с таким индексом отсутствует. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="acf72c84e3b1e64b3f745360156727dc0"></a><!-- doxytag: member="Dispatcher::QueueIndexFromId" ref="acf72c84e3b1e64b3f745360156727dc0" args="(id:int, silent:Boolean=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.QueueIndexFromId </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>id:int</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>silent:Boolean</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение позиции очереди в векторе по идентификатору. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Идентификатор, по которому нужно получить номер очереди. </td></tr>
+    <tr><td class="paramname">silent</td><td>Если функция вызывается для проверки, то писать отладочную информацию НЕ нужно. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Индекс очереди, идентификатор которой указан. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9a1ea13d0d45be3c7ae805c64e5f7fc9"></a><!-- doxytag: member="Dispatcher::ResetQueueIgnoring" ref="a9a1ea13d0d45be3c7ae805c64e5f7fc9" args="(queueId:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.ResetQueueIgnoring </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queueId:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Сброс игнорирования очереди. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queueId</td><td>Идентификатор очереди, игнорирование которой нужно отменить.<br/>
+ Если == -1, что по умолчанию, то будут отменены игнорирования всех очередей.<br/>
+ Выполнение действий очереди с указанным идентификатором продолжиться с остановленного места. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af678dc0e1927554c1c96c8825878edfb"></a><!-- doxytag: member="Dispatcher::ResetThreadIgnoring" ref="af678dc0e1927554c1c96c8825878edfb" args="(thread:int=&#45;1)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.ResetThreadIgnoring </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thread:int</em> = <code>-1</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Сброс игнорирования потока. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">thread</td><td>Идентификатор потока, игнорирование которого нужно отменить.<br/>
+ Если == -1, что по-умолчанию, то будут отменены игнорирования всех потоков. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a323f886e653885b568cd2dcfabe505b1"></a><!-- doxytag: member="Dispatcher::ResortRedirections" ref="a323f886e653885b568cd2dcfabe505b1" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.ResortRedirections </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Сортировка перенаправлений по возрастанию идентификаторов. </p>
+
+</div>
+</div>
+<a class="anchor" id="a45ff3b6d4d29ebd9a2b8e62c6cd3c04d"></a><!-- doxytag: member="Dispatcher::Task_Default" ref="a45ff3b6d4d29ebd9a2b8e62c6cd3c04d" args="(param:Param)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Dispatcher.Task_Default </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>param:Param</em></td><td>)</td>
+          <td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Действие по умолчанию. </p>
+
+</div>
+</div>
+<hr/><h2>Данные класса</h2>
+<a class="anchor" id="ac9e433b4f69da64fa2390fd87e626192"></a><!-- doxytag: member="Dispatcher::ignoringQueues" ref="ac9e433b4f69da64fa2390fd87e626192" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#ac9e433b4f69da64fa2390fd87e626192">Dispatcher.ignoringQueues</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Очереди, которые в данный момент игнорируются. </p>
+
+</div>
+</div>
+<a class="anchor" id="a47926a4469c2cd78f9c691087f116a66"></a><!-- doxytag: member="Dispatcher::ignoringThreads" ref="a47926a4469c2cd78f9c691087f116a66" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#a47926a4469c2cd78f9c691087f116a66">Dispatcher.ignoringThreads</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Потоки вызовов функции <a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4" title="Выполнение текущих действий в очередях.">Live()</a>, которые в данный момент игнорируются. </p>
+
+</div>
+</div>
+<a class="anchor" id="a444be279c8e063c48172de555641078e"></a><!-- doxytag: member="Dispatcher::output" ref="a444be279c8e063c48172de555641078e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#a444be279c8e063c48172de555641078e">Dispatcher.output</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Куда выводится вся информация. Указывается в конструкторе. </p>
+
+</div>
+</div>
+<a class="anchor" id="a0ec796574ced8b4ededca38f67a4a58e"></a><!-- doxytag: member="Dispatcher::queueOfCurrentAction" ref="a0ec796574ced8b4ededca38f67a4a58e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#a0ec796574ced8b4ededca38f67a4a58e">Dispatcher.queueOfCurrentAction</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Очередь, в которой выполняется текущее действие. Имеет смысл использовать только внутри какого-либо действия. </p>
+
+</div>
+</div>
+<a class="anchor" id="a36e140b2fbe14d6a4c65ff969094e5be"></a><!-- doxytag: member="Dispatcher::queues" ref="a36e140b2fbe14d6a4c65ff969094e5be" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#a36e140b2fbe14d6a4c65ff969094e5be">Dispatcher.queues</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Массив очередей. </p>
+
+</div>
+</div>
+<a class="anchor" id="abc271fb846a89472d4b89274b14c248b"></a><!-- doxytag: member="Dispatcher::redirections" ref="abc271fb846a89472d4b89274b14c248b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_dispatcher.html#abc271fb846a89472d4b89274b14c248b">Dispatcher.redirections</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Перенаправление на индекс по идентификатору для каждой очереди. </p>
+
+</div>
+</div>
+<hr/>Объявления и описания членов класса находятся в файле:<ul>
+<li>actions/<a class="el" href="_dispatcher_8as.html">Dispatcher.as</a></li>
+</ul>
+</div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Feb 9 2012 20:58:13. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

@@ -1,0 +1,2 @@
+	Isometric editor was started to develop with intention to later teach him generating only-blisc code to use within game, but it's a little time-consuming and changes dependent, so let's just use project's file within game itself and any code which editor uses to fire up Blisc with his data.
+	All that kind of classes/functions are here.

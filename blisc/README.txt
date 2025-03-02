@@ -1,0 +1,1 @@
+	AS3 isometric engine partially (inspired by) based on Blis (https://github.com/cjcenizal/Blis).

@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Исходный файл actions/ActionAsTask.as</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li><a href="pages.html"><span>Описания</span></a></li>
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li class="current"><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>Файлы</span></a></li>
+    </ul>
+  </div>
+<div class="header">
+  <div class="headertitle">
+<h1>actions/ActionAsTask.as</h1>  </div>
+</div>
+<div class="contents">
+<a href="_action_as_task_8as.html">См. документацию.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 ﻿
+<a name="l00002"></a>00002 <span class="keyword">package </span>actions 
+<a name="l00003"></a>00003 {
+<a name="l00004"></a>00004         
+<a name="l00006"></a>00006         
+<a name="l00008"></a><a class="code" href="class_action_as_task.html">00008</a>         public class ActionAsTask extends Action
+<a name="l00009"></a>00009         {
+<a name="l00012"></a><a class="code" href="class_action_as_task.html#ad7c1b061cc6701f91136ea00f59c5645">00012</a>                 public function ActionAsTask(output:Output, task:Function)
+<a name="l00013"></a>00013                 {
+<a name="l00014"></a>00014                         super(output);
+<a name="l00015"></a>00015                         
+<a name="l00016"></a>00016                         this.task = task;
+<a name="l00017"></a>00017                 }
+<a name="l00018"></a>00018                 
+<a name="l00022"></a><a class="code" href="class_action_as_task.html#ab6db375e34d52f1729de6ac20b98a1e9">00022</a>                 <span class="keyword">public</span> function Delete(): void
+<a name="l00023"></a>00023                 {
+<a name="l00024"></a>00024                         DeleteValues();
+<a name="l00025"></a>00025                         DeleteData();
+<a name="l00026"></a>00026                 }
+<a name="l00027"></a>00027                 
+<a name="l00029"></a><a class="code" href="class_action_as_task.html#a4c39b49af33dd595a486da4c3f3a87e6">00029</a>                 <span class="keyword">override</span> <span class="keyword">public</span> function MakeCopy(): <a class="code" href="class_action.html" title="Абстрактный класс действия внутри очереди.">Action</a>
+<a name="l00030"></a>00030                 {
+<a name="l00031"></a>00031                         var copy:<a class="code" href="class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди.">ActionAsTask</a> = <span class="keyword">new</span> <a class="code" href="class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди.">ActionAsTask</a>(output, task);
+<a name="l00032"></a>00032                         copy.muteEnding = muteEnding;
+<a name="l00033"></a>00033                         copy.solidarity = solidarity;
+<a name="l00034"></a>00034                         copy.elapsedSeconds = elapsedSeconds;
+<a name="l00035"></a>00035                         copy.consumedSeconds = consumedSeconds;
+<a name="l00036"></a>00036                         <span class="comment">//копирование параметров действия:</span>
+<a name="l00037"></a>00037                         <span class="keywordflow">for</span>(var ia:<span class="keywordtype">int</span> = 0; ia &lt; argumentsAsActions.length; ia++)
+<a name="l00038"></a>00038                         {
+<a name="l00039"></a>00039                                 copy.argumentsAsActions.push(argumentsAsActions[ia].MakeCopy());
+<a name="l00040"></a>00040                         }
+<a name="l00041"></a>00041                         <span class="comment">//копирование данных:</span>
+<a name="l00042"></a>00042                         <span class="keywordflow">for</span>(var <span class="keywordtype">id</span>:<span class="keywordtype">int</span> = 0; <span class="keywordtype">id</span> &lt; data.length; <span class="keywordtype">id</span>++)
+<a name="l00043"></a>00043                         {
+<a name="l00044"></a>00044                                 copy.data.push(data[<span class="keywordtype">id</span>]);
+<a name="l00045"></a>00045                         }
+<a name="l00046"></a>00046                         
+<a name="l00047"></a>00047                         <span class="keywordflow">return</span> copy;
+<a name="l00048"></a>00048                 }
+<a name="l00049"></a>00049                 
+<a name="l00051"></a><a class="code" href="class_action_as_task.html#a8a7076f3ae0bd728ff8a730bdb0d35b1">00051</a>                 <span class="keyword">override</span> <span class="keyword">public</span> function ResetToDefault(): void
+<a name="l00052"></a>00052                 {
+<a name="l00053"></a>00053                         super.ResetToDefault();
+<a name="l00054"></a>00054                         DeleteValues();
+<a name="l00055"></a>00055                         DeleteData();
+<a name="l00056"></a>00056                         abstractData.SetData( -1.0);
+<a name="l00057"></a>00057                         task = <a class="code" href="class_dispatcher.html" title="Хранит очереди. Вызывает выполнение их действий.">Dispatcher</a>.<a class="code" href="class_dispatcher.html#a45ff3b6d4d29ebd9a2b8e62c6cd3c04d">Task_Default</a>;
+<a name="l00058"></a>00058                 }
+<a name="l00059"></a>00059                 
+<a name="l00062"></a><a class="code" href="class_action_as_task.html#ac7ef3c3469a0a690f9b04cfa63555bb0">00062</a>                 <span class="keyword">public</span> function GetElapsedSeconds(): Number
+<a name="l00063"></a>00063                 {
+<a name="l00064"></a>00064                         <span class="keywordflow">return</span> elapsedSeconds;
+<a name="l00065"></a>00065                 }
+<a name="l00066"></a>00066                 
+<a name="l00068"></a><a class="code" href="class_action_as_task.html#a5330aaa5870d46ed2d3feed7cd4c2cf7">00068</a>                 <span class="keyword">public</span> function ConsumedSeconds(timeInSeconds:Number): void
+<a name="l00069"></a>00069                 {
+<a name="l00070"></a>00070                         <span class="comment">//если потреблённым указано время, которое не давалось действию в распоряжение:</span>
+<a name="l00071"></a>00071                         <span class="keywordflow">if</span>(timeInSeconds &gt; (elapsedSeconds - consumedSeconds))
+<a name="l00072"></a>00072                         {
+<a name="l00073"></a>00073                                 output.Out(<span class="stringliteral">&quot;W: ActionAsTask.ConsumedSeconds(&quot;</span> + timeInSeconds + <span class="stringliteral">&quot;): consumed &quot;</span> + elapsedSeconds + <span class="stringliteral">&quot; seconds but there are only &quot;</span> + (elapsedSeconds - consumedSeconds) + <span class="stringliteral">&quot; seconds.\n&quot;</span>, Output.WARN);
+<a name="l00074"></a>00074                         }
+<a name="l00075"></a>00075                         
+<a name="l00076"></a>00076                         consumedSeconds += timeInSeconds;
+<a name="l00077"></a>00077                 }
+<a name="l00078"></a>00078                 
+<a name="l00079"></a>00079                 
+<a name="l00081"></a><a class="code" href="class_action_as_task.html#abc50be1f15e4a5fb9937e2b23bd8ead9">00081</a>                 <span class="keyword">public</span> var data:Array = [];
+<a name="l00082"></a>00082                 
+<a name="l00083"></a>00083                 
+<a name="l00084"></a>00084                 
+<a name="l00087"></a><a class="code" href="class_action_as_task.html#aee936b8cdbe7cc2a940e9de5b552ba45">00087</a>                 <span class="keyword">override</span> <span class="keyword">public</span> function Execute(dispatcher:<a class="code" href="class_dispatcher.html" title="Хранит очереди. Вызывает выполнение их действий.">Dispatcher</a>, consumeSeconds:Number): Number
+<a name="l00088"></a>00088                 {
+<a name="l00089"></a>00089                         <span class="comment">//выполнение сначала всех параметров действий - после выполнения, должны сформироваться параметры, которые текущее действие может использовать:</span>
+<a name="l00090"></a>00090                         <span class="keywordflow">for</span>(var i:<span class="keywordtype">int</span> = 0; i &lt; argumentsAsActions.length; i++)
+<a name="l00091"></a>00091                         {
+<a name="l00092"></a>00092                                 argumentsAsActions[i].Execute(dispatcher, consumeSeconds);
+<a name="l00093"></a>00093                                 
+<a name="l00094"></a>00094                                 <span class="comment">//если указано что нужно завершить выполнение действия если один из параметров завершил своё выполнение (при этом этому параметру должно быть разрешено завершать своё действие):</span>
+<a name="l00095"></a>00095                                 <span class="keywordflow">if</span>(solidarity)
+<a name="l00096"></a>00096                                 {
+<a name="l00097"></a>00097                                         <span class="keywordflow">if</span>(dispatcher.queueOfCurrentAction.WasActionEnded())
+<a name="l00098"></a>00098                                         {
+<a name="l00099"></a>00099                                                 <span class="comment">//действие не потребило нисколько времени:</span>
+<a name="l00100"></a>00100                                                 <span class="keywordflow">return</span> consumeSeconds;
+<a name="l00101"></a>00101                                         }
+<a name="l00102"></a>00102                                 }
+<a name="l00103"></a>00103                         }
+<a name="l00104"></a>00104                         
+<a name="l00105"></a>00105                         <span class="comment">//действие только начинает выполняться:</span>
+<a name="l00106"></a>00106                         consumedSeconds = 0.0;
+<a name="l00107"></a>00107                         
+<a name="l00108"></a>00108                         <span class="comment">//указываем что в данный момент активно текущее действие:</span>
+<a name="l00109"></a>00109                         dispatcher.queueOfCurrentAction.currentlyActiveAction = <span class="keyword">this</span>;
+<a name="l00110"></a>00110                         
+<a name="l00111"></a>00111                         <span class="comment">//вызов выполнения действия до тех пор, пока оно не употребит полностью всё время или не отметится как &quot;оконченноe&quot; (функцией Queue.ActionEnded()):</span>
+<a name="l00112"></a>00112                         <span class="keywordflow">do</span>
+<a name="l00113"></a>00113                         {
+<a name="l00114"></a>00114                                 <span class="comment">//указываем сколько секунд действие может (и должно) потребить:</span>
+<a name="l00115"></a>00115                                 elapsedSeconds = consumeSeconds - consumedSeconds;
+<a name="l00116"></a>00116                                 
+<a name="l00117"></a>00117                                 task(<span class="keyword">new</span> <a class="code" href="class_param.html">Param</a>(dispatcher, dispatcher.queueOfCurrentAction, <span class="keyword">this</span>, argumentsAsActions));
+<a name="l00118"></a>00118                                 <span class="comment">//если это действие &quot;пытается&quot; закончиться:</span>
+<a name="l00119"></a>00119                                 <span class="keywordflow">if</span>(dispatcher.queueOfCurrentAction.WasActionMarkedAsEnded()) <span class="keywordflow">break</span>;
+<a name="l00120"></a>00120                         }
+<a name="l00121"></a>00121                         <span class="keywordflow">while</span>(consumedSeconds &lt; consumeSeconds);
+<a name="l00122"></a>00122                         dispatcher.queueOfCurrentAction.OneCycleOfCurrentActionDone();
+<a name="l00123"></a>00123                         
+<a name="l00124"></a>00124                         <span class="comment">//указываем сколько секунд потребило текущее действие:</span>
+<a name="l00125"></a>00125                         <span class="keywordflow">return</span> consumedSeconds;
+<a name="l00126"></a>00126                 }
+<a name="l00127"></a>00127                 
+<a name="l00129"></a><a class="code" href="class_action_as_task.html#aca76656c6df0c3a5c8f7452364329ad0">00129</a>                 <span class="keyword">protected</span> function DeleteValues(): void
+<a name="l00130"></a>00130                 {
+<a name="l00131"></a>00131                         <span class="comment">//удаление всех Value:</span>
+<a name="l00132"></a>00132                         <span class="keywordflow">for</span>(var i:<span class="keywordtype">int</span> = 0; i &lt; argumentsAsActions.length; i++)
+<a name="l00133"></a>00133                         {
+<a name="l00134"></a>00134                                 <span class="keyword">delete</span> argumentsAsActions[i];
+<a name="l00135"></a>00135                         }
+<a name="l00136"></a>00136                         argumentsAsActions.length = 0;
+<a name="l00137"></a>00137                 }
+<a name="l00138"></a>00138                 
+<a name="l00140"></a><a class="code" href="class_action_as_task.html#aef5dfe33fa013de7ea7747e276be6e66">00140</a>                 <span class="keyword">protected</span> function DeleteData(): void
+<a name="l00141"></a>00141                 {
+<a name="l00142"></a>00142                         data.length = 0;
+<a name="l00143"></a>00143                 }
+<a name="l00144"></a>00144                 
+<a name="l00146"></a><a class="code" href="class_action_as_task.html#a56dcc5972591722d68de8e61fb1a718c">00146</a>                 <span class="keyword">protected</span> var task:Function;
+<a name="l00147"></a>00147                 
+<a name="l00149"></a><a class="code" href="class_action_as_task.html#a682e78f88320663b1b0f36dded75e770">00149</a>                 <span class="keyword">public</span> var argumentsAsActions:Array = [];
+<a name="l00150"></a>00150                 
+<a name="l00152"></a><a class="code" href="class_action_as_task.html#a2a91890261e92b4e95fac7e62b8af515">00152</a>                 <span class="keyword">protected</span> var elapsedSeconds:Number;
+<a name="l00153"></a>00153                 
+<a name="l00155"></a><a class="code" href="class_action_as_task.html#a4a3df17db67b50f4b5d3faafd63508fa">00155</a>                 <span class="keyword">protected</span> var consumedSeconds:Number;
+<a name="l00156"></a>00156         }
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158 }
+</pre></div></div>
+</div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Sep 29 2011 18:32:00. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

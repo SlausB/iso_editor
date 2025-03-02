@@ -1,0 +1,4 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$class_action_as_data.html" title="Простое значение как параметр (аргумент) для задания (действия)." alt="" coords="5,83,107,112"/>
+<area shape="rect" id="node5" href="$class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди." alt="" coords="131,83,232,112"/>
+</map>

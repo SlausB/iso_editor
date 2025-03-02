@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$class_action.html" title="Абстрактный класс действия внутри очереди." alt="" coords="5,32,64,61"/>
+<area shape="rect" id="node3" href="$class_action_as_data.html" title="Простое значение как параметр (аргумент) для задания (действия)." alt="" coords="113,5,215,35"/>
+<area shape="rect" id="node5" href="$class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди." alt="" coords="113,59,215,88"/>
+</map>

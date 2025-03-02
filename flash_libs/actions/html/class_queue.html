@@ -1,0 +1,585 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Класс Queue</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li><a href="pages.html"><span>Описания</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="classes.html"><span>Алфавитный&#160;указатель&#160;классов</span></a></li>
+      <li><a href="inherits.html"><span>Иерархия&#160;классов</span></a></li>
+      <li><a href="functions.html"><span>Члены&#160;классов</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Открытые члены</a> &#124;
+<a href="#pub-attribs">Открытые атрибуты</a> &#124;
+<a href="#pri-methods">Закрытые члены</a> &#124;
+<a href="#pri-attribs">Закрытые данные</a>  </div>
+  <div class="headertitle">
+<h1>Класс Queue</h1>  </div>
+</div>
+<div class="contents">
+<!-- doxytag: class="Queue" -->
+<p>Очередь выполняемых действий.  
+<a href="#_details">Подробнее...</a></p>
+
+<p><a href="class_queue-members.html">Полный список членов класса</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Открытые члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a3d649936c7081466073da8933c95c547">Queue</a> (output:Output)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Конструктор.  <a href="#a3d649936c7081466073da8933c95c547"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a66fa69e9a973ac89f29a7dc0b028e2b1">Copy</a> (queue:Queue)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Конструктор.  <a href="#a66fa69e9a973ac89f29a7dc0b028e2b1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a3c08fe2e3083b45a27759dd2616c24f2">CurrentAction</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Текущее действие.  <a href="#a3c08fe2e3083b45a27759dd2616c24f2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a37083e410d5709b250b9bb672657a8c6">ActionEnded</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Текущее действие закончилось.  <a href="#a37083e410d5709b250b9bb672657a8c6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#ac64fb94c93f11f9f86f87b869a492f8b">WasActionEnded</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Закончилось ли текущее действие.  <a href="#ac64fb94c93f11f9f86f87b869a492f8b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#afae532197d2dda7fe0fbb6d742a53e9c">WasActionMarkedAsEnded</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Возвращает wasActionMarkedAsEnded .  <a href="#afae532197d2dda7fe0fbb6d742a53e9c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a4dc515c7b6b87b6f0f055c8e404a24d2">AddAction</a> (action:Action)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Добавление нового действия.  <a href="#a4dc515c7b6b87b6f0f055c8e404a24d2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a8655e2773641a1d26f709f4a4ed0169e">Clear</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Удаление всех действий.  <a href="#a8655e2773641a1d26f709f4a4ed0169e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a45fbb82533db9a40dfad2dfc31ab7aed">GoToAction</a> (actionIndex:int)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Перевод указателя текущего действия на указанное действие.  <a href="#a45fbb82533db9a40dfad2dfc31ab7aed"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#afc8851fd9af482a9e8b0e0bb09eab3a5">ActionsCount</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Количество действий.  <a href="#afc8851fd9af482a9e8b0e0bb09eab3a5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#ae1dff792d874a762eb0a39183799051f">OneCycleOfCurrentActionDone</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Должно вызываться действием после совершения действия.  <a href="#ae1dff792d874a762eb0a39183799051f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a6406989e5b516f1c5b452d2abe7b6365">SetRemainOnCurrentAction</a> (remainOnCurrentAction:Boolean)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Установка remainOnCurrentAction .  <a href="#a6406989e5b516f1c5b452d2abe7b6365"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#aafa3dee5e2f37c9dce54985901c50c23">GetRemainOnCurrentAction</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение remainOnCurrentAction .  <a href="#aafa3dee5e2f37c9dce54985901c50c23"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-attribs"></a>
+Открытые атрибуты</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a4782eb72aee8edca05abb0da47f9d73e">currentAction</a>:int</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Индекс текущего действия.  <a href="#a4782eb72aee8edca05abb0da47f9d73e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#aa19dc70f590f49667e4d3f62f191d1de">wasActionEnded</a>:Boolean</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Закончилось ли текущее действие в очереди.  <a href="#aa19dc70f590f49667e4d3f62f191d1de"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a7a117f4b3728fba6d0f7f0e3df9f23d2">currentlyActiveAction</a>:<a class="el" href="class_action.html">Action</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Действие, которое выполняется в данный момент.  <a href="#a7a117f4b3728fba6d0f7f0e3df9f23d2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a47d54c4e148461489f68d6154e2fcfaf">wasActionMarkedAsEnded</a>:Boolean</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Пометило ли текущее действие себя как "оконченное".  <a href="#a47d54c4e148461489f68d6154e2fcfaf"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a90589e96ed4ce624233189cde7691832">remainOnCurrentAction</a>:Boolean</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">true - после завершения текущего действия очередь сохранит это действия как снова "текущее". Сбрасывается после одного использования.  <a href="#a90589e96ed4ce624233189cde7691832"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a924e9d803085e2f5692ea431ab3d41d2">doneCycles</a>:int</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Сколько циклов выполняется текущее действие.  <a href="#a924e9d803085e2f5692ea431ab3d41d2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#af8efceaa7767e7789011ab642ee86906">associativeArray</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Данные, которые устанавливаются и читаются в действиях текущей очереди.  <a href="#af8efceaa7767e7789011ab642ee86906"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Закрытые члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#a5543c23857c9fa5b73d65f39f01f4042">SetDataToDefault</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Установка данных на по-умолчанию.  <a href="#a5543c23857c9fa5b73d65f39f01f4042"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Закрытые данные</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#ae0d77ea0fe9277419875a8042dfed312">output</a>:Output</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Средство вывода отладочных сообщений. Передаётся в конструкторе.  <a href="#ae0d77ea0fe9277419875a8042dfed312"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_queue.html#acc9b350589c83267259c5365afd70e62">_actions</a>:Array = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Действия.  <a href="#acc9b350589c83267259c5365afd70e62"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Подробное описание</h2>
+<div class="textblock"><p>Очередь выполняемых действий. </p>
+</div><hr/><h2>Конструктор(ы)</h2>
+<a class="anchor" id="a3d649936c7081466073da8933c95c547"></a><!-- doxytag: member="Queue::Queue" ref="a3d649936c7081466073da8933c95c547" args="(output:Output)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.Queue </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>output:Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Конструктор. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">output</td><td>Средство вывода отладочных сообщений. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/><h2>Методы</h2>
+<a class="anchor" id="a37083e410d5709b250b9bb672657a8c6"></a><!-- doxytag: member="Queue::ActionEnded" ref="a37083e410d5709b250b9bb672657a8c6" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.ActionEnded </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Текущее действие закончилось. </p>
+<p>Используется в действиях для указания что оно закончилось.<br/>
+ Это лишь указание на то что действие закончилось. Перевод указателя Actions.Queue.currentAction и другие операции будут выполнены только когда управление вернётся функции Actions.Dispatcher.Live() (то есть когда завершится действие, вызвавшее эту функцию и/или действие, которое хранит внутри себя это действие как аргумент). </p>
+
+</div>
+</div>
+<a class="anchor" id="afc8851fd9af482a9e8b0e0bb09eab3a5"></a><!-- doxytag: member="Queue::ActionsCount" ref="afc8851fd9af482a9e8b0e0bb09eab3a5" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.ActionsCount </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Количество действий. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4dc515c7b6b87b6f0f055c8e404a24d2"></a><!-- doxytag: member="Queue::AddAction" ref="a4dc515c7b6b87b6f0f055c8e404a24d2" args="(action:Action)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.AddAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>action:Action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Добавление нового действия. </p>
+
+</div>
+</div>
+<a class="anchor" id="a8655e2773641a1d26f709f4a4ed0169e"></a><!-- doxytag: member="Queue::Clear" ref="a8655e2773641a1d26f709f4a4ed0169e" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.Clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Удаление всех действий. </p>
+
+</div>
+</div>
+<a class="anchor" id="a66fa69e9a973ac89f29a7dc0b028e2b1"></a><!-- doxytag: member="Queue::Copy" ref="a66fa69e9a973ac89f29a7dc0b028e2b1" args="(queue:Queue)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.Copy </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>queue:Queue</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Конструктор. </p>
+<p>Копирование указанных данных. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queue</td><td>Очередь, которую нужно скопировать. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a3c08fe2e3083b45a27759dd2616c24f2"></a><!-- doxytag: member="Queue::CurrentAction" ref="a3c08fe2e3083b45a27759dd2616c24f2" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.CurrentAction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Текущее действие. </p>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Указатель на текущее действие. null если действий нет или все действия выполнены. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aafa3dee5e2f37c9dce54985901c50c23"></a><!-- doxytag: member="Queue::GetRemainOnCurrentAction" ref="aafa3dee5e2f37c9dce54985901c50c23" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.GetRemainOnCurrentAction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение remainOnCurrentAction . </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd><a class="el" href="class_queue.html#a90589e96ed4ce624233189cde7691832" title="true - после завершения текущего действия очередь сохранит это действия как снова &quot;текущее&quot;...">remainOnCurrentAction</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a45fbb82533db9a40dfad2dfc31ab7aed"></a><!-- doxytag: member="Queue::GoToAction" ref="a45fbb82533db9a40dfad2dfc31ab7aed" args="(actionIndex:int)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.GoToAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actionIndex:int</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Перевод указателя текущего действия на указанное действие. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">actionIndex</td><td>Индекс действия, на которое нужно перевести указатель. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae1dff792d874a762eb0a39183799051f"></a><!-- doxytag: member="Queue::OneCycleOfCurrentActionDone" ref="ae1dff792d874a762eb0a39183799051f" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.OneCycleOfCurrentActionDone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Должно вызываться действием после совершения действия. </p>
+<p>Если действие пришлось вызвать несколько раз, то эту функцию вызвать после <b>всех</b> вызовов. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5543c23857c9fa5b73d65f39f01f4042"></a><!-- doxytag: member="Queue::SetDataToDefault" ref="a5543c23857c9fa5b73d65f39f01f4042" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.SetDataToDefault </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Установка данных на по-умолчанию. </p>
+
+</div>
+</div>
+<a class="anchor" id="a6406989e5b516f1c5b452d2abe7b6365"></a><!-- doxytag: member="Queue::SetRemainOnCurrentAction" ref="a6406989e5b516f1c5b452d2abe7b6365" args="(remainOnCurrentAction:Boolean)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.SetRemainOnCurrentAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>remainOnCurrentAction:Boolean</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Установка remainOnCurrentAction . </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd><a class="el" href="class_queue.html#a90589e96ed4ce624233189cde7691832" title="true - после завершения текущего действия очередь сохранит это действия как снова &quot;текущее&quot;...">remainOnCurrentAction</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac64fb94c93f11f9f86f87b869a492f8b"></a><!-- doxytag: member="Queue::WasActionEnded" ref="ac64fb94c93f11f9f86f87b869a492f8b" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.WasActionEnded </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Закончилось ли текущее действие. </p>
+
+</div>
+</div>
+<a class="anchor" id="afae532197d2dda7fe0fbb6d742a53e9c"></a><!-- doxytag: member="Queue::WasActionMarkedAsEnded" ref="afae532197d2dda7fe0fbb6d742a53e9c" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Queue.WasActionMarkedAsEnded </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Возвращает wasActionMarkedAsEnded . </p>
+<p>Используется в <a class="el" href="class_action_as_task.html#aee936b8cdbe7cc2a940e9de5b552ba45" title="Вызов функции Task до тех пор, пока в ней не будет потреблено всё время либо пока действие не закончи...">ActionAsTask.Execute()</a> для определения когда прекратить вечный вызов выполнения задания (помимо определения величины потреблённого времени). </p>
+
+</div>
+</div>
+<hr/><h2>Данные класса</h2>
+<a class="anchor" id="acc9b350589c83267259c5365afd70e62"></a><!-- doxytag: member="Queue::_actions" ref="acc9b350589c83267259c5365afd70e62" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#acc9b350589c83267259c5365afd70e62">Queue._actions</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Действия. </p>
+
+</div>
+</div>
+<a class="anchor" id="af8efceaa7767e7789011ab642ee86906"></a><!-- doxytag: member="Queue::associativeArray" ref="af8efceaa7767e7789011ab642ee86906" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#af8efceaa7767e7789011ab642ee86906">Queue.associativeArray</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Данные, которые устанавливаются и читаются в действиях текущей очереди. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4782eb72aee8edca05abb0da47f9d73e"></a><!-- doxytag: member="Queue::currentAction" ref="a4782eb72aee8edca05abb0da47f9d73e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#a4782eb72aee8edca05abb0da47f9d73e">Queue.currentAction</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Индекс текущего действия. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7a117f4b3728fba6d0f7f0e3df9f23d2"></a><!-- doxytag: member="Queue::currentlyActiveAction" ref="a7a117f4b3728fba6d0f7f0e3df9f23d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#a7a117f4b3728fba6d0f7f0e3df9f23d2">Queue.currentlyActiveAction</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Действие, которое выполняется в данный момент. </p>
+<p>По завершении выполнения действия или между циклами указатель становится неактуальным, поэтому используется только в функциях интерфейса выполняемого действия с очередью, в которой это действие находится. Устанавливается в <a class="el" href="class_dispatcher.html#acf8f1f43617c22280960f9d1c80733d4" title="Выполнение текущих действий в очередях.">Dispatcher.Live()</a> . </p>
+
+</div>
+</div>
+<a class="anchor" id="a924e9d803085e2f5692ea431ab3d41d2"></a><!-- doxytag: member="Queue::doneCycles" ref="a924e9d803085e2f5692ea431ab3d41d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#a924e9d803085e2f5692ea431ab3d41d2">Queue.doneCycles</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Сколько циклов выполняется текущее действие. </p>
+<p>Увеличивается диспетчером в Live() . </p>
+
+</div>
+</div>
+<a class="anchor" id="ae0d77ea0fe9277419875a8042dfed312"></a><!-- doxytag: member="Queue::output" ref="ae0d77ea0fe9277419875a8042dfed312" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#ae0d77ea0fe9277419875a8042dfed312">Queue.output</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Средство вывода отладочных сообщений. Передаётся в конструкторе. </p>
+
+</div>
+</div>
+<a class="anchor" id="a90589e96ed4ce624233189cde7691832"></a><!-- doxytag: member="Queue::remainOnCurrentAction" ref="a90589e96ed4ce624233189cde7691832" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#a90589e96ed4ce624233189cde7691832">Queue.remainOnCurrentAction</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>true - после завершения текущего действия очередь сохранит это действия как снова "текущее". Сбрасывается после одного использования. </p>
+<p>То есть после своего завершения действия снова начнёт выполняться с нуля. Сбрасывается после одного использования. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa19dc70f590f49667e4d3f62f191d1de"></a><!-- doxytag: member="Queue::wasActionEnded" ref="aa19dc70f590f49667e4d3f62f191d1de" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#aa19dc70f590f49667e4d3f62f191d1de">Queue.wasActionEnded</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Закончилось ли текущее действие в очереди. </p>
+<p>Устанавливается в true в <a class="el" href="class_queue.html#a37083e410d5709b250b9bb672657a8c6" title="Текущее действие закончилось.">ActionEnded()</a> . </p>
+
+</div>
+</div>
+<a class="anchor" id="a47d54c4e148461489f68d6154e2fcfaf"></a><!-- doxytag: member="Queue::wasActionMarkedAsEnded" ref="a47d54c4e148461489f68d6154e2fcfaf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_queue.html#a47d54c4e148461489f68d6154e2fcfaf">Queue.wasActionMarkedAsEnded</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Пометило ли текущее действие себя как "оконченное". </p>
+<p>Для того чтобы действие действительно закончилось нужно чтобы внутри него переменная muteEnding была равна false.<br/>
+ Будет установлено в true и в том случае, если действие закончилось. </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd>Actions.Queue.ActionEnded() </dd></dl>
+
+</div>
+</div>
+<hr/>Объявления и описания членов класса находятся в файле:<ul>
+<li>actions/<a class="el" href="_queue_8as.html">Queue.as</a></li>
+</ul>
+</div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Feb 9 2012 20:58:13. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

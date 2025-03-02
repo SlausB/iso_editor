@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Использование &quot;Actions&quot;.</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li class="current"><a href="pages.html"><span>Описания</span></a></li>
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="header">
+  <div class="headertitle">
+<h1>Использование "Actions". </h1>  </div>
+</div>
+<div class="contents">
+<div class="textblock"><p>Действия, которые могут формировать очередь и выполняться параллельно в разных очередях.</p>
+<h2><a class="anchor" id="Examples"></a>
+Примеры</h2>
+<p>Действия могут быть ожиданием, плавным появлением, перемещением и т.д.<br/>
+</p>
+<h3><a class="anchor" id="One_action"></a>
+Одно действие</h3>
+<p>Пример плавного появления картинки:<br/>
+ </p>
+<div class="fragment"><pre class="fragment"><span class="keyword">public</span> <span class="keyword">class </span>Main
+{
+        <span class="keyword">private</span> var lastTimer:<span class="keywordtype">int</span> = 0;
+        
+        <span class="keyword">public</span> var image:Sprite = <span class="keyword">new</span> Sprite;
+        
+        <span class="keyword">private</span> var output:Output = <span class="keyword">new</span> Output(function(what:String, type:<span class="keywordtype">int</span>): <span class="keywordtype">void</span>
+        {
+                trace(what);
+        });
+        
+        <span class="keyword">public</span> var dispatcher:<a class="code" href="class_dispatcher.html" title="Хранит очереди. Вызывает выполнение их действий.">Dispatcher</a> = <span class="keyword">new</span> <a class="code" href="class_dispatcher.html" title="Хранит очереди. Вызывает выполнение их действий.">Dispatcher</a>(output);
+        
+        <span class="keyword">public</span> function Main()
+        {
+                addEventListener(Event.ENTER_FRAME, onEnterFrame);
+                
+                image.graphics.clear();
+                image.graphics.beginFill(0xff0000);
+                image.graphics.drawRect(0, 0, 30, 30);
+                image.graphics.endFill();
+                addChild(image);
+                
+                lastTimer = getTimer();
+                
+                var alphaChange:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+                alphaChange.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a15236b49ec33cc0679bf23f13f90b6b0" title="Плавное изменение прозрачности от одного значения до другого за указанное время.">Alpha_Change</a>, image, 100, 0, 1, 1);
+                dispatcher.CreateAction( -1, alphaChange);
+        }
+        
+        <span class="keyword">private</span> function onEnterFrame(e:Event): void
+        {
+                <span class="keyword">const</span> currentTimer:<span class="keywordtype">int</span> = getTimer();
+                <span class="keyword">const</span> elapsedSeconds:Number = (Number)(currentTimer - lastTimer) / 1000.0;
+                lastTimer = currentTimer;
+                
+                dispatcher.Live(elapsedSeconds);
+        }
+}
+</pre></div><p> В остальных примерах отброшен код конкретного использования и показаны только задевающие тему вопроса строки.</p>
+<h3><a class="anchor" id="Actions_in_queue"></a>
+Действия внутри очереди</h3>
+<p>Каждое созданное действие существует в очереди. После завершения выполнения текущего действия в очереди, начинает выполняться следующее действие.<br/>
+ Пример исчезновения картинки после появления:<br/>
+ </p>
+<div class="fragment"><pre class="fragment"><span class="comment">//картинка плавно появится, прождёт секунду и плавно исчезнет:</span>
+var alphaChange:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+alphaChange.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a15236b49ec33cc0679bf23f13f90b6b0" title="Плавное изменение прозрачности от одного значения до другого за указанное время.">Alpha_Change</a>, image, 0.800, 1, 0, 1);
+dispatcher.CreateAction(0, alphaChange);
+alphaChange.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a15236b49ec33cc0679bf23f13f90b6b0" title="Плавное изменение прозрачности от одного значения до другого за указанное время.">Alpha_Change</a>, image, 0.800, 0, 1, 1);
+dispatcher.CreateAction(0, alphaChange);
+</pre></div><p> Чтобы запретить действию заканчиваться нужно указать <a class="el" href="class_action_desc.html#a915c10e528495d5c790dea63061b8327" title="Если установлено в true (по-умолчанию false), то все попытки действия сообщить очереди что оно законч...">ActionDesc.muteEnding</a> = true .</p>
+<h3><a class="anchor" id="Action_as_argument"></a>
+Действие как аргумент другого действия.</h3>
+<p>Каждое действие является функцией, способной получать параметры из других действий. Действия реализованы так, что расценивают свои параметры как константные параметры, поэтому завершаются тогда, когда считают нужным. Для избежания этого применяется функция Actions.ActionDesc.SetMuteEnding (true) .<br/>
+ Пример: </p>
+<div class="fragment"><pre class="fragment"><span class="comment">//изменение масштаба с нуля до 20:</span>
+dispatcher.Clear();
+var actionDesc_ValueChange:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+actionDesc_ValueChange.To(<a class="code" href="class_common.html">Common</a>.<a class="code" href="class_common.html#a8aed7c1d21bbbd7a554dbf584133cd1b" title="Изменение величины с указанными скоростью и ускорением.">Value_Change</a>, 0.0, 1.0, 0.0, 20.0);
+var actionDesc:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+actionDesc.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a753e87fee85bb16c746c8c850d97be42" title="Установка масштаба картинки.">Scale_Set</a>, image, actionDesc_ValueChange, actionDesc_ValueChange);
+<span class="comment">//действие Graphical.Scale_Set выполняется за один цикл, поэтому чтобы оно не заканчивалось, пока не закончится действие Common.Value_Change :</span>
+actionDesc.muteEnding = <span class="keyword">true</span>;
+dispatcher.CreateAction(0, actionDesc);
+</pre></div><h3><a class="anchor" id="Parallel_actions"></a>
+Параллельное выполнение действий.</h3>
+<p>Различные действия могут выполняться параллельно в разных очередях.<br/>
+ Параллельное изменение масштаба картинки в процессе появления и исчезновения:<br/>
+ </p>
+<div class="fragment"><pre class="fragment"><span class="comment">//плавное появление картинки из прозрачности и с увеличивающимся масштабом и такое же исчезновение спустя 1 секунду:</span>
+var alphaChange:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+alphaChange.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a15236b49ec33cc0679bf23f13f90b6b0" title="Плавное изменение прозрачности от одного значения до другого за указанное время.">Alpha_Change</a>, image, 0.800, 1, 0, 1);
+dispatcher.CreateAction(0, alphaChange);
+alphaChange.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a15236b49ec33cc0679bf23f13f90b6b0" title="Плавное изменение прозрачности от одного значения до другого за указанное время.">Alpha_Change</a>, image, 0.800, 0, 1, 1);
+dispatcher.CreateAction(0, alphaChange);
+
+var actionDesc_ValueChange:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+actionDesc_ValueChange.To(<a class="code" href="class_common.html">Common</a>.<a class="code" href="class_common.html#a8aed7c1d21bbbd7a554dbf584133cd1b" title="Изменение величины с указанными скоростью и ускорением.">Value_Change</a>, 0.0, 1.25, 0.0, 1.0);
+var actionDesc:<a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> = <span class="keyword">new</span> <a class="code" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a>(output);
+actionDesc.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a753e87fee85bb16c746c8c850d97be42" title="Установка масштаба картинки.">Scale_Set</a>, image, actionDesc_ValueChange, actionDesc_ValueChange);
+actionDesc.muteEnding = <span class="keyword">true</span>;
+dispatcher.CreateAction(1, actionDesc);
+actionDesc.To(<a class="code" href="class_common.html">Common</a>.<a class="code" href="class_common.html#aea619b7e726671096baece415f39916c" title="Ожидание времени.">Wait</a>, 1);
+dispatcher.CreateAction(1, actionDesc);
+actionDesc_ValueChange.To(<a class="code" href="class_common.html">Common</a>.<a class="code" href="class_common.html#a8aed7c1d21bbbd7a554dbf584133cd1b" title="Изменение величины с указанными скоростью и ускорением.">Value_Change</a>, 1.0, -1.25, 0.0, 0.0);
+actionDesc.To(<a class="code" href="class_graphical.html">Graphical</a>.<a class="code" href="class_graphical.html#a753e87fee85bb16c746c8c850d97be42" title="Установка масштаба картинки.">Scale_Set</a>, image, actionDesc_ValueChange, actionDesc_ValueChange);
+actionDesc.muteEnding = <span class="keyword">true</span>;
+dispatcher.CreateAction(1, actionDesc);
+</pre></div><p>Полный список действий см. на странице <a class="el" href="_available_actions.html">Доступные типы действий.</a> .<br/>
+</p>
+<p>При добавлении в очередь действия оно выполняется по-шагово в Actions.Dispatcher.Live() . По окончании выполнения действия оно продолжает оставаться в очереди, но уже не выполняется. Добавление в очередь нового действия не прерывает выполнения других действий в этой очереди. Если в очереди выполнение всех действий закончилось, то выполнение возобновляется с только что добавленного действия.</p>
+<h2><a class="anchor" id="Actions"></a>
+Действия.</h2>
+<p>Каждое действие представляет из себя функцию, которая вызывается с фиксированными параметрами ( Actions.ACTION_ARGUMENTS - диспетчер, очередь, само действие, вектор параметров действия).<br/>
+ Параметрами действия могут быть простые вещественные числа, другие действия и любые данные ( Actions.AbstractData ). В случае если параметром действия является другое действие, то в качестве параметра используется устанавливаемое действием значение (посредством Actions.Action.SetData() ). Например действие <a class="el" href="class_graphical.html#Coord_X_Set">Coord_X_Set</a> можно сформировать с простым числом (например 5 - тогда координата X будет просто установлена в 5), а можно сформировать с действием <a class="el" href="class_common.html#Value_Change">Value_Change</a> , в котором координата будет изменяться с указанной скоростью и ускорением. В свою очередь, в параметр параметра <a class="el" href="class_common.html#Value_Change">Value_Change</a> можно также передать действие, тогда, например, можно сделать изменяющимся ускорение. Уровень вложенности не ограничен.</p>
+<h2><a class="anchor" id="Writing_your_own_actions"></a>
+Добавление новых действий.</h2>
+<p>Выполнение действия будет вызываться в Actions.Dispatcher.Live() до тех пор, пока оно либо не потребит всё время, либо не укажет что оно закончилось. При этом сохранённым будет то значение (оно будет использоваться в действии, которое хранит текущее действие как параметр), которое было указано в последнем цикле выполнения действия.<br/>
+</p>
+<h2><a class="anchor" id="Etcetera"></a>
+Прочее.</h2>
+<ul>
+<li>Процесс добавления 1500 действий ValueChange по-одному действию в одну очередь занимает 5.154003 секунд (на Intel(R) Pentium(R) @ 1.60GHz). Один вызов Live(0.020f) у получившегося объекта занимает 0.003162 секунды. Те же данные при добавлении только одного действия: 0.000019 и 0.000004 секунды. </li>
+</ul>
+</div></div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Feb 9 2012 20:58:13. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Доступные типы действий.</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li class="current"><a href="pages.html"><span>Описания</span></a></li>
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="header">
+  <div class="headertitle">
+<h1>Доступные типы действий. </h1>  </div>
+</div>
+<div class="contents">
+<div class="textblock"><p>Перечислены доступные типы действий с кратким описанием оных.<br/>
+ Параметры действий, выделенные <span style="color:#ff0000"><b>красным</b></span> цветом, обязательны. Остальные параметры можно не узазывать. <br/>
+</p>
+<h2><a class="anchor" id="Core_actions"></a>
+Действия для работы с самой архитектурой Actions.</h2>
+<p><a class="el" href="class_common.html#Wait">Wait</a> - Ожидание времени.<br/>
+ WaitTillActionsEnded - Ожидание выполнения действий в очереди объекта.<br/>
+ WaitTillSoundStop - Ожидание завершения проигрывания звука.<br/>
+ <a class="el" href="class_common.html#GoToAction">GoToAction</a> - Переход на указанное действие в указанной очереди.<br/>
+ TernaryOperator - Установка результата выполнения действия в зависимости от параметра.<br/>
+ Data_Set - Установка данных в диспетчере или в очереди.<br/>
+ Data_Get - Получение данных из диспетчера или из очереди.<br/>
+ Clear - Очистка очередей.<br/>
+ IgnoreQueue_Set - Установка игнорирования очереди.<br/>
+ IgnoreQueue_Reset - Сброс игнорирования очереди.<br/>
+ Null - Действие-пустышка. Ничего не выполняет и сразу завершается.<br/>
+ <a class="el" href="class_common.html#Call">Call</a> - Вызывает один раз передаваемую в единственном параметре функцию и завершается. <br/>
+ <br/>
+</p>
+<h2><a class="anchor" id="Graphical_and_moving_actions"></a>
+Действия, свазянные с графическим изменением картинки (alpha, scale, show, hide...) и передвижением.</h2>
+<p><b>Графические действия</b><br/>
+<br/>
+ <a class="el" href="class_graphical.html#Show">Show</a> - Показ картинки.<br/>
+ Show_Endless - Бесконечный показ картинки.<br/>
+ <a class="el" href="class_graphical.html#Hide">Hide</a> - Скрытие картинки.<br/>
+ Show_Permit - Разрешить прорисовывать объект функцией Show() .<br/>
+ Show_Refuse - Запретить прорисовывать объект функцией Show() .<br/>
+ <br/>
+ <b>Прозрачность</b><br/>
+ <a class="el" href="class_graphical.html#Alpha_Set">Alpha_Set</a> - Установка уровня прозрачности.<br/>
+ <a class="el" href="class_graphical.html#Alpha_Get">Alpha_Get</a> - Получение текущего уровня прозрачности.<br/>
+ <a class="el" href="class_graphical.html#Alpha_Change">Alpha_Change</a> - Плавное изменение прозрачности от одного значения до другого за указанное время.<br/>
+ <br/>
+ <b>Масштаб</b><br/>
+ <a class="el" href="class_graphical.html#Scale_Set">Scale_Set</a> - Установка масштаба картинки.<br/>
+ <a class="el" href="class_graphical.html#Scale_X_Set">Scale_X_Set</a> - Установка масштаба картинки.<br/>
+ <a class="el" href="class_graphical.html#Scale_Y_Set">Scale_Y_Set</a> - Установка масштаба картинки.<br/>
+ <a class="el" href="class_graphical.html#Scale_X_Get">Scale_X_Get</a> - Получение масштаба картинки.<br/>
+ <a class="el" href="class_graphical.html#Scale_Y_Get">Scale_Y_Get</a> - Получение масштаба картинки.<br/>
+ <br/>
+ <b>Положение</b><br/>
+ <a class="el" href="class_graphical.html#Coord_X_Set">Coord_X_Set</a> - Установка координаты X.<br/>
+ <a class="el" href="class_graphical.html#Coord_Y_Set">Coord_Y_Set</a> - Установка координаты Y.<br/>
+ <a class="el" href="class_graphical.html#Coord_X_Get">Coord_X_Get</a> - Получение координаты X.<br/>
+ <a class="el" href="class_graphical.html#Coord_Y_Get">Coord_Y_Get</a> - Получение координаты Y.<br/>
+ <br/>
+ <b>Угол вращения по оси Z</b><br/>
+ <a class="el" href="class_graphical.html#Angle_Set">Angle_Set</a> - Установка угла вращения по оси Z.<br/>
+ <a class="el" href="class_graphical.html#Angle_Get">Angle_Get</a> - Получение угла вращения по оси Z.<br/>
+ <br/>
+ <br/>
+</p>
+<h2><a class="anchor" id="Math"></a>
+Математика</h2>
+<p><b>Арифметика</b><br/>
+ Sine - Получение синуса угла.<br/>
+ Cosine - Получение синуса угла.<br/>
+ Sum - Сложение двух величин.<br/>
+ Difference - Разность двух величин.<br/>
+ Product - Произведение двух величин.<br/>
+ Quotient - Частное двух величин.<br/>
+ Power - Возведение в степень.<br/>
+ Negation - Отрицание числа.<br/>
+ Magnitude - Модуль числа.<br/>
+ <br/>
+ <b>Прочее</b><br/>
+ <a class="el" href="class_common.html#Value_Change">Value_Change</a> - Изменение величины с указанными скоростью и ускорением.<br/>
+ Direction - Направление изменения величины.<br/>
+ RandomValue - Получение случайного значения.<br/>
+ <br/>
+ <b>Кривая Безье</b><br/>
+ <a class="el" href="class_common.html#Bezier_Move">Bezier_Move</a> - Перемещение по кривой Безье.<br/>
+ <a class="el" href="class_common.html#Bezier_X">Bezier_X</a> - Получение координаты X на кривой Безье.<br/>
+ <a class="el" href="class_common.html#Bezier_Y">Bezier_Y</a> - Получение координаты Y на кривой Безье.<br/>
+ <a class="el" href="class_common.html#Bezier_Direction">Bezier_Direction</a> - Получение направления кривой Безье в указанной её точке.<br/>
+ <br/>
+ <br/>
+</p>
+<h2><a class="anchor" id="Actions_To_Dias"></a>
+Действия, свазянные с реализацией графики DIAS и звуков.</h2>
+<p><b>Анимация</b><br/>
+ Animation_NextFrame - Переход к следующему кадру анимации.<br/>
+ Animation_Draw - Отрисовка текущего кадра анимации.<br/>
+ Animation_Start - Запуск анимации, начиная с текущего установленного кадра.<br/>
+ Animation_SetCurrentFrame - Установка конкретного кадра анимации.<br/>
+ <br/>
+ <b>Звук</b><br/>
+ Sound_Play - Проигрывание звука в указанном канале.<br/>
+ Sound_Continuous - Постоянное возобновление проигрывания звука.<br/>
+ Sound_Fade - Запуск стандартной функции плавного изменения громкости звука.<br/>
+ <br/>
+ <b>Текстовая метка</b><br/>
+ Number_Set - Установка числа.<br/>
+ Number_Get - Получение числа.<br/>
+ Number_Flow - Перетекание числа.<br/>
+ String_Set - Установка строки, отображаемой в TArtText.<br/>
+ <br/>
+ <b>Слой отображения объекта</b><br/>
+ Layer_Append - Добавление нового слоя.<br/>
+ Layer_Switch - Переключение слоя отображения объекта.<br/>
+ Layer_Clear - Удаление всех слоёв.<br/>
+ Layer_SwitchUp - Переключение на следующий слой в списке слоёв.<br/>
+ Layer_SwitchDown - Переключение на предыдущий слой в списке слоёв.<br/>
+ Layer_First - Переключение на первый слой в списке слоёв.<br/>
+ Layer_Last - Переключение на последний слой в списке слоёв.<br/>
+ <br/>
+ <b>Отражение картинки</b><br/>
+ Orientation_Set - Установка текущего отражения картинки.<br/>
+ Orientation_Get - Получение текущего отражения картинки.<br/>
+ Orientation_Flip_Horizontal - Инвертирование текущего отражения картинки по горизонтали.<br/>
+ Orientation_Flip_Vertical - Инвертирование текущего отражения картинки по вертикали.<br/>
+ <br/>
+ <b>Прочее</b><br/>
+ Line_ScissorsSet - Установки ножниц для линий.<br/>
+ <br/>
+ <br/>
+ </p>
+</div></div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Feb 9 2012 20:58:13. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

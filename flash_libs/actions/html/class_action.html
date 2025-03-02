@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Класс Action</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li><a href="pages.html"><span>Описания</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li><a href="classes.html"><span>Алфавитный&#160;указатель&#160;классов</span></a></li>
+      <li><a href="inherits.html"><span>Иерархия&#160;классов</span></a></li>
+      <li><a href="functions.html"><span>Члены&#160;классов</span></a></li>
+    </ul>
+  </div>
+</div>
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Открытые члены</a> &#124;
+<a href="#pub-attribs">Открытые атрибуты</a> &#124;
+<a href="#pro-attribs">Защищенные данные</a>  </div>
+  <div class="headertitle">
+<h1>Класс Action</h1>  </div>
+</div>
+<div class="contents">
+<!-- doxytag: class="Action" -->
+<p>Абстрактный класс действия внутри очереди.  
+<a href="#_details">Подробнее...</a></p>
+<div class="dynheader">
+Граф наследования:Action:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_action__inherit__graph.png" border="0" usemap="#_action_inherit__map" alt="Inheritance graph"/></div>
+<map name="_action_inherit__map" id="_action_inherit__map">
+<area shape="rect" id="node3" href="class_action_as_data.html" title="Простое значение как параметр (аргумент) для задания (действия)." alt="" coords="5,83,107,112"/><area shape="rect" id="node5" href="class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди." alt="" coords="131,83,232,112"/></map>
+<center><span class="legend">[<a href="graph_legend.html">см. легенду</a>]</span></center></div>
+
+<p><a href="class_action-members.html">Полный список членов класса</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Открытые члены</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#af8e9b5ba4b26cc13777f6ae725b1696e">Action</a> (output:Output)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Конструктор. Устанавливает muteEnding в false.  <a href="#af8e9b5ba4b26cc13777f6ae725b1696e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a7c29790564d02476c6ce23eef3d2f963">MakeCopy</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Создание своей копии.  <a href="#a7c29790564d02476c6ce23eef3d2f963"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a4dd78fc17a49a58362facff4c9c86725">GetData</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение значения как результат последнего выполнения <a class="el" href="class_action.html#ad6cffab9f080270363ad2f9bf2623dca" title="Вызывается очередью, в которой хранится это задание.">Execute()</a> .  <a href="#a4dd78fc17a49a58362facff4c9c86725"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#ab2bb297f7d23739c467456a492e3b6f5">SetData</a> (abstractData:AbstractData)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Установка данных, как результат выполнения задания.  <a href="#ab2bb297f7d23739c467456a492e3b6f5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#acdae9873c4fe5018c71e0571469a8f10">ResetToDefault</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Установка muteEnding в false.  <a href="#acdae9873c4fe5018c71e0571469a8f10"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a34a8fb5438694e32dbf450d9f1f4df42">SetMuteEnding</a> (muteEnding:Boolean)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Установить muteEnding .  <a href="#a34a8fb5438694e32dbf450d9f1f4df42"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a1830998b92a04867d49db95785ce8084">GetMuteEnding</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Получить muteEnding .  <a href="#a1830998b92a04867d49db95785ce8084"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#ad6cffab9f080270363ad2f9bf2623dca">Execute</a> (dispatcher:Dispatcher, consumeSeconds:Number)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Вызывается очередью, в которой хранится это задание.  <a href="#ad6cffab9f080270363ad2f9bf2623dca"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pub-attribs"></a>
+Открытые атрибуты</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a716b60872598628371bb4d26533a5db7">output</a>:Output</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a0904005250ee938d66625e66fb8b22e4">muteEnding</a>:Boolean</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Если установлено в true (по умолчанию false), то все попытки действия сообщить очереди что оно закончено (через <a class="el" href="class_queue.html#a37083e410d5709b250b9bb672657a8c6" title="Текущее действие закончилось.">Queue.ActionEnded()</a> ) будут игнорироваться.  <a href="#a0904005250ee938d66625e66fb8b22e4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#af67a77926bcbd8ccaa0bfd7054b220f1">solidarity</a>:Boolean</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Если установлено в true (по-умолчанию true), то действие не будет выполнять свой цикл если одно из его действий-параметров закончило своё выполнение (или было отмечено как действие, которое "хочет" завершиться).  <a href="#af67a77926bcbd8ccaa0bfd7054b220f1"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pro-attribs"></a>
+Защищенные данные</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_action.html#a029364edd4914b96ada8e6e2cd55b1ba">abstractData</a>:<a class="el" href="class_abstract_data.html">AbstractData</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Значение, сформированное в последнем вызове <a class="el" href="class_action.html#ad6cffab9f080270363ad2f9bf2623dca" title="Вызывается очередью, в которой хранится это задание.">Execute()</a> если это <a class="el" href="class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди.">ActionAsTask</a> или просто хранящиеся данные если это <a class="el" href="class_action_as_data.html" title="Простое значение как параметр (аргумент) для задания (действия).">ActionAsData</a> .  <a href="#a029364edd4914b96ada8e6e2cd55b1ba"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Подробное описание</h2>
+<div class="textblock"><p>Абстрактный класс действия внутри очереди. </p>
+</div><hr/><h2>Конструктор(ы)</h2>
+<a class="anchor" id="af8e9b5ba4b26cc13777f6ae725b1696e"></a><!-- doxytag: member="Action::Action" ref="af8e9b5ba4b26cc13777f6ae725b1696e" args="(output:Output)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.Action </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>output:Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Конструктор. Устанавливает muteEnding в false. </p>
+
+</div>
+</div>
+<hr/><h2>Методы</h2>
+<a class="anchor" id="ad6cffab9f080270363ad2f9bf2623dca"></a><!-- doxytag: member="Action::Execute" ref="ad6cffab9f080270363ad2f9bf2623dca" args="(dispatcher:Dispatcher, consumeSeconds:Number)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.Execute </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>dispatcher:Dispatcher</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>consumeSeconds:Number</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Вызывается очередью, в которой хранится это задание. </p>
+<p>Должно вызываться один раз в рамках одного цикла. Определяется в наследниках. </p>
+<dl><dt><b>Аргументы:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dispatcher</td><td>Диспетчер, в котором выполняется это действие. </td></tr>
+    <tr><td class="paramname">consumeSeconds</td><td>Время в секундах, которое <b>должно</b> быть потреблено действием. Функция действия будет вызываться до тех пор, пока это время не будет полностью потреблено или пока действие не завершится. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Возвращает:</b></dt><dd>Сколько секунд действие потребило. </dd></dl>
+
+<p>Переопределяется в <a class="el" href="class_action_as_data.html#a84caeb697d040d514b4e2541dcfb7a30">ActionAsData</a> и <a class="el" href="class_action_as_task.html#aee936b8cdbe7cc2a940e9de5b552ba45">ActionAsTask</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4dd78fc17a49a58362facff4c9c86725"></a><!-- doxytag: member="Action::GetData" ref="a4dd78fc17a49a58362facff4c9c86725" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.GetData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получение значения как результат последнего выполнения <a class="el" href="class_action.html#ad6cffab9f080270363ad2f9bf2623dca" title="Вызывается очередью, в которой хранится это задание.">Execute()</a> . </p>
+<p>Может вызываться много раз внутри одного цикла. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1830998b92a04867d49db95785ce8084"></a><!-- doxytag: member="Action::GetMuteEnding" ref="a1830998b92a04867d49db95785ce8084" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.GetMuteEnding </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Получить muteEnding . </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd><a class="el" href="class_action.html#a0904005250ee938d66625e66fb8b22e4" title="Если установлено в true (по умолчанию false), то все попытки действия сообщить очереди что оно законч...">muteEnding</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7c29790564d02476c6ce23eef3d2f963"></a><!-- doxytag: member="Action::MakeCopy" ref="a7c29790564d02476c6ce23eef3d2f963" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.MakeCopy </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Создание своей копии. </p>
+<p>Используется при создании действия из <a class="el" href="class_action_desc.html" title="Используется для описания действия перед добавлением в очередь.">ActionDesc</a> , а также при копировании очередей. Определяется в наследниках. </p>
+
+<p>Переопределяется в <a class="el" href="class_action_as_data.html#a304b0ccfa1bb8fdfee34b29b2b07de62">ActionAsData</a> и <a class="el" href="class_action_as_task.html#a4c39b49af33dd595a486da4c3f3a87e6">ActionAsTask</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acdae9873c4fe5018c71e0571469a8f10"></a><!-- doxytag: member="Action::ResetToDefault" ref="acdae9873c4fe5018c71e0571469a8f10" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.ResetToDefault </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Установка muteEnding в false. </p>
+
+<p>Переопределяется в <a class="el" href="class_action_as_task.html#a8a7076f3ae0bd728ff8a730bdb0d35b1">ActionAsTask</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab2bb297f7d23739c467456a492e3b6f5"></a><!-- doxytag: member="Action::SetData" ref="ab2bb297f7d23739c467456a492e3b6f5" args="(abstractData:AbstractData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.SetData </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>abstractData:AbstractData</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Установка данных, как результат выполнения задания. </p>
+<p>Обычно устанавливается в задании. </p>
+
+</div>
+</div>
+<a class="anchor" id="a34a8fb5438694e32dbf450d9f1f4df42"></a><!-- doxytag: member="Action::SetMuteEnding" ref="a34a8fb5438694e32dbf450d9f1f4df42" args="(muteEnding:Boolean)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">function Action.SetMuteEnding </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>muteEnding:Boolean</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Установить muteEnding . </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd><a class="el" href="class_action.html#a0904005250ee938d66625e66fb8b22e4" title="Если установлено в true (по умолчанию false), то все попытки действия сообщить очереди что оно законч...">muteEnding</a> </dd></dl>
+
+</div>
+</div>
+<hr/><h2>Данные класса</h2>
+<a class="anchor" id="a029364edd4914b96ada8e6e2cd55b1ba"></a><!-- doxytag: member="Action::abstractData" ref="a029364edd4914b96ada8e6e2cd55b1ba" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_action.html#a029364edd4914b96ada8e6e2cd55b1ba">Action.abstractData</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Значение, сформированное в последнем вызове <a class="el" href="class_action.html#ad6cffab9f080270363ad2f9bf2623dca" title="Вызывается очередью, в которой хранится это задание.">Execute()</a> если это <a class="el" href="class_action_as_task.html" title="Простой вызов функции (действие) с параметрами внутри очереди.">ActionAsTask</a> или просто хранящиеся данные если это <a class="el" href="class_action_as_data.html" title="Простое значение как параметр (аргумент) для задания (действия).">ActionAsData</a> . </p>
+
+</div>
+</div>
+<a class="anchor" id="a0904005250ee938d66625e66fb8b22e4"></a><!-- doxytag: member="Action::muteEnding" ref="a0904005250ee938d66625e66fb8b22e4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_action.html#a0904005250ee938d66625e66fb8b22e4">Action.muteEnding</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Если установлено в true (по умолчанию false), то все попытки действия сообщить очереди что оно закончено (через <a class="el" href="class_queue.html#a37083e410d5709b250b9bb672657a8c6" title="Текущее действие закончилось.">Queue.ActionEnded()</a> ) будут игнорироваться. </p>
+
+</div>
+</div>
+<a class="anchor" id="a716b60872598628371bb4d26533a5db7"></a><!-- doxytag: member="Action::output" ref="a716b60872598628371bb4d26533a5db7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_action.html#a716b60872598628371bb4d26533a5db7">Action.output</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Средство вывода отладочной информации. Передаётся в конструкторе. </p>
+
+</div>
+</div>
+<a class="anchor" id="af67a77926bcbd8ccaa0bfd7054b220f1"></a><!-- doxytag: member="Action::solidarity" ref="af67a77926bcbd8ccaa0bfd7054b220f1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">var <a class="el" href="class_action.html#af67a77926bcbd8ccaa0bfd7054b220f1">Action.solidarity</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Если установлено в true (по-умолчанию true), то действие не будет выполнять свой цикл если одно из его действий-параметров закончило своё выполнение (или было отмечено как действие, которое "хочет" завершиться). </p>
+<dl class="see"><dt><b>См. также:</b></dt><dd>Actions.Queue.WasActionMarkedAsEnded() </dd></dl>
+
+</div>
+</div>
+<hr/>Объявления и описания членов класса находятся в файле:<ul>
+<li>actions/<a class="el" href="_action_8as.html">Action.as</a></li>
+</ul>
+</div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Feb 9 2012 20:58:13. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>

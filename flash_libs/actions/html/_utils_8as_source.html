@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<title>&quot;Actions&quot;: Исходный файл actions/Utils.as</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload='searchBox.OnSelectItem(0);'>
+<!-- Создано системой Doxygen 1.7.3 -->
+<script type="text/javascript"><!--
+var searchBox = new SearchBox("searchBox", "search",false,'Поиск');
+--></script>
+<div id="top">
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">"Actions"</div>
+   <div id="projectbrief">Библиотека для упорядоченного совершения действий.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Титульная&#160;страница</span></a></li>
+      <li><a href="pages.html"><span>Описания</span></a></li>
+      <li><a href="annotated.html"><span>Классы</span></a></li>
+      <li class="current"><a href="files.html"><span>Файлы</span></a></li>
+      <li id="searchli">
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Поиск" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>Файлы</span></a></li>
+    </ul>
+  </div>
+<div class="header">
+  <div class="headertitle">
+<h1>actions/Utils.as</h1>  </div>
+</div>
+<div class="contents">
+<a href="_utils_8as.html">См. документацию.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 ﻿
+<a name="l00002"></a>00002 <span class="keyword">package </span>actions 
+<a name="l00003"></a>00003 {
+<a name="l00004"></a>00004         
+<a name="l00006"></a>00006         
+<a name="l00007"></a><a class="code" href="class_utils.html">00007</a>         public class Utils 
+<a name="l00008"></a>00008         {
+<a name="l00010"></a><a class="code" href="class_utils.html#a6863106db982fb2e9b0ed1cfdd122887">00010</a>                 public static function ToInt(value:Number): int
+<a name="l00011"></a>00011                 {
+<a name="l00012"></a>00012                         if(value &gt;= 0.0) return (int)(value + 0.5);
+<a name="l00013"></a>00013                         <span class="keywordflow">else</span> <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)(value - 0.5);
+<a name="l00014"></a>00014                 }
+<a name="l00015"></a>00015                 
+<a name="l00018"></a><a class="code" href="class_utils.html#acdb649b0ac8dded5bda1801ab579dcdf">00018</a>         <span class="keyword">public</span> <span class="keyword">static</span> function IsEqual(value1:Number, value2:Number, epsilon:Number = 0.0001): Boolean
+<a name="l00019"></a>00019                 {
+<a name="l00020"></a>00020                         <span class="keywordflow">if</span>(Math.abs(value1 - value2) &lt;= epsilon) <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00021"></a>00021                         <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00022"></a>00022                 }
+<a name="l00023"></a>00023                 
+<a name="l00025"></a><a class="code" href="class_utils.html#a3e9b85cf5fc6cb3fe3d0b514b512fadf">00025</a>         <span class="keyword">public</span> <span class="keyword">static</span> function DegreesToRadians(degrees:Number): Number
+<a name="l00026"></a>00026                 {
+<a name="l00027"></a>00027                         <span class="keywordflow">return</span> degrees / 57.29577951308232088;
+<a name="l00028"></a>00028                 }
+<a name="l00029"></a>00029                 
+<a name="l00031"></a><a class="code" href="class_utils.html#a171b6d331ef12750631b990f496bc518">00031</a>         <span class="keyword">public</span> <span class="keyword">static</span> function RadiansToDegrees(radians:Number): Number
+<a name="l00032"></a>00032                 {
+<a name="l00033"></a>00033                         <span class="keywordflow">return</span> radians * 57.29577951308232088;
+<a name="l00034"></a>00034                 }
+<a name="l00035"></a>00035         }
+<a name="l00036"></a>00036 
+<a name="l00037"></a>00037 }
+<a name="l00038"></a>00038 
+</pre></div></div>
+</div>
+<!--- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Указатель</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Классы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Файлы</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Функции</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Переменные</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<hr class="footer"/><address class="footer"><small>Документация по "Actions". Последние изменения: Thu Sep 29 2011 18:32:00. Создано системой&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
+</body>
+</html>
