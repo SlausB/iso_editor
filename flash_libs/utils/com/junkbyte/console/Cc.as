@@ -149,7 +149,8 @@ package com.junkbyte.console {
 		 */
 		public static function log(...args):void{
 			if(_console) _console.log.apply(null, args);
-            Cc.to_browser( args )
+			//throws code: 2067, message: 'The ExternalInterface is not available in this container. ExternalInterface requires Internet Explorer ActiveX, Firefox, Mozilla 1.7.5 and greater, or other browsers that support NPRuntime.'}
+            //Cc.to_browser( args )
 		}
 		/**
 		 * Add log line with priority 3
@@ -159,7 +160,8 @@ package com.junkbyte.console {
 		 */
 		public static function info(...args):void{
 			if(_console) _console.info.apply(null, args);
-            Cc.to_browser( args )
+			//throws code: 2067, message: 'The ExternalInterface is not available in this container. ExternalInterface requires Internet Explorer ActiveX, Firefox, Mozilla 1.7.5 and greater, or other browsers that support NPRuntime.'}
+            //Cc.to_browser( args )
 		}
 		/**
 		 * Add log line with priority 5
@@ -169,7 +171,8 @@ package com.junkbyte.console {
 		 */
 		public static function debug(...args):void{
 			if(_console) _console.debug.apply(null, args);
-            Cc.to_browser( args )
+			//throws code: 2067, message: 'The ExternalInterface is not available in this container. ExternalInterface requires Internet Explorer ActiveX, Firefox, Mozilla 1.7.5 and greater, or other browsers that support NPRuntime.'}
+            //Cc.to_browser( args )
 		}
 		/**
 		 * Add log line with priority 7
