@@ -1,3 +1,5 @@
+![Sample Screenshot](docs/catch_the_eye.png)
+
 # IsoEditor
 For now tested only on Windows (Adobe Flash too also works only on Windows anyway). To build and pack, run `build.bat` which should put executable and dependencies (AIR) in dir `bundle` which can be redistributed without the need to install anything (including Adobe AIR Runtime).
 
