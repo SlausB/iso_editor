@@ -1280,8 +1280,7 @@ import view.Projection;
 						{
 							_changeMade = true;
 							
-							var bytes : ByteArray = new ByteArray;
-							openingProjectFileStream.readBytes( bytes );
+                			var jsonString : String = openingProjectFileStream.readUTFBytes( openingProjectFileStream.bytesAvailable );
 							
 							//let's try clean-up currently existing instances a little:
 							_isometry.Unload();
@@ -1289,7 +1288,7 @@ import view.Projection;
 							///...
 							//well, now we got rid of it using _changeMade variable...
 							
-							_project.Accept( bytes, function( errorText : String ) : void
+							_project.Accept( openingProjectFile.parent.nativePath, jsonString, function( errorText : String ) : void
 							{
 								if ( errorText == null )
 								{
@@ -1313,13 +1312,14 @@ import view.Projection;
 						PopUp.Show( "Opening failed with error: " + securityErrorEvent.text, PopUp.POP_UP_ERROR );
 					} );
 					
-					openingProjectFile.browse();
+					var jsonFilter:FileFilter = new FileFilter("JSON Files (*.json)", "*.json");
+					openingProjectFile.browseForOpen("Open Project File", [jsonFilter]);
 					break;
 				
 				case "save_project":
 					if ( _projectPath == null )
 					{
-						PopUp.Show( "Program error: no path known.", PopUp.POP_UP_ERROR );
+						PopUp.Show( "Program error: open project first", PopUp.POP_UP_ERROR );
 					}
 					else
 					{
@@ -1331,11 +1331,16 @@ import view.Projection;
 					var savingAsFile:File = new File;
 					savingAsFile.addEventListener( Event.SELECT, function( ... args ): void
 					{
+						// Ensure the file has a .json extension
+						if ( savingAsFile.extension != "json" ) {
+							savingAsFile = new File( savingAsFile.nativePath + ".json" );
+						}
+
 						projectPath = savingAsFile.nativePath;
 						
 						SaveProject( _projectPath );
 					} );
-					savingAsFile.browse();
+					savingAsFile.browseForSave( "Save Project As" );
 					break;
 				
 				case "generate_sources":
@@ -2060,20 +2065,8 @@ import view.Projection;
 		
 		private function SaveProject( path : String ) : void
 		{
-			var savingStream:FileStream = new FileStream;
-			try
-			{
-				savingStream.open( new File( path ), FileMode.WRITE );
-			}
-			catch ( e:Error )
-			{
-				PopUp.Show( "Saving failed: file \"" + path + "\" was NOT opened: " + e.message, PopUp.POP_UP_ERROR );
-				return;
-			}
-			
-			savingStream.writeBytes( _project.DataToSave() );
-			savingStream.close();
-			PopUp.Show( "Project file successfully saved.", PopUp.POP_UP_INFO );
+			project_data.S11n.write( _project._data, path );
+			PopUp.Show( "Project file successfully saved to " + path, PopUp.POP_UP_INFO );
 		}
 		
 		public function AddTemplate( complexTemplate : ComplexTemplate = null ): void

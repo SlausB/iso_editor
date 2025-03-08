@@ -4,10 +4,13 @@ package
 	import com.junkbyte.console.Cc;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.geom.Point;
 	import flash.net.registerClassAlias;
 	import flash.net.URLRequest;
@@ -28,21 +31,7 @@ package
 	import mx.collections.IList;
 	import mx.managers.PopUpManager;
 	import mx.rpc.soap.types.MapType;
-	import project_data.AnimationProperties;
-	import project_data.ComplexTemplate;
-	import project_data.ComplexWithinCompound;
-	import project_data.CompoundTemplate;
-	import project_data.Layer;
-	import project_data.Map;
-	import project_data.ObjectInstance;
-	import project_data.ObjectTemplate;
-	import project_data.Preferences;
-	import project_data.ProjectData;
-	import project_data.Region;
-	import project_data.RegionWithinComplex;
-	import project_data.Resource;
-	import project_data.SingleResource;
-	import project_data.UnitProperties;
+	import project_data.*;
 	import ru.etcs.utils.getDefinitionNames;
 	import utils.Utils;
 	
@@ -52,6 +41,7 @@ package
 	public class Project
 	{
 		public var _data : ProjectData = new ProjectData;
+		public var _project_dir : String = "./";
 		
 		
 		public var _main : Main;
@@ -61,40 +51,30 @@ package
 		
 		public function Project( main : Main )
 		{
-			//to save and load project using AMF:
-			registerClassAlias( "project_data.ProjectData", ProjectData );
-			registerClassAlias( "project_data.ComplexTemplate", ComplexTemplate );
-			registerClassAlias( "project_data.ComplexWithinCompound", ComplexWithinCompound );
-			registerClassAlias( "project_data.CompoundTemplate", CompoundTemplate );
-			registerClassAlias( "project_data.Layer", Layer );
-			registerClassAlias( "project_data.Map", Map );
-			registerClassAlias( "project_data.ObjectInstance", ObjectInstance );
-			registerClassAlias( "project_data.ObjectTemplate", ObjectTemplate );
-			registerClassAlias( "project_data.Resource", Resource );
-			registerClassAlias( "project_data.SingleResource", SingleResource );
-			registerClassAlias( "project_data.Region", Region );
-			registerClassAlias( "project_data.RegionWithinComplex", RegionWithinComplex );
-			registerClassAlias( "project_data.UnitProperties", UnitProperties );
-			registerClassAlias( "project_data.Preferences", Preferences );
-			registerClassAlias( "project_data.AnimationProperties", AnimationProperties );
-			registerClassAlias( "flash.geom.Point", Point );
-			
 			_main = main;
 		}
 		
 		/** Initialize using specified data.
 		\param onResult function( errorText:String ): void where errorText is non-null value when anything gone wrong.
 		*/
-		public function Accept( data : ByteArray, onResult : Function ) : void
+		public function Accept(
+			project_dir : String,
+			jsonString : String,
+			onResult : Function
+		) : void
 		{
+			Cc.info( "Opening project dir: ", project_dir );
+			_project_dir = project_dir;
 			try
 			{
-				Accept_Unsafe( data );
+				Accept_Unsafe( jsonString );
 				Cc.info( "Loaded project:", _data );
 			}
 			catch ( e:Error )
 			{
+				Cc.error( "Error loading project: ", e );
 				onResult( e.message );
+				return;
 			}
 			
 			//graphical resources:
@@ -305,44 +285,10 @@ package
 			}
 		}
 		
-		private function Accept_Unsafe( data : ByteArray ) : void
+		private function Accept_Unsafe( jsonString : String ) : void
 		{
-			_data = data.readObject() as ProjectData;
-		}
-		
-		/** Generate data to save appropriate for future accepting.*/
-		public function DataToSave() : ByteArray
-		{
-			//avoid saving data which cannot (and not needed) be saved:
-			var temp : Array = [];
-			var i : int = 0;
-			var j : int = 0;
-			for ( ; i < _data._resources.length; ++i )
-			{
-				var sr : Resource = _data._resources[ i ];
-				
-				temp.push( { ad : sr._applicationDomain, n: sr._names, u: sr._units, F: sr._FPS } );
-				
-				_data._resources[ i ]._applicationDomain = null;
-				_data._resources[ i ]._names = null;
-				_data._resources[ i ]._units = null;
-			}
-			
-			var byteArray : ByteArray = new ByteArray;
-			byteArray.writeObject( _data );
-			
-			
-			for ( i = 0; i < _data._resources.length; ++i )
-			{
-				var lr : Resource = _data._resources[ i ];
-				
-				lr._applicationDomain = temp[ i ].ad;
-				lr._names = temp[ i ].n;
-				lr._units = temp[ i ].u;
-				lr._FPS = temp[ i ].F;
-			}
-			
-			return byteArray;
+			var jsonObject : Object = JSON.parse( jsonString );
+			_data = project_data.S11n.json_to_project( jsonObject );
 		}
 		
 		/** Load specified resources.
@@ -356,6 +302,13 @@ package
 			onFail : Function
 		) : void
 		{
+			// Absolute or relative path
+			var base_path : File = new File( _project_dir );
+			// Resolves the relative path
+			var full_path : File = base_path.resolvePath( path );
+			var result_path : String = full_path.nativePath;
+
+			Cc.info( "Loading resource:", _project_dir, "+", path, "->", result_path );
 			var loader : Loader = new Loader;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function( e:Event ): void
 			{
@@ -368,13 +321,15 @@ package
 			} );
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function( ioErrorEvent : IOErrorEvent ) : void
 			{
+				Cc.error( "Resource " + result_path + " failed to load. IO Error: " + ioErrorEvent.text );
 				onFail( ioErrorEvent.text );
 			} );
 			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( securityErrorEvent : SecurityErrorEvent ) : void
 			{
+				Cc.error( "Resource " + result_path + " failed to load. Security Error: " + securityErrorEvent.text );
 				onFail( securityErrorEvent.text );
 			} );
-			loader.load( new URLRequest( path ) );
+			loader.load( new URLRequest( result_path ) );
 		}
 		
 		public function AddResource( andDisplay : Boolean = true ) : void

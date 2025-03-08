@@ -5,7 +5,7 @@ setlocal EnableDelayedExpansion
 set "trap=if %%errorlevel%% neq 0 exit /b %%errorlevel%%"
 
 mkdir build 2>nul
-call .\flexair\bin\amxmlc -load-config="iso_editor.xml" -warnings=false -output="build/iso_editor.swf" ./src/Main.mxml
+call .\flexair\bin\amxmlc -load-config="iso_editor.xml" -warnings=false -debug=true -output="build/iso_editor.swf" ./src/Main.mxml
 
 set PATH=%CD%\flexair\bin;%PATH%
 

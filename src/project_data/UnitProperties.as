@@ -14,7 +14,7 @@ package project_data
 		/** Archaic field to avoid AMF loading errors/warning. Used to store chosen default region. Null if wasn't yet.*/
 		public var _region : Region = null;
 		
-		/** Surfaces designer managed to choose for this unit - where he is walking on.*/
+		/** Surfaces designer managed to choose for this unit - where it's walking upon.*/
 		public var _surfaces : Vector.< Region > = new Vector.< Region >;
 		
 		/** Which directions unit cannot go.*/
