@@ -28,10 +28,6 @@
 				<menuitem label="Properties..." id="project_properties" />
 			</menuitem>
 			
-			<menuitem label="Preferences" >
-				<menuitem label="Edit..." id="preferences_edit" />
-			</menuitem>
-			
 			<menuitem label="Help" >
 				<menuitem label="About" id="about" />
 			</menuitem>
@@ -74,8 +70,8 @@
 					<s:Label x="402" y="33" text="Through:" />
 					<s:CheckBox id="_through" x="456" y="28" toolTip="Choose deepest selectable object under mouse and make remaining overlapping transparent" change="onThroughChange(event)" />
 					
-					<s:Label x="484" y="33" text="Move:" />
-					<s:CheckBox id="_move" x="520" y="28" toolTip="Toggle to enter moving mode where objects will be moved by mouse instead of viewport" />
+					<s:Label x="480" y="33" text="Spawn:" />
+					<s:CheckBox id="_spawn" x="522" y="28" toolTip="Object will keep spawning after it's first placement" />
 					
 					<s:VGroup x="550" y="4" >
 						<s:RadioButton id="_tipGraphics" groupName="tip" label="Graphics" selected="true" toolTip="Show objects selection tooltip using their graphics" />
@@ -313,7 +309,6 @@ import flash.utils.getQualifiedClassName;
 import ie.AnimationsOptimization;
 import ie.ConfirmationWindow;
 import ie.EditingMapWindow;
-import ie.EditingPreferencesWindow;
 import ie.PopUp;
 import ie.SourcesGenerationResult;
 import list_items.CompoundTableItem;
@@ -1357,15 +1352,6 @@ import view.Projection;
 					break;
 				
 				
-				///PREFERENCES:
-				
-				case "preferences_edit":
-					var editingPreferencesWindow : EditingPreferencesWindow = PopUpManager.createPopUp( thisOne, EditingPreferencesWindow, false ) as EditingPreferencesWindow;
-					editingPreferencesWindow.Init( _project );
-					PopUpManager.centerPopUp( editingPreferencesWindow );
-					break;
-				
-				
 				///HELP:
 				
 				case "about":
@@ -2350,12 +2336,10 @@ import view.Projection;
 			}
 		}
 		
-		
-		public function get moving() : Boolean
+		public function get spawning() : Boolean
 		{
-			return _move.selected;
+			return _spawn.selected;
 		}
-		
 		
 		]]>
 	</fx:Script>

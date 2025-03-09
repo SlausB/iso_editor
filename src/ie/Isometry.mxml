@@ -9,6 +9,9 @@
 			   mouseUp="onMouseUp(event)"
 			   mouseMove="onMouseMove(event)"
 			   mouseOut="onMouseOut(event)"
+			   rightMouseDown="onRightMouseDown(event)" 
+			   rightMouseUp="onRightMouseUp(event)"
+			   rightClick="onRightClick(event)"
 			   >
 	
 	<fx:Declarations>
@@ -58,7 +61,6 @@ import project_data.Layer;
 import project_data.Map;
 import project_data.ObjectInstance;
 import project_data.ObjectTemplate;
-import project_data.Preferences;
 import project_data.Region;
 import project_data.SingleResource;
 import project_data.UnitProperties;
@@ -147,10 +149,8 @@ import view.Projection;
 			_project = project;
 			_main = main;
 		}
-		
-		private var _previousTime : int = 0;
-		private function onEnterFrame( ... args ) : void
-		{
+
+		private function update_viewport_size() {
 			if ( width != _previousWidth || height != _previousHeight )
 			{
 				_previousWidth = width;
@@ -166,8 +166,12 @@ import view.Projection;
 					_gridDrawer.SetViewport( width, height );
 				}
 			}
-			
-			
+		}
+		
+		private var _previousTime : int = 0;
+		private function onEnterFrame( ... args ) : void
+		{
+			update_viewport_size();
 			
 			if ( _blisc == null )
 			{
@@ -220,68 +224,47 @@ import view.Projection;
 				_fitting.x = _positioning.x = positioningPlanar.x;
 				_fitting.y = _positioning.y = positioningPlanar.y;
 			}
-			//scroll isometric view using sensitive mouse:
-			else if (
-				( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
-				|| DragManager.isDragging
-				|| _isDragging
-				!= null
-			)
+
+			//move object that is being dragged:
+			if ( _dragAnchor != null && _dragging != null )
 			{
-				var horisontalScrolling : Number = 0;
-				var verticalScrolling : Number = 0;
-				const scrollStep : Number = SCROLL_SPEED * elapsedSeconds;
-				
-				//scroll right:
-				if ( mouseX >= ( width - SCROLL_FRAME ) && mouseX <= width )
+				var newIsoPos : Point = Utils.ToIso(
+					local.x - ( _dragAnchor.x - _blisc.cameraOffsetX ),
+					local.y - ( _dragAnchor.y - _blisc.cameraOffsetY ),
+					new Point
+				);
+				var newTilePos : Point = new Point(
+					newIsoPos.x / _project.side,
+					newIsoPos.y / _project.side
+				);
+				if ( displaying._clampToTiles )
 				{
-					horisontalScrolling = scrollStep;
+					newTilePos.x = Math.round( newTilePos.x );
+					newTilePos.y = Math.round( newTilePos.y );
 				}
-				//scroll left:
-				else if ( mouseX >= 0 && mouseX <= SCROLL_FRAME )
+				_dragging._view.SetTileXY( newTilePos.x, newTilePos.y );
+				//weird runtime null-referencing error here, so get rid of it:
+				if ( _dragging._objectInstance == null || _dragging._objectInstance._tileCoords == null )
 				{
-					horisontalScrolling = -scrollStep;
+					Cc.error( "E: Isometry.onEnterFrame(): weird bug happened." );
 				}
-				
-				//scroll up:
-				if ( mouseY >= 0 && mouseY <= SCROLL_FRAME )
+				else
 				{
-					verticalScrolling = -scrollStep;
+					_dragging._objectInstance._tileCoords.x = newTilePos.x;
+					_dragging._objectInstance._tileCoords.y = newTilePos.y;
 				}
-				else if ( mouseY >= ( height - SCROLL_FRAME ) && mouseY <= height )
-				{
-					verticalScrolling = scrollStep;
-				}
-				
-				_blisc.MoveCamera( horisontalScrolling, verticalScrolling );
-				
-				
-				
-				if ( _main.moving && _isDragging != null )
-				{
-					var newIsoPos : Point = Utils.ToIso( local.x - ( _isDragging.x - _blisc.cameraOffsetX ), local.y - ( _isDragging.y - _blisc.cameraOffsetY ), new Point );
-					var newTilePos : Point = new Point( newIsoPos.x / _project.side, newIsoPos.y / _project.side );
-					if ( displaying._clampToTiles )
-					{
-						newTilePos.x = Math.round( newTilePos.x );
-						newTilePos.y = Math.round( newTilePos.y );
-					}
-					_dragging._view.SetTileXY( newTilePos.x, newTilePos.y );
-					//weird runtime null-referencing error here, so get rid of it:
-					if ( _dragging._objectInstance == null || _dragging._objectInstance._tileCoords == null )
-					{
-						Cc.error( "E: Isometry.onEnterFrame(): weird bug happened." );
-					}
-					else
-					{
-						_dragging._objectInstance._tileCoords.x = newTilePos.x;
-						_dragging._objectInstance._tileCoords.y = newTilePos.y;
-					}
-					_main.ShowObjectProperties();
-				}
+				_main.ShowObjectProperties();
+			}
+
+			//move camera:
+			if ( _isDragging != null ) {
+				_blisc.MoveCameraTo(
+					_isDragging.x - local.x,
+					_isDragging.y - local.y
+				);
 			}
 			
-			if ( DragManager.isDragging == false && _isDragging == null && _main._windows <= 0 )
+			if ( DragManager.isDragging == false && _dragAnchor == null && _main._windows <= 0 )
 			{
 				//mouse should be within isometry to display hovering tips to avoid overlapping while working with interfaces:
 				if ( _bliscViewport.mouseX >= 0 && _bliscViewport.mouseY >= 0 && _bliscViewport.mouseX < width && _bliscViewport.mouseY < height )
@@ -515,6 +498,7 @@ import view.Projection;
 			
 			_dragging = null;
 			_isDragging = null;
+			_dragAnchor = null;
 			
 			_regionsCache.length = 0;
 		}
@@ -645,9 +629,11 @@ import view.Projection;
 		/** Did any mouse movement happened after mouse was pushed down.*/
 		public var _wasDrag : Boolean = false;
 		
-		/** Sensora: Object which was captured to drag.*/
+		/** Object which was captured to drag.*/
 		public var _dragging : IsometryObject = null;
-		/** Sensora: Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
+		/** Point currently dragging object was captured at.*/
+		public var _dragAnchor : Point = null;
+		/** Mouse position (in local coordinates) relatively to dragging object when it was pushed down to start dragging or null if nothing is currently being dragged.*/
 		public var _isDragging : Point = null;
 		
 		/** Pulliny: local mouse position at clicking moment to ignore small mouse moves.*/
@@ -671,9 +657,9 @@ import view.Projection;
 				globalY,
 				null,
 				false,
-				( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_PULLINY )
-					? false
-					: ( _main._through.selected == false )
+				false,
+				false,
+				true
 			);
 			if ( over.length > 0 )
 			{
@@ -687,8 +673,6 @@ import view.Projection;
 		}
 		private function onMouseDown( e : MouseEvent ) : void
 		{
-			_wasDrag = false;
-			
 			if ( _blisc == null )
 			{
 				return;
@@ -709,12 +693,15 @@ import view.Projection;
 					_main.UpdateUsage( _lastPositioned );
 				}
 			}
-			else if ( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
+			else
 			{
 				var newDragging : IsometryObject = GetObj( e, local );
 				if ( newDragging != null )
 				{
-					_isDragging = new Point( local.x - newDragging._view.GetX() + _blisc.cameraOffsetX, local.y - newDragging._view.GetY() + _blisc.cameraOffsetY );
+					_dragAnchor = new Point(
+						local.x - newDragging._view.GetX() + _blisc.cameraOffsetX,
+						local.y - newDragging._view.GetY() + _blisc.cameraOffsetY
+					);
 					_dragging = newDragging;
 					
 					if ( _selected != null )
@@ -726,10 +713,6 @@ import view.Projection;
 					_main._isometry.HideTip();
 				}
 			}
-			else
-			{
-				_blisc.OnMouseDown( local.x, local.y );
-			}
 		}
 		private function onMouseUp( e : MouseEvent ) : void
 		{
@@ -738,58 +721,36 @@ import view.Projection;
 				return;
 			}
 			
-			_isDragging = null;
+			if ( _positioning != null )
+			{
+				if ( _fitting.canPut )
+				{
+					AddTemplate(
+						_positioningTemplate,
+						_fitting._tryingTileX,
+						_fitting._tryingTileY
+					);
+					
+					if ( _causedByMovement && _main.spawning == false )
+					{
+						CancelPositioning();
+					}
+				}
+			}
+			//send currently selected unit to specified position:
+			else if ( _selected is Unit )
+			{
+				var sendingUnitPos : Point = ResolveMouseIso();
+				( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y, _main._strictMove.selected );
+			}
+
+			//drop dragging object:
+			if ( _dragging ) {
+				_dragging = null;
+			}
 			
 			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
-			
-			if ( _main.moving && _project._data._preferences._movingWay == Preferences.MOVING_WAY_SENSORA )
-			{
-			}
-			else
-			{
-				var movedRightNow : Boolean = false;
-				
-				if ( _wasDrag == false )
-				{
-					if ( _positioning != null )
-					{
-						if ( _fitting.canPut )
-						{
-							AddTemplate( _positioningTemplate, _fitting._tryingTileX, _fitting._tryingTileY );
-							
-							if ( _causedByMovement && _project._data._preferences._spawning == false )
-							{
-								CancelPositioning();
-								movedRightNow = true;
-							}
-						}
-					}
-					//send currently selected unit to specified position:
-					else if ( _selected is Unit )
-					{
-						var sendingUnitPos : Point = ResolveMouseIso();
-						( _selected as Unit ).MoveTo( sendingUnitPos.x, sendingUnitPos.y, _main._strictMove.selected );
-					}
-				}
-				
-				_blisc.OnMouseUp( local.x, local.y );
-				
-				if (
-					_main.moving
-					&& _project._data._preferences._movingWay == Preferences.MOVING_WAY_PULLINY
-					&& _positioning == null
-					&& Utils.Distance( local.x - _clickMoment.x, local.y - _clickMoment.y ) < 5
-					&& movedRightNow == false
-				)
-				{
-					var removing : IsometryObject = GetObj( e, local );
-					if ( removing != null )
-					{
-						Position( removing._objectInstance._template, true );
-						_main.RemoveObjectFromMap( removing._objectInstance, displaying );
-					}
-				}
-			}
+			_blisc.OnMouseUp( local.x, local.y );
 		}
 		private function onMouseMove( e : MouseEvent ) : void
 		{
@@ -805,6 +766,30 @@ import view.Projection;
 		private function onMouseOut( ... args ) : void
 		{
 			HideTip();
+		}
+
+		private function onRightMouseDown( e : MouseEvent ) : void
+		{
+			_wasDrag = false;
+
+			//initiating drag process (which maintained in onEnterFrame):
+			var local : Point = globalToLocal( new Point( e.stageX, e.stageY ) );
+			_isDragging = new Point(
+				local.x + _blisc.cameraFocusX,
+				local.y + _blisc.cameraFocusY
+			);
+		}
+		private function onRightMouseUp( e : MouseEvent ) : void
+		{
+			_isDragging = null;
+
+			//TODO: open right-clicked object's properties ...
+			if ( _wasDrag == false ) {
+
+			}
+		}
+		private function onRightClick( e : MouseEvent ) : void
+		{
 		}
 		
 		private function UpdateHoverTip( local : Point ) : void

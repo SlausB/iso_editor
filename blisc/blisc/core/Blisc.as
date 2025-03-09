@@ -808,8 +808,17 @@ package blisc.core
 		\param alpha true if _tempAlpha array need to be filled with BliscDisplayObjects.
 		\param force true if _selectable layer's field must be ignored.
 		\param ignoreInvisibility True if invisible layers should be processed as well.
+		\param ignore_interactivity True if "selectable" flag of BDO (which is derived from ObjectTemplate) should be ignored. "selectable" is kinda bugged because BDO doesn't get updated when tempate updates and, also, it doesn't make sense having non-interactive objects on the map.
 		*/
-		public function ObjectsUnderPoint( x : Number, y : Number, toFill : Vector.< * > = null, alpha : Boolean = false, force : Boolean = false, ignoreInvisibility : Boolean = false ) : Vector.< * >
+		public function ObjectsUnderPoint(
+			x : Number,
+			y : Number,
+			toFill : Vector.< * > = null,
+			alpha : Boolean = false,
+			force : Boolean = false,
+			ignoreInvisibility : Boolean = false,
+			ignore_interactivity : Boolean = false
+		) : Vector.< * >
 		{
 			x /= zoom;
 			y /= zoom;
@@ -856,7 +865,13 @@ package blisc.core
 						continue;
 					}
 					
-					if ( bdo._complex != null && bdo._complex._template._interactive == false )
+					if (
+						ignore_interactivity == false
+						&&
+						bdo._complex != null
+						&&
+						bdo._complex._template._interactive == false
+					)
 					{
 						continue;
 					}

@@ -95,10 +95,6 @@ package project_data {
                 slippingValue : p._slippingValue,
                 sourcesDirectory : p._sourcesDirectory,
                 throughAlpha : p._throughAlpha,
-                preferences : {
-                    movingWay : p._preferences._movingWay,
-                    spawning : p._preferences._spawning
-                },
                 animationProperties : map( p._animationProperties.concat(), function( a : AnimationProperties ) : Object { return write_ap( a ); } ),
                 performPerPixelAnimationsCheck : p._performPerPixelAnimationsCheck
             };
@@ -326,9 +322,6 @@ package project_data {
                 }
                 p._unitProperties.push( unitProperties );
             }
-
-            p._preferences._movingWay = json.preferences.movingWay;
-            p._preferences._spawning = json.preferences.spawning;
 
             for each ( var a : Object in json.animationProperties ) {
                 var animationProperties : AnimationProperties = new AnimationProperties();
